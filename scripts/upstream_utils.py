@@ -42,11 +42,11 @@ def _load_config():
         'baseDir': '.upstreams',
         'repos': {
             'mindspore-docs': {
-                'url': 'https://gitee.com/mindspore/docs.git',
+                'url': 'https://atomgit.com/mindspore/docs.git',
                 'ref': 'master',
             },
             'mindquantum': {
-                'url': 'https://gitee.com/mindspore/mindquantum.git',
+                'url': 'https://atomgit.com/mindspore/mindquantum.git',
                 'ref': 'master',
             },
         },
@@ -157,4 +157,3 @@ if __name__ == '__main__':
     ensured = ensure_all(update=upd)
     for n, p in ensured.items():
         print(f'{n}: {p}')
-

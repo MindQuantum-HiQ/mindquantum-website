@@ -2,13 +2,12 @@
   "baseDir": ".upstreams",
   "repos": {
     "mindspore-docs": {
-      "url": "https://gitee.com/mindspore/docs.git",
+      "url": "https://atomgit.com/mindspore/docs.git",
       "ref": "master"
     },
     "mindquantum": {
-      "url": "https://gitee.com/mindspore/mindquantum.git",
+      "url": "https://atomgit.com/mindspore/mindquantum.git",
       "ref": "master"
     }
   }
 }
-
