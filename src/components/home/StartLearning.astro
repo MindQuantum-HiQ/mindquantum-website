@@ -9,47 +9,59 @@ interface Props {
 const { learning } = Astro.props as Props;
 const BASE = import.meta.env.BASE_URL || "/";
 
-const colorClasses: Record<string, string> = {
-  primary: "bg-primary text-primary-foreground",
-  green: "bg-brand-green text-primary-foreground",
-  orange: "bg-brand-orange text-primary-foreground",
-  teal: "bg-brand-teal text-primary-foreground",
-};
-
-const badgeClasses: Record<string, string> = {
-  primary: "bg-primary text-primary-foreground",
-  green: "bg-brand-green text-primary-foreground",
-  orange: "bg-brand-orange text-primary-foreground",
-  teal: "bg-brand-teal text-primary-foreground",
-};
+function resolveHref(href: string) {
+  if (/^https?:\/\//.test(href)) return href;
+  return withBase(href, BASE);
+}
 ---
 
-<section class="mq-container mb-16">
+<section class="mq-container mb-20 lg:mb-24">
   <h2 class="mq-section-title mb-10">{learning.heading}</h2>
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-    {learning.cards.map((card) => {
-      const href = /^https?:\/\//.test(card.href)
-        ? card.href
-        : withBase(card.href, BASE);
+  <ol class="border-t border-border">
+    {learning.cards.map((card, idx) => {
+      const num = String(idx + 1).padStart(2, "0");
+      const href = resolveHref(card.href);
       return (
-        <a
-          href={href}
-          class="group relative mq-card p-6 block hover:shadow-lg hover:-translate-y-0.5 transition-all"
-        >
-          {card.badge && (
-            <span class:list={["absolute top-4 right-4 rounded-full px-2.5 py-0.5 text-xs", badgeClasses[card.color]]}>
-              {card.badge}
+        <li class="border-b border-border">
+          <a
+            href={href}
+            class="group flex items-start gap-6 sm:gap-10 py-5 sm:py-6 transition-colors hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:outline-none px-0 sm:px-2 -mx-0 sm:-mx-2 rounded-sm"
+          >
+            <span class="font-mono text-sm tabular-nums text-muted-foreground pt-1 w-10 shrink-0">
+              {num}
             </span>
-          )}
-          <div class:list={["w-12 h-12 rounded-full flex items-center justify-center text-xl mb-4", colorClasses[card.color]]}>
-            {card.icon}
-          </div>
-          <h3 class="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-            {card.title}
-          </h3>
-          <p class="text-sm text-muted-foreground leading-relaxed">{card.description}</p>
-        </a>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-baseline flex-wrap gap-x-3 gap-y-1">
+                <h3 class="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
+                  {card.title}
+                </h3>
+                {card.badge && (
+                  <span class="text-xs font-normal text-muted-foreground">
+                    {card.badge}
+                  </span>
+                )}
+              </div>
+              <p class="mt-1.5 text-sm leading-relaxed text-muted-foreground mq-measure">
+                {card.description}
+              </p>
+            </div>
+            <svg
+              aria-hidden="true"
+              class="w-4 h-4 mt-2 shrink-0 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all"
+              viewBox="0 0 24 24"
+            >
+              <path
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M5 12h14m-6-6l6 6l-6 6"
+              />
+            </svg>
+          </a>
+        </li>
       );
     })}
-  </div>
+  </ol>
 </section>

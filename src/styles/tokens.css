@@ -19,67 +19,90 @@
 :root {
   /* ---------------------------------------------------------------------
    * MindQuantum brand palette (HSL triplets — consumed by Tailwind)
+   *
+   * Palette strategy (see .impeccable.md → Aesthetic Direction):
+   *   - Single primary: indigo-leaning "quantum blue" (less saturated than
+   *     the old pure 214° blue); approximates oklch(55% 0.17 252).
+   *   - Single warm secondary accent (--brand-orange), reserved for
+   *     run/execute/launch energy ONLY (install button, composer CTA, etc).
+   *   - Background is a warm off-white, not pure white.
+   *   - Neutrals are tinted toward the brand hue for cohesion.
+   *   - Legacy --brand-green / --brand-teal / --brand-purple / --brand-yellow
+   *     survive only as BenchmarkChart.tsx categorical colors. They must NOT
+   *     appear as UI accents on marketing pages.
    * ---------------------------------------------------------------------*/
-  --background: 0 0% 100%;
-  --foreground: 220 20% 15%;
 
-  --card: 0 0% 100%;
-  --card-foreground: 220 20% 15%;
+  /* Surfaces & text */
+  --background: 40 22% 98%;           /* warm off-white (~#fbfaf7)           */
+  --foreground: 224 25% 14%;          /* indigo-tinted near-black            */
+
+  --card: 0 0% 100%;                  /* cards lift above the warm bg        */
+  --card-foreground: 224 25% 14%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 220 20% 15%;
+  --popover-foreground: 224 25% 14%;
 
-  --primary: 214 100% 50%;
+  /* Primary — quantum blue */
+  --primary: 224 65% 52%;             /* ≈ oklch(55% 0.17 252)               */
+  --primary-hover: 224 62% 46%;       /* slightly deeper on hover            */
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 210 40% 96%;
-  --secondary-foreground: 220 20% 15%;
+  /* Tinted neutrals */
+  --secondary: 222 18% 96%;
+  --secondary-foreground: 224 25% 14%;
 
-  --muted: 210 20% 96%;
-  --muted-foreground: 215 16% 47%;
+  --muted: 222 20% 96%;
+  --muted-foreground: 222 12% 45%;
 
-  --accent: 210 40% 96%;
-  --accent-foreground: 220 20% 15%;
+  --accent: 222 18% 96%;
+  --accent-foreground: 224 25% 14%;
 
-  --destructive: 0 84% 60%;
+  --destructive: 0 68% 52%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 214 100% 50%;
+  --border: 222 16% 89%;
+  --input: 222 16% 89%;
+  --ring: 224 65% 52%;
 
   --radius: 0.75rem;
 
-  --brand-blue: 214 100% 50%;
-  --brand-blue-light: 210 100% 95%;
-  --brand-orange: 28 100% 55%;
-  --brand-green: 145 63% 42%;
-  --brand-teal: 180 60% 45%;
-  --brand-purple: 265 84% 58%;
-  --brand-yellow: 44 100% 52%;
+  /* Run/execute/launch accent — the ONLY warm color on marketing surfaces */
+  --brand-orange: 32 78% 55%;         /* ≈ oklch(72% 0.17 65)                */
+  --brand-orange-foreground: 0 0% 100%;
 
-  --hero-gradient: linear-gradient(135deg, hsl(210 100% 97%) 0%, hsl(210 60% 95%) 50%, hsl(210 40% 98%) 100%);
-  --cta-gradient: linear-gradient(90deg, hsl(214 100% 50%) 0%, hsl(200 100% 50%) 100%);
+  /* --- Legacy brand tokens (chart-only; do not use as UI accents) --- */
+  --brand-blue: 224 65% 52%;          /* alias of --primary                  */
+  --brand-blue-light: 222 60% 95%;
+  --brand-green: 152 52% 40%;
+  --brand-teal: 186 52% 40%;
+  --brand-purple: 258 50% 55%;
+  --brand-yellow: 42 82% 55%;
+
+  /* Same-hue tonal gradient — kills the old blue→cyan AI tell */
+  --hero-gradient: linear-gradient(135deg, hsl(40 22% 98%) 0%, hsl(222 30% 97%) 50%, hsl(40 22% 98%) 100%);
+  --cta-gradient: linear-gradient(135deg, hsl(224 65% 52%) 0%, hsl(222 58% 42%) 100%);
 
   /* ---------------------------------------------------------------------
    * Legacy --mq-* tokens (OKLCH) — consumed by Jupyter Book theme.
-   * Keep these in sync visually with the HSL tokens above.
+   * Kept in visual sync with the HSL tokens above. Updated values follow
+   * the brief's quantum-blue target directly (no HSL round-trip).
    * ---------------------------------------------------------------------*/
-  --mq-primary: oklch(59% 0.2 250);
+  --mq-primary: oklch(55% 0.17 252);
+  --mq-primary-hover: oklch(48% 0.17 252);
   --mq-primary-contrast: #ffffff;
-  --mq-bg: oklch(100% 0 0);
-  --mq-surface: oklch(98% 0.01 240);
-  --mq-surface-2: oklch(97% 0.01 240);
+  --mq-bg: oklch(98.5% 0.006 80);
+  --mq-surface: oklch(97% 0.008 252);
+  --mq-surface-2: oklch(95% 0.012 252);
   --mq-border: color-mix(in oklab, var(--mq-text-muted), transparent 65%);
-  --mq-text: oklch(27% 0.02 250);
-  --mq-text-muted: oklch(45% 0.02 250);
+  --mq-text: oklch(20% 0.03 252);
+  --mq-text-muted: oklch(48% 0.02 252);
 
   --mq-page-max: min(96vw, 1400px);
   --mq-radius: 12px;
   --mq-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 10px 24px rgba(0, 0, 0, .06);
 
-  --mq-font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-  --mq-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --mq-font-sans: "Hanken Grotesk", "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans SC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --mq-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
 .dark {

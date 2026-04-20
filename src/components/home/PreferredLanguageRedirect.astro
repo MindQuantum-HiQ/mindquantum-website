@@ -1,43 +1,197 @@
 ---
+/*
+ * LanguagePrompt — previously a silent auto-redirect based on a localStorage
+ * "mq_lang" preference. That violated Nielsen heuristic #3 (user control)
+ * because the user was teleported to a different language without consent.
+ *
+ * Current behavior: if the user has previously visited the site in the other
+ * language, surface a small bottom-right prompt asking if they want to switch.
+ * A dismiss updates `mq_lang` to the current page's language so the prompt
+ * stops appearing, and writes a sessionStorage flag so it does not reappear
+ * during the session even across pages.
+ */
 import type { Lang } from "../../config/i18n";
+
+interface Props {
+  defaultLang: Lang;
+  storageKey?: string;
+  baseUrl?: string;
+  lang?: Lang;
+}
 
 const {
   defaultLang,
   storageKey = "mq_lang",
   baseUrl,
-}: {
-  defaultLang: Lang;
-  storageKey?: string;
-  baseUrl?: string;
-} = Astro.props;
+  lang,
+}: Props = Astro.props;
+
+// The component may be rendered in either the default-lang page (/) or a
+// localized page (/zh/…). If the caller passes an explicit `lang`, trust it.
+// Otherwise fall back to the default.
+const currentLang: Lang = (lang as Lang) ?? defaultLang;
 
 const resolvedBase = baseUrl ?? import.meta.env.BASE_URL ?? "/";
-const normalizedBase = resolvedBase.endsWith("/") ? resolvedBase : `${resolvedBase}/`;
+const normalizedBase = resolvedBase.endsWith("/")
+  ? resolvedBase
+  : `${resolvedBase}/`;
 
-const redirectScript = `
-(function(){
-  try {
-    var storageKey = ${JSON.stringify(storageKey)};
-    var defaultLang = ${JSON.stringify(defaultLang)};
-    var base = ${JSON.stringify(normalizedBase)};
-    var pref = localStorage.getItem(storageKey) || defaultLang;
-    if (!pref) return;
-    var path = window.location.pathname;
-    var ref = document.referrer || '';
-    var sameOrigin = false;
-    try {
-      sameOrigin = ref && new URL(ref).origin === window.location.origin;
-    } catch(_) {
-      sameOrigin = false;
-    }
-    if (!sameOrigin && pref && pref !== defaultLang) {
-      var dest = base + pref + '/';
-      if (path === base) {
-        window.location.replace(dest);
-      }
-    }
-  } catch (e) { /* no-op */ }
-})();
-`;
+type PromptCopy = {
+  suggestion: string;
+  switchLabel: string;
+  keepLabel: string;
+  dismissLabel: string;
+  targetLang: Lang;
+  targetPath: string;
+};
+
+const COPY: Record<Lang, PromptCopy> = {
+  en: {
+    suggestion: "Looks like you prefer 中文.",
+    switchLabel: "Switch to 中文",
+    keepLabel: "Keep English",
+    dismissLabel: "Dismiss",
+    targetLang: "zh" as Lang,
+    targetPath: `${normalizedBase}zh/`,
+  },
+  zh: {
+    suggestion: "您似乎更习惯使用 English。",
+    switchLabel: "Switch to English",
+    keepLabel: "保持中文",
+    dismissLabel: "关闭",
+    targetLang: "en" as Lang,
+    targetPath: normalizedBase,
+  },
+};
+
+const copy = COPY[currentLang] ?? COPY[defaultLang];
 ---
-<script is:inline set:html={redirectScript}></script>
+
+<aside
+  class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-[60] max-w-sm rounded-xl border border-border bg-card shadow-md p-4 flex items-start gap-3"
+  data-lang-prompt
+  data-storage-key={storageKey}
+  data-dismiss-key="mq_lang_prompt_dismissed"
+  data-current-lang={currentLang}
+  data-target-lang={copy.targetLang}
+  data-target-path={copy.targetPath}
+  hidden
+  role="dialog"
+  aria-label={copy.suggestion}
+>
+  <div class="flex-1 min-w-0">
+    <p class="text-sm text-foreground">{copy.suggestion}</p>
+    <div class="mt-3 flex flex-wrap items-center gap-2">
+      <button
+        type="button"
+        class="mq-btn-primary px-4 py-1.5 text-sm"
+        data-lang-prompt-accept
+      >
+        {copy.switchLabel}
+      </button>
+      <button
+        type="button"
+        class="mq-btn-ghost px-3 py-1.5 text-sm"
+        data-lang-prompt-dismiss
+      >
+        {copy.keepLabel}
+      </button>
+    </div>
+  </div>
+  <button
+    type="button"
+    class="shrink-0 -mr-1 -mt-1 p-1.5 text-muted-foreground hover:text-foreground rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    aria-label={copy.dismissLabel}
+    data-lang-prompt-close
+  >
+    <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24">
+      <path
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M6 6l12 12M6 18L18 6"
+      />
+    </svg>
+  </button>
+</aside>
+
+<script>
+  (function () {
+    try {
+      const root = document.querySelector<HTMLElement>("[data-lang-prompt]");
+      if (!root) return;
+
+      const storageKey = root.dataset.storageKey || "mq_lang";
+      const dismissKey = root.dataset.dismissKey || "mq_lang_prompt_dismissed";
+      const currentLang = root.dataset.currentLang;
+      const targetLang = root.dataset.targetLang;
+      const targetPath = root.dataset.targetPath;
+      if (!currentLang || !targetLang || !targetPath) return;
+
+      // Never re-appear in the same session if already dismissed.
+      try {
+        if (sessionStorage.getItem(dismissKey)) return;
+      } catch (_) {
+        /* sessionStorage unavailable */
+      }
+
+      let pref: string | null = null;
+      try {
+        pref = localStorage.getItem(storageKey);
+      } catch (_) {
+        /* localStorage unavailable */
+      }
+
+      // Only surface when the user's stored preference differs from the page
+      // they are currently on. Fresh visits (no preference yet) see nothing.
+      if (!pref || pref !== targetLang) return;
+
+      const acceptBtn = root.querySelector<HTMLButtonElement>(
+        "[data-lang-prompt-accept]",
+      );
+      const keepBtn = root.querySelector<HTMLButtonElement>(
+        "[data-lang-prompt-dismiss]",
+      );
+      const closeBtn = root.querySelector<HTMLButtonElement>(
+        "[data-lang-prompt-close]",
+      );
+
+      acceptBtn?.addEventListener("click", () => {
+        try {
+          localStorage.setItem(storageKey, targetLang);
+        } catch (_) {
+          /* ignore */
+        }
+        window.location.href = targetPath;
+      });
+
+      function dismiss(updatePreference: boolean) {
+        try {
+          sessionStorage.setItem(dismissKey, "1");
+        } catch (_) {
+          /* ignore */
+        }
+        if (updatePreference) {
+          try {
+            localStorage.setItem(storageKey, currentLang!);
+          } catch (_) {
+            /* ignore */
+          }
+        }
+        root!.setAttribute("hidden", "");
+      }
+
+      keepBtn?.addEventListener("click", () => dismiss(true));
+      closeBtn?.addEventListener("click", () => dismiss(false));
+
+      // Reveal with the page-load stagger easing used across the site.
+      root.removeAttribute("hidden");
+      root.classList.add("mq-animate-in");
+      root.style.setProperty("--mq-delay", "320ms");
+    } catch (e) {
+      /* no-op */
+    }
+  })();
+</script>

@@ -21,10 +21,7 @@ const href = /^https?:\/\//.test(announcement.href)
       </svg>
       <span class="text-sm text-foreground">{announcement.text}</span>
     </div>
-    <a
-      href={href}
-      class="mq-btn border border-brand-orange text-brand-orange hover:bg-brand-orange/10"
-    >
+    <a href={href} class="mq-btn-outline">
       {announcement.cta}
       <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6l-6 6" /></svg>
     </a>

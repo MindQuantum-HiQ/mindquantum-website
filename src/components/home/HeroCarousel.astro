@@ -19,68 +19,129 @@ const backgrounds = {
   meeting: heroMeeting,
 };
 
-const actionClasses: Record<string, string> = {
-  primary: "mq-btn-primary",
-  orange: "mq-btn-orange",
-  outline:
-    "mq-btn border border-white/40 bg-white/20 backdrop-blur text-white hover:bg-white/30",
-};
+// Variant resolution is tone-aware: the outline button needs different chrome
+// on a light vs a dark hero background so it reads clearly against either.
+function resolveActionClass(
+  variant: "primary" | "outline",
+  tone: "light" | "dark",
+): string {
+  if (variant === "primary") return "mq-btn-primary";
+  return tone === "light"
+    ? "mq-btn-outline"
+    : "mq-btn border border-white/60 bg-transparent text-white hover:bg-white/10";
+}
 
 function resolveHref(href: string) {
   if (/^https?:\/\//.test(href)) return href;
   return withBase(href, BASE);
 }
+
+// Bell-state preparation — the framework's canonical "hello world". Runs as-is
+// against the code in the docs; the sample is deliberately copy-paste-able.
+const CODE_SAMPLE = `from mindquantum.core.circuit import Circuit
+from mindquantum.core.gates import H, X
+from mindquantum.simulator import Simulator
+
+# Prepare a Bell state |\u03a6\u207a\u27e9
+circ = Circuit([H.on(0), X.on(1, 0)])
+sim = Simulator('mqvector', 2)
+sim.apply_circuit(circ)
+
+print(sim.get_qs())
+# array([0.707+0.j, 0.+0.j, 0.+0.j, 0.707+0.j])`;
 ---
 
-<section class="relative overflow-hidden border-b border-border" aria-label="About MindSpore Quantum" data-hero-carousel>
+<section
+  class="relative overflow-hidden border-b border-border"
+  aria-label="About MindSpore Quantum"
+  data-hero-carousel
+>
   <div class="relative" data-hero-track>
     {slides.map((slide, index) => {
       const bg = backgrounds[slide.background];
       const titleColor = slide.tone === "light" ? "text-foreground" : "text-white";
       const subColor = slide.tone === "light" ? "text-muted-foreground" : "text-white/85";
       const eyebrowColor = slide.tone === "light" ? "text-primary" : "text-white";
+      const isFirst = index === 0;
       return (
         <article
-          class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-700 ease-out"
+          class:list={[
+            "hero-slide absolute inset-0 transition-opacity duration-700 ease-out-expo",
+            isFirst ? "opacity-100" : "opacity-0",
+          ]}
           data-hero-slide
           data-index={index}
-          aria-hidden={index === 0 ? "false" : "true"}
+          aria-hidden={isFirst ? "false" : "true"}
         >
           <Image
             src={bg}
             alt=""
             class="absolute inset-0 h-full w-full object-cover"
-            loading={index === 0 ? "eager" : "lazy"}
+            loading={isFirst ? "eager" : "lazy"}
             widths={[800, 1280, 1920]}
             sizes="100vw"
           />
           {slide.tone === "light" ? (
-            <div class="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-transparent" />
+            <div class="absolute inset-0 bg-gradient-to-r from-background/95 via-background/70 to-background/30" />
           ) : (
-            <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+            <div class="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20" />
           )}
 
-          <div class="relative mq-container py-20 md:py-28">
-            <div class="max-w-xl">
+          <div class="relative mq-container py-20 md:py-28 lg:py-32">
+            <div class="max-w-xl lg:max-w-[34rem] xl:max-w-[36rem]">
               {slide.eyebrow && (
-                <p class:list={["text-sm font-semibold uppercase tracking-wider mb-3", eyebrowColor]}>
+                <p
+                  class:list={[
+                    "mq-eyebrow mb-4",
+                    eyebrowColor,
+                    isFirst && "mq-animate-in",
+                  ]}
+                  style={isFirst ? "--mq-delay: 0ms" : undefined}
+                >
                   {slide.eyebrow}
                 </p>
               )}
-              <h1 class:list={["text-4xl md:text-5xl font-bold leading-tight mb-4", titleColor]}>
+              <h1
+                class:list={[
+                  "mq-display mb-5",
+                  titleColor,
+                  isFirst && "mq-animate-in",
+                ]}
+                style={isFirst ? "--mq-delay: 80ms" : undefined}
+              >
                 {slide.title}
               </h1>
-              <p class:list={["text-lg mb-8 max-w-lg", subColor]}>{slide.subtitle}</p>
-              <div class="flex flex-wrap gap-3">
+              <p
+                class:list={[
+                  "text-lg mb-8 mq-measure",
+                  subColor,
+                  isFirst && "mq-animate-in",
+                ]}
+                style={isFirst ? "--mq-delay: 160ms" : undefined}
+              >
+                {slide.subtitle}
+              </p>
+              <div
+                class:list={[
+                  "flex flex-wrap gap-3",
+                  isFirst && "mq-animate-in",
+                ]}
+                style={isFirst ? "--mq-delay: 240ms" : undefined}
+              >
                 {slide.actions.map((action) => (
                   <a
                     href={resolveHref(action.href)}
                     target={action.external ? "_blank" : undefined}
                     rel={action.external ? "noopener" : undefined}
-                    class:list={["px-6 gap-2", actionClasses[action.variant]]}
+                    class:list={[
+                      "px-6 gap-2",
+                      resolveActionClass(action.variant, slide.tone),
+                    ]}
                   >
                     {action.icon === "play" && (
-                      <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7L8 5Z" /></svg>
+                      <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M8 5v14l11-7L8 5Z" />
+                      </svg>
                     )}
                     <span>{action.label}</span>
                   </a>
@@ -91,14 +152,32 @@ function resolveHref(href: string) {
         </article>
       );
     })}
-    <div class="min-h-[420px] md:min-h-[520px]" aria-hidden="true"></div>
+    <div class="min-h-[460px] md:min-h-[520px] lg:min-h-[560px]" aria-hidden="true"></div>
   </div>
+
+  <!-- Persistent code sample — the "interactive proof" per the design brief.
+       Floats on the right side of the hero on large screens; hidden below lg. -->
+  <aside
+    class="mq-animate-in hidden lg:flex absolute right-6 xl:right-10 top-20 bottom-20 xl:top-24 xl:bottom-24 w-[40%] max-w-[460px] z-[5] flex-col rounded-xl border border-border bg-card shadow-sm overflow-hidden"
+    style="--mq-delay: 360ms"
+    aria-label="Sample MindQuantum code"
+  >
+    <header class="flex items-center justify-between px-4 py-2.5 border-b border-border">
+      <span class="text-[11px] font-mono text-muted-foreground tracking-tight">
+        bell_state.py
+      </span>
+      <span class="text-[10px] font-mono uppercase tracking-[0.14em] text-muted-foreground/70">
+        python
+      </span>
+    </header>
+    <pre class="flex-1 overflow-auto p-5 text-[12.5px] leading-[1.7] font-mono text-foreground/90 m-0"><code>{CODE_SAMPLE}</code></pre>
+  </aside>
 
   <button
     type="button"
     aria-label="Previous slide"
     data-hero-prev
-    class="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background/70 backdrop-blur border border-border flex items-center justify-center text-foreground hover:bg-background transition"
+    class="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background/85 border border-border flex items-center justify-center text-foreground hover:bg-background transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
   >
     <svg aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m15 18l-6-6l6-6" /></svg>
   </button>
@@ -106,12 +185,16 @@ function resolveHref(href: string) {
     type="button"
     aria-label="Next slide"
     data-hero-next
-    class="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background/70 backdrop-blur border border-border flex items-center justify-center text-foreground hover:bg-background transition"
+    class="absolute left-16 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background/85 border border-border flex items-center justify-center text-foreground hover:bg-background transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:left-[unset] lg:right-4"
   >
     <svg aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 18l6-6l-6-6" /></svg>
   </button>
 
-  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10" role="tablist" aria-label="Slide selector">
+  <div
+    class="absolute bottom-6 left-6 flex gap-2 z-10"
+    role="tablist"
+    aria-label="Slide selector"
+  >
     {slides.map((_slide, index) => (
       <button
         type="button"
@@ -120,7 +203,7 @@ function resolveHref(href: string) {
         role="tab"
         aria-selected={index === 0 ? "true" : "false"}
         aria-label={`Go to slide ${index + 1}`}
-        class="h-2 w-2 rounded-full bg-background/60 hover:bg-background/80 transition-all data-[active=true]:w-8 data-[active=true]:bg-primary"
+        class="h-2 w-6 rounded-sm bg-foreground/25 hover:bg-foreground/50 transition-all data-[active=true]:w-10 data-[active=true]:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         data-active={index === 0 ? "true" : "false"}
       />
     ))}
@@ -141,6 +224,11 @@ function resolveHref(href: string) {
     let timer: ReturnType<typeof setInterval> | null = null;
     const DELAY = 6500;
 
+    // Honor the user's motion preference. When reduced motion is requested,
+    // autoplay is disabled entirely; the user drives slide advancement via
+    // dots / arrows only.
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
     function show(i: number) {
       index = (i + slides.length) % slides.length;
       slides.forEach((el, j) => {
@@ -158,6 +246,7 @@ function resolveHref(href: string) {
 
     function start() {
       stop();
+      if (reduceMotion.matches) return;
       timer = setInterval(() => show(index + 1), DELAY);
     }
     function stop() {
@@ -166,6 +255,13 @@ function resolveHref(href: string) {
         timer = null;
       }
     }
+
+    // Re-evaluate autoplay if the user toggles their reduced-motion pref
+    // while the page is open (rare but correct).
+    reduceMotion.addEventListener("change", () => {
+      if (reduceMotion.matches) stop();
+      else start();
+    });
 
     prev?.addEventListener("click", () => {
       show(index - 1);

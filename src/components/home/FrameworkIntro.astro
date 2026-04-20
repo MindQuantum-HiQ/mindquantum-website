@@ -12,10 +12,14 @@ const BASE = import.meta.env.BASE_URL || "/";
 const releaseHref = /^https?:\/\//.test(framework.releaseHref)
   ? framework.releaseHref
   : withBase(framework.releaseHref, BASE);
+
+function resolveHref(href: string): string {
+  return /^https?:\/\//.test(href) ? href : withBase(href, BASE);
+}
 ---
 
-<section class="mq-container mb-16">
-  <div class="grid md:grid-cols-2 gap-8 items-start">
+<section class="mq-container mb-20">
+  <div class="grid md:grid-cols-2 gap-10 lg:gap-12 items-start">
     <div class="mq-card bg-background p-6">
       <table class="w-full text-xs md:text-sm border-collapse">
         <thead>
@@ -35,13 +39,20 @@ const releaseHref = /^https?:\/\//.test(framework.releaseHref)
                 {row.label}
               </th>
               {row.cells.map((cell) => (
-                <td class="py-2 px-1 align-top">
+                <td class="py-3 px-2 align-top text-center text-xs md:text-sm text-muted-foreground">
                   {cell ? (
-                    <span class="block border border-dashed border-primary/40 rounded-md px-2 py-1.5 text-muted-foreground text-center text-[11px] md:text-xs">
-                      {cell}
-                    </span>
+                    row.href ? (
+                      <a
+                        href={resolveHref(row.href)}
+                        class="block transition-colors hover:text-foreground hover:underline underline-offset-4 decoration-border hover:decoration-foreground/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+                      >
+                        {cell}
+                      </a>
+                    ) : (
+                      <span class="block">{cell}</span>
+                    )
                   ) : (
-                    <span class="block" aria-hidden="true">&nbsp;</span>
+                    <span class="block text-muted-foreground/40" aria-hidden="true">—</span>
                   )}
                 </td>
               ))}
@@ -56,16 +67,17 @@ const releaseHref = /^https?:\/\//.test(framework.releaseHref)
         {framework.release}
         <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6l-6 6" /></svg>
       </a>
-      <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
+      <p class="mq-measure mt-4 text-sm leading-relaxed text-muted-foreground">
         {framework.description}
       </p>
       <div class="mt-6 flex flex-wrap gap-3 items-center">
         <button
           type="button"
-          class="mq-btn-primary gap-2 font-mono text-sm"
+          class="mq-btn-run gap-2 font-mono text-sm"
           data-install-copy
           data-copy-text={framework.installCmd}
           data-copied-label={framework.installCopiedLabel}
+          data-manual-label={framework.installManualLabel}
           aria-label={`Copy ${framework.installCmd}`}
         >
           <span data-install-label>{framework.installCmd}</span>
@@ -86,17 +98,48 @@ const releaseHref = /^https?:\/\//.test(framework.releaseHref)
     document.querySelectorAll<HTMLButtonElement>("[data-install-copy]").forEach((button) => {
       const text = button.getAttribute("data-copy-text") || "";
       const copiedLabel = button.getAttribute("data-copied-label") || "Copied";
+      const manualLabel =
+        button.getAttribute("data-manual-label") ||
+        "Copy failed \u2014 press \u2318C / Ctrl+C";
       const labelEl = button.querySelector<HTMLElement>("[data-install-label]");
       const originalLabel = labelEl?.textContent || text;
+
+      function flashLabel(label: string, holdMs: number) {
+        if (labelEl) labelEl.textContent = label;
+        button.classList.remove("mq-flash");
+        void button.offsetWidth;
+        button.classList.add("mq-flash");
+        setTimeout(() => {
+          if (labelEl) labelEl.textContent = originalLabel;
+          button.classList.remove("mq-flash");
+          button.removeAttribute("data-copy-state");
+        }, holdMs);
+      }
+
       button.addEventListener("click", async () => {
         try {
+          if (!navigator.clipboard || !navigator.clipboard.writeText) {
+            throw new Error("clipboard unavailable");
+          }
           await navigator.clipboard.writeText(text);
-          if (labelEl) labelEl.textContent = copiedLabel;
-          setTimeout(() => {
-            if (labelEl) labelEl.textContent = originalLabel;
-          }, 1500);
+          button.setAttribute("data-copy-state", "success");
+          flashLabel(copiedLabel, 1500);
         } catch (_) {
-          /* clipboard denied */
+          // Clipboard blocked (insecure context, permission, or old browser).
+          // Surface the failure with a readable hint rather than silently
+          // swallowing it, and select the command text so the user can
+          // copy it manually with a keyboard shortcut.
+          button.setAttribute("data-copy-state", "error");
+          try {
+            const range = document.createRange();
+            if (labelEl) range.selectNodeContents(labelEl);
+            const sel = window.getSelection();
+            sel?.removeAllRanges();
+            if (labelEl) sel?.addRange(range);
+          } catch (_err) {
+            /* selection unavailable */
+          }
+          flashLabel(manualLabel, 2800);
         }
       });
     });

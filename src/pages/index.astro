@@ -9,6 +9,6 @@ const messages = HOME_MESSAGES[lang];
 const BASE = import.meta.env.BASE_URL || '/';
 ---
 <BaseLayout lang={lang} title="MindQuantum" description={messages.metaDescription}>
-  <PreferredLanguageRedirect defaultLang={lang} baseUrl={BASE} />
   <HomePage lang={lang} messages={messages} baseUrl={BASE} />
+  <PreferredLanguageRedirect defaultLang={lang} lang={lang} baseUrl={BASE} />
 </BaseLayout>

@@ -78,7 +78,7 @@ function resolveHref(href: string) {
         {messages.cards.map((card) => (
           <a
             href={resolveHref(card.href)}
-            class="mq-card p-6 hover:shadow-md hover:-translate-y-0.5 transition-all group"
+            class="mq-card p-6 transition-colors hover:border-foreground/20 hover:bg-muted/40 group"
           >
             <h3 class="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
               {card.title}

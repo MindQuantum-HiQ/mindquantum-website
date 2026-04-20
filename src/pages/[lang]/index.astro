@@ -3,6 +3,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import { LANGS, DEFAULT_LANG, type Lang } from "../../config/i18n";
 import { HOME_MESSAGES } from "../../locales/home";
 import HomePage from "../../components/home/HomePage.astro";
+import PreferredLanguageRedirect from "../../components/home/PreferredLanguageRedirect.astro";
 
 // Generate localized home pages for non-default languages (e.g., zh)
 export function getStaticPaths() {
@@ -20,4 +21,9 @@ const BASE = import.meta.env.BASE_URL || '/';
 ---
 <BaseLayout lang={safeLang} title="MindQuantum" description={messages.metaDescription}>
   <HomePage lang={safeLang} messages={messages} baseUrl={BASE} />
+  <PreferredLanguageRedirect
+    defaultLang={DEFAULT_LANG}
+    lang={safeLang}
+    baseUrl={BASE}
+  />
 </BaseLayout>

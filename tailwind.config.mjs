@@ -19,25 +19,39 @@ export default {
     extend: {
       fontFamily: {
         sans: [
-          "Inter",
+          "Hanken Grotesk",
+          "PingFang SC",
+          "Microsoft YaHei",
+          "Source Han Sans SC",
+          "Noto Sans SC",
           "ui-sans-serif",
           "system-ui",
           "-apple-system",
           "Segoe UI",
-          "Roboto",
-          "Helvetica",
-          "Arial",
           "sans-serif",
         ],
         mono: [
+          "JetBrains Mono",
           "ui-monospace",
           "SFMono-Regular",
           "Menlo",
-          "Monaco",
           "Consolas",
           "Liberation Mono",
-          "Courier New",
           "monospace",
+        ],
+      },
+      fontSize: {
+        "display-xl": [
+          "clamp(2.5rem, 1.5rem + 3.5vw, 4.25rem)",
+          { lineHeight: "1.05", letterSpacing: "-0.025em" },
+        ],
+        "display-lg": [
+          "clamp(2rem, 1.25rem + 2.5vw, 3.25rem)",
+          { lineHeight: "1.08", letterSpacing: "-0.02em" },
+        ],
+        "display-md": [
+          "clamp(1.75rem, 1.25rem + 1.5vw, 2.5rem)",
+          { lineHeight: "1.15", letterSpacing: "-0.015em" },
         ],
       },
       colors: {
@@ -89,6 +103,11 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      transitionTimingFunction: {
+        "out-expo": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "out-quint": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "out-quart": "cubic-bezier(0.25, 1, 0.5, 1)",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },
@@ -99,14 +118,14 @@ export default {
           to: { height: "0" },
         },
         "fade-in-up": {
-          from: { opacity: "0", transform: "translateY(12px)" },
+          from: { opacity: "0", transform: "translateY(8px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in-up": "fade-in-up 0.5s ease-out both",
+        "accordion-down": "accordion-down 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+        "accordion-up": "accordion-up 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+        "fade-in-up": "fade-in-up 600ms cubic-bezier(0.16, 1, 0.3, 1) both",
       },
       backgroundImage: {
         "cta-gradient": "var(--cta-gradient)",

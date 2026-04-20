@@ -23,7 +23,7 @@ export type HeroSlide = {
   tone: "light" | "dark";
   actions: Array<{
     label: string;
-    variant: "primary" | "orange" | "outline";
+    variant: "primary" | "outline";
     href: string;
     icon?: "play";
     external?: boolean;
@@ -33,6 +33,11 @@ export type HeroSlide = {
 export type ArchitectureRow = {
   label: string;
   cells: Array<string | null>;
+  /* If set, every non-null cell in this row becomes a link to `href` and
+     picks up a hover affordance (underline + foreground color). Used to
+     invite drilling into algorithm / simulator documentation directly from
+     the capability matrix instead of leaving the grid as dead text. */
+  href?: string;
 };
 
 export type HomeMessages = {
@@ -48,6 +53,7 @@ export type HomeMessages = {
     description: string;
     installCmd: string;
     installCopiedLabel: string;
+    installManualLabel: string;
     docsLabel: string;
   };
   architecture: {
@@ -71,6 +77,9 @@ export type HomeMessages = {
     subtitle: string;
     universities: string[];
     featuredUniversities: string[];
+    statement: string;
+    linkLabel: string;
+    linkHref: string;
   };
   learning: {
     heading: string;
@@ -160,19 +169,20 @@ const COMMON_UNIVERSITIES_ZH = [
 export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
   en: {
     metaDescription:
-      "MindSpore Quantum — a new generation, open-source, quantum-classical hybrid computing framework.",
+      "Open-source Python framework for parameterized quantum circuits. CPU, GPU, and Ascend backends. Auto-differentiation via MindSpore, with VQE, QAOA, and Grover built in.",
     announcement: {
-      text: "Experience quantum circuit visual programming online.",
-      cta: "Quick Start",
+      text: "Drag quantum gates into a live circuit — no install required.",
+      cta: "Open Composer",
       href: "/composer/",
     },
     framework: {
       release: "MindSpore Quantum V0.11 released",
       releaseHref: "/documentation/",
       description:
-        "MindSpore Quantum is a new generation, open-source, quantum-classical hybrid computing framework launched by the MindSpore open-source community. It supports mainstream quantum algorithms and quantum-classical hybrid algorithms, providing an efficient environment for research and development in quantum computing.",
+        "MindSpore Quantum is the open-source quantum framework from the MindSpore ecosystem. Write parameterized quantum circuits in Python, differentiate them through MindSpore's autograd, and run on CPU, GPU, or Ascend. Ships with VQE, QAOA, Grover, and quantum phase estimation, plus full-amplitude and density-matrix simulators.",
       installCmd: "pip install mindquantum",
       installCopiedLabel: "Copied",
+      installManualLabel: "Copy failed — press \u2318C / Ctrl+C",
       docsLabel: "Documentation",
     },
     architecture: {
@@ -185,18 +195,22 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
         {
           label: "Algorithm Library",
           cells: ["Grover / Shor / HHL", "VQE / QAOA / QNN", "SB / LQA / SimCIM"],
+          href: "/documentation/",
         },
         {
           label: "Quantum Neural Network",
           cells: ["Encoder", "Ansatz", "QRam"],
+          href: "/documentation/",
         },
         {
           label: "Compiler",
           cells: ["Quantum Circuit Compilation", "Qubit Mapping", null],
+          href: "/documentation/",
         },
         {
           label: "Domain Specific Language",
           cells: ["Quantum Gate", "Quantum Circuit", "Quantum Operator"],
+          href: "/documentation/",
         },
         {
           label: "Simulator",
@@ -205,6 +219,7 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
             "Density Matrix Simulator",
             "Quantum Chemistry Simulator",
           ],
+          href: "/documentation/",
         },
       ],
     },
@@ -218,7 +233,7 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
         {
           title: "MindSpore Quantum",
           subtitle:
-            "New Generation, Open-source, Quantum-classical Hybrid Computing Framework",
+            "Python framework for parameterized quantum circuits. CPU, GPU, and Ascend backends. Auto-differentiation via MindSpore.",
           background: "quantum",
           tone: "light",
           actions: [
@@ -230,13 +245,13 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
             },
             {
               label: "GitHub",
-              variant: "primary",
+              variant: "outline",
               href: "https://github.com/mindspore-ai/mindquantum",
               external: true,
             },
             {
               label: "Gitee",
-              variant: "orange",
+              variant: "outline",
               href: "https://gitee.com/mindspore/mindquantum",
               external: true,
             },
@@ -304,6 +319,10 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
     research: {
       heading: "Research",
       subtitle: "Over 100 papers researched based on MindSpore Quantum",
+      statement:
+        "100+ peer-reviewed papers from 30+ institutions — including Peking University, Tsinghua, and Shanghai Jiao Tong.",
+      linkLabel: "See the full institution list",
+      linkHref: "/community/",
       universities: COMMON_UNIVERSITIES_EN,
       featuredUniversities: [
         "Peking University",
@@ -316,35 +335,35 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
       cards: [
         {
           icon: "🔬",
-          title: "Beginner Developer",
+          title: "Quantum foundations",
           description:
-            "Zero Foundation Introduction: This part of the course focuses on mastering the theoretical foundations of quantum information and computing.",
+            "Zero-foundation introduction to quantum information and computing — the math, the postulates, and the vocabulary you need before writing any circuit.",
           color: "primary",
           href: "/learning/",
         },
         {
           icon: "🧩",
-          title: "Intermediate Developer",
+          title: "Install and set up",
           description:
-            "Learn how to install MindSpore Quantum on different systems, or quickly set up compilation and debugging for local development.",
-          color: "green",
-          href: "/learning/",
+            "Install MindSpore Quantum on Linux, macOS, Windows, or Ascend, and stand up a local compile + debug environment.",
+          color: "primary",
+          href: "/documentation/",
         },
         {
           icon: "🚀",
-          title: "Advanced Developer",
+          title: "Algorithm case studies",
           description:
-            "Comprehensive case tutorials in the field of universal quantum algorithms and variational quantum algorithms that can help you quickly get started in related research.",
-          color: "orange",
-          href: "/learning/",
+            "Runnable walkthroughs of VQE, QAOA, Grover, and quantum phase estimation — the jumping-off point for research work.",
+          color: "primary",
+          href: "/docs/en/",
         },
         {
           icon: "🎬",
-          title: "Video Courses",
+          title: "Video courses",
           description:
-            "Online courses covering introduction to quantum computing, MindSpore Quantum programming, case analysis, and practical applications.",
-          color: "teal",
-          badge: "Chinese",
+            "Recorded lectures covering the introduction to quantum computing, MindSpore Quantum programming, case analysis, and applications.",
+          color: "primary",
+          badge: "Chinese only",
           href: "/courses/",
         },
       ],
@@ -370,19 +389,21 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
     },
   },
   zh: {
-    metaDescription: "MindSpore Quantum — 新一代开源量子-经典混合计算框架。",
+    metaDescription:
+      "开源 Python 量子框架。支持参数化量子电路与量子-经典混合算法，可在 CPU、GPU 与昇腾上运行，通过 MindSpore 实现自动微分，内置 VQE、QAOA 与 Grover。",
     announcement: {
-      text: "在线体验量子电路可视化编程。",
-      cta: "快速开始",
+      text: "在浏览器里拖放量子门，构建电路——无需安装。",
+      cta: "打开 Composer",
       href: "/zh/composer/",
     },
     framework: {
       release: "MindSpore Quantum V0.11 发布",
       releaseHref: "/zh/documentation/",
       description:
-        "MindSpore Quantum 是 MindSpore 开源社区推出的新一代开源量子-经典混合计算框架。它支持主流量子算法与量子-经典混合算法，为量子计算的研究与开发提供高效环境。",
+        "MindSpore Quantum 是 MindSpore 生态中的开源量子框架。用 Python 编写参数化量子电路，通过 MindSpore 的自动微分引擎训练，并在 CPU、GPU 或昇腾上运行。内置 VQE、QAOA、Grover 与量子相位估计，以及全振幅和密度矩阵模拟器。",
       installCmd: "pip install mindquantum",
       installCopiedLabel: "已复制",
+      installManualLabel: "复制失败——请按 \u2318C / Ctrl+C",
       docsLabel: "文档",
     },
     architecture: {
@@ -391,22 +412,27 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
         {
           label: "算法库",
           cells: ["Grover / Shor / HHL", "VQE / QAOA / QNN", "SB / LQA / SimCIM"],
+          href: "/zh/documentation/",
         },
         {
           label: "量子神经网络",
           cells: ["编码器", "拟设", "QRam"],
+          href: "/zh/documentation/",
         },
         {
           label: "编译器",
           cells: ["量子电路编译", "量子比特映射", null],
+          href: "/zh/documentation/",
         },
         {
           label: "领域专用语言",
           cells: ["量子门", "量子电路", "量子算符"],
+          href: "/zh/documentation/",
         },
         {
           label: "模拟器",
           cells: ["全振幅模拟器", "密度矩阵模拟器", "量子化学模拟器"],
+          href: "/zh/documentation/",
         },
       ],
     },
@@ -418,7 +444,8 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
       slides: [
         {
           title: "MindSpore Quantum",
-          subtitle: "新一代开源量子-经典混合计算框架",
+          subtitle:
+            "基于 Python 的参数化量子电路框架，可运行于 CPU、GPU 与昇腾，通过 MindSpore 实现自动微分。",
           background: "quantum",
           tone: "light",
           actions: [
@@ -430,13 +457,13 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
             },
             {
               label: "GitHub",
-              variant: "primary",
+              variant: "outline",
               href: "https://github.com/mindspore-ai/mindquantum",
               external: true,
             },
             {
               label: "Gitee",
-              variant: "orange",
+              variant: "outline",
               href: "https://gitee.com/mindspore/mindquantum",
               external: true,
             },
@@ -504,6 +531,10 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
     research: {
       heading: "研究",
       subtitle: "超过 100 篇基于 MindSpore Quantum 的论文",
+      statement:
+        "超过 100 篇同行评审论文，覆盖 30 余所院校——包括北京大学、清华大学与上海交通大学。",
+      linkLabel: "查看完整院校列表",
+      linkHref: "/zh/community/",
       universities: COMMON_UNIVERSITIES_ZH,
       featuredUniversities: ["北京大学", "清华大学", "上海交通大学"],
     },
@@ -512,35 +543,35 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
       cards: [
         {
           icon: "🔬",
-          title: "入门开发者",
+          title: "量子基础",
           description:
-            "零基础入门：聚焦量子信息与计算的理论基础。",
+            "零基础入门：量子信息与计算的数学基础、基本假设与术语，先学透再写代码。",
           color: "primary",
           href: "/zh/learning/",
         },
         {
           icon: "🧩",
-          title: "中级开发者",
+          title: "安装与环境搭建",
           description:
-            "学习在不同系统下安装 MindSpore Quantum，或快速搭建本地编译与调试环境。",
-          color: "green",
-          href: "/zh/learning/",
+            "在 Linux、macOS、Windows 或昇腾上安装 MindSpore Quantum，并快速搭建本地编译与调试环境。",
+          color: "primary",
+          href: "/zh/documentation/",
         },
         {
           icon: "🚀",
-          title: "高级开发者",
+          title: "算法案例精讲",
           description:
-            "通用量子算法与变分量子算法的全面案例教程，助你快速入门相关研究。",
-          color: "orange",
-          href: "/zh/learning/",
+            "VQE、QAOA、Grover 与量子相位估计的可运行案例——快速进入研究工作的起点。",
+          color: "primary",
+          href: "/docs/zh/",
         },
         {
           icon: "🎬",
           title: "视频课程",
           description:
-            "在线课程涵盖量子计算入门、MindSpore Quantum 编程、案例分析与实战应用。",
-          color: "teal",
-          badge: "中文",
+            "涵盖量子计算入门、MindSpore Quantum 编程、案例分析与实战应用的录播课程。",
+          color: "primary",
+          badge: "仅中文",
           href: "/courses/",
         },
       ],

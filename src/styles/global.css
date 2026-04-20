@@ -6,6 +6,13 @@
   :root {
     color-scheme: light;
     font-family: theme("fontFamily.sans");
+    /* Enable optical kerning + common ligatures globally; keep tabular figures
+       available where data alignment matters via the .tabular-nums utility. */
+    font-feature-settings: "kern", "liga", "calt", "ss01";
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   * {
@@ -20,6 +27,8 @@
   body {
     @apply bg-background text-foreground antialiased;
     margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
   }
 
   img {
@@ -27,15 +36,39 @@
     height: auto;
   }
 
+  /* Headings — reset Tailwind's default h1–h6 to explicit weight/leading so
+     every page has consistent hierarchy without relying on per-section
+     utilities. Component-level classes below override sizing. */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+    color: hsl(var(--foreground));
+  }
+
   pre,
   code,
   kbd,
   samp {
     font-family: theme("fontFamily.mono");
+    font-feature-settings: "liga" off, "calt" off;
   }
 
   a {
     color: hsl(var(--primary));
+  }
+
+  /* Honor reader preferences for motion. Components that opt in to motion
+     (e.g. the hero carousel) should check this media query themselves. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
@@ -44,18 +77,31 @@
     @apply mx-auto w-full max-w-[1200px] px-6 md:px-8;
   }
 
+  /* Unified button geometry — 8px radius reads as "commodity web control"
+     while cards use 12px (mq-card). No full-pill shapes anywhere: the brief
+     warns rounded-full + backdrop-blur reads as generic AI-product chrome. */
   .mq-btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 text-sm font-medium
            transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
            focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
   }
 
   .mq-btn-primary {
-    @apply mq-btn bg-primary text-primary-foreground hover:bg-primary/90;
+    @apply mq-btn bg-primary text-primary-foreground;
+  }
+  .mq-btn-primary:hover {
+    background-color: hsl(var(--primary-hover));
   }
 
-  .mq-btn-orange {
+  /* Single-purpose "run / execute / launch" button. Use only for install
+     commands, composer/run CTAs, and primary tutorial actions. */
+  .mq-btn-run {
     @apply mq-btn bg-brand-orange text-primary-foreground hover:bg-brand-orange/90;
+  }
+
+  /* Backwards-compat alias — legacy call sites still reference mq-btn-orange. */
+  .mq-btn-orange {
+    @apply mq-btn-run;
   }
 
   .mq-btn-outline {
@@ -70,23 +116,65 @@
     @apply rounded-xl border border-border bg-card text-card-foreground shadow-sm;
   }
 
+  /* Display type scale — driven by the custom `display-*` tokens in
+     tailwind.config.mjs so font-size, leading, and tracking stay coupled.
+     mq-display reserves the largest size (hero); mq-section-title is the
+     workhorse h2 used across marketing sections. Both left-align by default
+     per the design brief. */
+  .mq-display {
+    @apply text-display-xl font-extrabold text-foreground;
+  }
+
   .mq-section-title {
-    @apply text-3xl md:text-4xl font-bold tracking-tight text-foreground text-center;
+    @apply text-display-md font-bold text-foreground;
+  }
+
+  .mq-eyebrow {
+    @apply inline-block text-xs font-semibold uppercase text-muted-foreground;
+    letter-spacing: 0.14em;
   }
 
   .mq-link-arrow {
     @apply inline-flex items-center gap-1 text-primary font-medium hover:underline;
   }
+
+  /* Cap long-form copy at ~68ch so the eye can track. Use sparingly on
+     prose blocks; layout components should not rely on this. */
+  .mq-measure {
+    max-width: 68ch;
+  }
+
+  /* ------------------------------------------------------------------
+   * Motion — the brief wants "one well-choreographed hero load, subtle
+   * entrance reveals on scroll, exponential ease-out for all transitions."
+   * `mq-animate-in` drives the page-load stagger; consumers pass a CSS
+   * custom property `--mq-delay` to offset the reveal.
+   * ------------------------------------------------------------------ */
+  .mq-animate-in {
+    animation: fade-in-up 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation-delay: var(--mq-delay, 0ms);
+  }
+
+  /* One-shot press/press-release flash — used for copy/success feedback. */
+  .mq-flash {
+    animation: mq-press-flash 280ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mq-animate-in,
+    .mq-flash {
+      animation: none;
+    }
+  }
+}
+
+@keyframes mq-press-flash {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.035); }
+  100% { transform: scale(1); }
 }
 
 @layer utilities {
-  .text-gradient-brand {
-    background-image: var(--cta-gradient);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-
   .scrollbar-thin {
     scrollbar-width: thin;
   }
