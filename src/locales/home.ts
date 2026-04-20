@@ -195,22 +195,22 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
         {
           label: "Algorithm Library",
           cells: ["Grover / Shor / HHL", "VQE / QAOA / QNN", "SB / LQA / SimCIM"],
-          href: "/documentation/",
+          href: "/documentation/#algorithms",
         },
         {
           label: "Quantum Neural Network",
           cells: ["Encoder", "Ansatz", "QRam"],
-          href: "/documentation/",
+          href: "/documentation/#quantum-neural-networks",
         },
         {
           label: "Compiler",
           cells: ["Quantum Circuit Compilation", "Qubit Mapping", null],
-          href: "/documentation/",
+          href: "/documentation/#compiler",
         },
         {
           label: "Domain Specific Language",
           cells: ["Quantum Gate", "Quantum Circuit", "Quantum Operator"],
-          href: "/documentation/",
+          href: "/documentation/#dsl",
         },
         {
           label: "Simulator",
@@ -219,7 +219,7 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
             "Density Matrix Simulator",
             "Quantum Chemistry Simulator",
           ],
-          href: "/documentation/",
+          href: "/documentation/#simulators",
         },
       ],
     },
@@ -291,27 +291,27 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
       heading: "Features",
       items: [
         {
-          title: "Visual Circuit Programming",
+          title: "Visual circuit programming",
           description:
-            "Provides a full-amplitude simulator, allowing developers to freely drag and drop quantum gates to build quantum circuits, with simple and easy-to-use operations.",
+            "Drag quantum gates onto a circuit and watch the state vector update in real time. Export to Python, OpenQASM, or paste straight into a Jupyter notebook.",
           image: "visual",
         },
         {
-          title: "Hybrid Quantum-Classical",
+          title: "Trainable quantum circuits",
           description:
-            "Built on MindSpore's auto-differentiation engine, enabling seamless training of parameterized quantum circuits (PQC) and quantum neural networks.",
+            "Parameterized circuits differentiate through MindSpore's autograd — VQE, QAOA, and QNN models compose directly with any MindSpore optimizer.",
           image: "hybrid",
         },
         {
-          title: "High-performance Simulation",
+          title: "CPU, GPU, and Ascend backends",
           description:
-            "Support high-performance simulation logic tailored for CPU, GPU, and Ascend architectures, with flexible switching between single-precision and double-precision simulation modes.",
+            "Full-amplitude and density-matrix simulators on all three. Switch single- and double-precision per run, with no recompilation step.",
           image: "simulation",
         },
         {
-          title: "Rich Algorithm Library",
+          title: "Algorithms, batteries included",
           description:
-            "Integrated implementations of VQE, QAOA, Grover Search, and Quantum Phase Estimation. Ready to use for chemistry and combinatorial optimization.",
+            "VQE, QAOA, Grover, and Quantum Phase Estimation ship as one-line APIs — drop-in for quantum chemistry (LiH, H₂O) and combinatorial problems (MaxCut, TSP).",
           image: "algorithm",
         },
       ],
@@ -412,27 +412,27 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
         {
           label: "算法库",
           cells: ["Grover / Shor / HHL", "VQE / QAOA / QNN", "SB / LQA / SimCIM"],
-          href: "/zh/documentation/",
+          href: "/zh/documentation/#algorithms",
         },
         {
           label: "量子神经网络",
           cells: ["编码器", "拟设", "QRam"],
-          href: "/zh/documentation/",
+          href: "/zh/documentation/#quantum-neural-networks",
         },
         {
           label: "编译器",
           cells: ["量子电路编译", "量子比特映射", null],
-          href: "/zh/documentation/",
+          href: "/zh/documentation/#compiler",
         },
         {
           label: "领域专用语言",
           cells: ["量子门", "量子电路", "量子算符"],
-          href: "/zh/documentation/",
+          href: "/zh/documentation/#dsl",
         },
         {
           label: "模拟器",
           cells: ["全振幅模拟器", "密度矩阵模拟器", "量子化学模拟器"],
-          href: "/zh/documentation/",
+          href: "/zh/documentation/#simulators",
         },
       ],
     },
@@ -505,25 +505,25 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
         {
           title: "可视化电路编程",
           description:
-            "提供全振幅模拟器，开发者可以自由拖放量子门构建量子电路，操作简单易用。",
+            "拖放量子门构建电路，实时查看态向量变化。支持导出为 Python、OpenQASM，也可直接粘贴进 Jupyter notebook。",
           image: "visual",
         },
         {
-          title: "量子-经典混合",
+          title: "可训练量子电路",
           description:
-            "基于 MindSpore 的自动微分引擎，无缝训练参数化量子电路（PQC）和量子神经网络。",
+            "参数化量子电路通过 MindSpore 自动微分引擎求导，VQE、QAOA 与 QNN 可与任意 MindSpore 优化器无缝组合。",
           image: "hybrid",
         },
         {
-          title: "高性能模拟",
+          title: "CPU、GPU 与昇腾后端",
           description:
-            "支持面向 CPU、GPU 与昇腾架构的高性能模拟逻辑，可在单精度与双精度模拟模式之间灵活切换。",
+            "全振幅与密度矩阵模拟器同时支持三种后端，单精度 / 双精度可按需切换，无需重新编译。",
           image: "simulation",
         },
         {
-          title: "丰富算法库",
+          title: "算法开箱即用",
           description:
-            "集成 VQE、QAOA、Grover 搜索、量子相位估计等实现，可直接用于化学与组合优化。",
+            "VQE、QAOA、Grover 与量子相位估计均提供一行式 API，可直接用于量子化学（LiH、H₂O）与组合优化（MaxCut、TSP）。",
           image: "algorithm",
         },
       ],

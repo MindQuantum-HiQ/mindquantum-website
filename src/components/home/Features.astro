@@ -1,41 +1,22 @@
 ---
-import { Image } from "astro:assets";
-import featureVisual from "../../assets/home/feature-visual-circuit.jpg";
-import featureHybrid from "../../assets/home/feature-hybrid.jpg";
-import featureSimulation from "../../assets/home/feature-simulation.jpg";
-import featureAlgorithm from "../../assets/home/feature-algorithm.jpg";
 import type { HomeMessages } from "../../locales/home";
+import FeatureThumbnail from "./FeatureThumbnail.astro";
 
 interface Props {
   features: HomeMessages["features"];
 }
 
 const { features } = Astro.props as Props;
-
-const IMAGES = {
-  visual: featureVisual,
-  hybrid: featureHybrid,
-  simulation: featureSimulation,
-  algorithm: featureAlgorithm,
-};
-
 const [primary, ...supporting] = features.items;
 ---
 
 <section class="mq-container mb-20 lg:mb-24">
   <h2 class="mq-section-title mb-10 lg:mb-12">{features.heading}</h2>
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
-    <!-- Featured item — large image, left-aligned copy, wider column -->
+    {/* Featured — large hand-drawn diagram, left-aligned copy. */}
     <article class="lg:col-span-7 group">
-      <div class="relative rounded-xl overflow-hidden mb-6 aspect-[16/10] bg-muted">
-        <Image
-          src={IMAGES[primary.image]}
-          alt={primary.title}
-          class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-          loading="lazy"
-          widths={[640, 960, 1280]}
-          sizes="(min-width: 1024px) 620px, 90vw"
-        />
+      <div class="relative rounded-xl overflow-hidden mb-6 aspect-[16/10] border border-border bg-card flex items-center justify-center p-8 lg:p-10">
+        <FeatureThumbnail kind={primary.image} size="primary" title={primary.title} />
       </div>
       <h3 class="text-xl lg:text-2xl font-semibold text-foreground mb-2.5 tracking-tight">
         {primary.title}
@@ -45,19 +26,12 @@ const [primary, ...supporting] = features.items;
       </p>
     </article>
 
-    <!-- Supporting three — compact horizontal layout, narrower column -->
+    {/* Supporting three — compact diagrams, narrower column. */}
     <div class="lg:col-span-5 flex flex-col gap-7 lg:gap-8 lg:pt-2">
       {supporting.map((feature) => (
         <article class="group flex items-start gap-5">
-          <div class="relative rounded-lg overflow-hidden aspect-square w-20 md:w-24 shrink-0 bg-muted">
-            <Image
-              src={IMAGES[feature.image]}
-              alt={feature.title}
-              class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-              loading="lazy"
-              widths={[160, 224]}
-              sizes="96px"
-            />
+          <div class="relative rounded-lg overflow-hidden aspect-square w-20 md:w-24 shrink-0 border border-border bg-card flex items-center justify-center p-3">
+            <FeatureThumbnail kind={feature.image} size="compact" title={feature.title} />
           </div>
           <div class="flex-1 min-w-0 pt-0.5">
             <h3 class="font-semibold text-foreground mb-1.5 tracking-tight">
