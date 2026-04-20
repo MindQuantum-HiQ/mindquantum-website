@@ -46,6 +46,35 @@
     color: hsl(var(--foreground));
   }
 
+  /* Bilingual parity (brief principle #4). CJK glyphs are taller and fuller
+     than Latin, so tracking tuned for Latin display type makes Chinese feel
+     crammed. Add more leading, neutralize negative letter-spacing, and let
+     the body breathe a touch wider — applied as a scoped override so Latin
+     pages keep their existing rhythm. */
+  :lang(zh) {
+    line-height: 1.75;
+  }
+  :lang(zh) h1,
+  :lang(zh) h2,
+  :lang(zh) h3,
+  :lang(zh) h4,
+  :lang(zh) h5,
+  :lang(zh) h6 {
+    line-height: 1.25;
+    letter-spacing: 0;
+  }
+  :lang(zh) .text-display-xl,
+  :lang(zh) .text-display-lg,
+  :lang(zh) .text-display-md {
+    line-height: 1.2;
+    letter-spacing: 0;
+  }
+  :lang(zh) .mq-eyebrow {
+    /* Wide tracking on tracked uppercase Latin reads "designed"; on CJK it
+       breaks character joining. Dial it back. */
+    letter-spacing: 0.06em;
+  }
+
   pre,
   code,
   kbd,
@@ -135,7 +164,16 @@
   }
 
   .mq-link-arrow {
-    @apply inline-flex items-center gap-1 text-primary font-medium hover:underline;
+    @apply inline-flex items-center gap-1 rounded-sm text-primary font-medium hover:underline
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
+  }
+
+  /* Shared focus-ring treatment for non-button interactive surfaces (anchor
+     rows, accordion rails, navigation items). Applied alongside existing
+     hover styles so keyboard-only users get a visible indicator that matches
+     the project's token ring color (--ring = --primary). */
+  .mq-focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 
   /* Cap long-form copy at ~68ch so the eye can track. Use sparingly on

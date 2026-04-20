@@ -4,16 +4,24 @@ export type DocSection = {
   title: string;
   description: string;
   href: string;
+  meta?: string;
 };
 
 export type DocumentationMessages = {
   metaDescription: string;
   eyebrow: string;
   title: string;
+  lede: string;
   sidebar: Array<{ label: string; href: string }>;
+  sectionsHeading: string;
   sections: DocSection[];
-  searchPlaceholder: string;
-  downloadLabel: string;
+  install: {
+    command: string;
+    meta: string;
+    copyLabel: string;
+    copiedLabel: string;
+    manualLabel: string;
+  };
   nextLabel: string;
 };
 
@@ -21,93 +29,115 @@ export const DOCUMENTATION_MESSAGES: Record<Lang, DocumentationMessages> = {
   en: {
     metaDescription:
       "MindQuantum documentation — installation guide, case library, API reference, release notes and more.",
-    eyebrow: "MindSpore Quantum Documentation",
+    eyebrow: "Documentation",
     title: "MindSpore Quantum Documentation",
+    lede: "Install guides, tutorials, API reference, and release notes for MindSpore Quantum.",
     sidebar: [
-      { label: "MindSpore Quantum Courses", href: "/learning/" },
-      { label: "Quantum Computing Fundamentals Course", href: "/courses/" },
-      { label: "Beginner Tutorial", href: "/docs/en/" },
-      { label: "Middle Level Tutorial", href: "/docs/en/" },
-      { label: "Advanced Tutorial", href: "/docs/en/" },
+      { label: "Overview", href: "/documentation/" },
+      { label: "Installation Guide", href: "/docs/en/" },
+      { label: "Case Library", href: "/docs/en/" },
+      { label: "API Reference", href: "/api/en/" },
+      { label: "Release Notes", href: "/docs/en/" },
     ],
+    sectionsHeading: "Reference",
     sections: [
       {
         title: "Installation Guide",
         description:
-          "Understand how to install MindSpore Quantum in different systems, or localize fast compilation and debugging of MindSpore Quantum as a developer.",
+          "Install MindSpore Quantum on Linux, macOS, or build it from source for development.",
         href: "/docs/en/",
+        meta: "Jupyter Book",
       },
       {
         title: "Case Library",
         description:
-          "Comprehensive case tutorials in the field of universal quantum algorithms and variational quantum algorithms that can help you quickly get started in related research areas.",
+          "End-to-end tutorials covering universal and variational quantum algorithms.",
         href: "/docs/en/",
+        meta: "Jupyter Book",
       },
       {
-        title: "API",
-        description: "MindSpore Quantum API description list.",
+        title: "API Reference",
+        description: "Every module, class, and function in MindSpore Quantum.",
         href: "/api/en/",
+        meta: "Sphinx",
       },
       {
         title: "Paper with Code",
         description:
-          "Open-source contributors and official reproduction code based on academic papers.",
+          "Reproduction code and open-source contributions based on academic papers.",
         href: "/community/",
+        meta: "Community",
       },
       {
         title: "Release Notes",
         description:
-          "Contains information on major features, augments, and API changes for the release versions.",
+          "Major features, enhancements, and API changes for each release.",
         href: "/docs/en/",
+        meta: "GitHub",
       },
     ],
-    searchPlaceholder: "Search in Docs",
-    downloadLabel: "Download",
+    install: {
+      command: "pip install mindquantum",
+      meta: "Stable · Python 3.9+ · Linux / macOS / Windows (WSL)",
+      copyLabel: "Copy",
+      copiedLabel: "Copied",
+      manualLabel: "Press \u2318C / Ctrl+C",
+    },
     nextLabel: "Installation Guide",
   },
   zh: {
     metaDescription:
       "MindQuantum 文档 — 安装指南、案例库、API 参考、发行说明等。",
-    eyebrow: "MindSpore Quantum 文档",
+    eyebrow: "文档",
     title: "MindSpore Quantum 文档",
+    lede: "MindSpore Quantum 的安装指南、教程、API 参考与发行说明。",
     sidebar: [
-      { label: "MindSpore Quantum 课程", href: "/zh/learning/" },
-      { label: "量子计算基础课", href: "/courses/" },
-      { label: "初级教程", href: "/docs/zh/" },
-      { label: "中级教程", href: "/docs/zh/" },
-      { label: "高级教程", href: "/docs/zh/" },
+      { label: "概览", href: "/zh/documentation/" },
+      { label: "安装指南", href: "/docs/zh/" },
+      { label: "案例库", href: "/docs/zh/" },
+      { label: "API 参考", href: "/api/zh/" },
+      { label: "发行说明", href: "/docs/zh/" },
     ],
+    sectionsHeading: "参考",
     sections: [
       {
         title: "安装指南",
-        description:
-          "了解在不同系统中安装 MindSpore Quantum，或作为开发者快速完成本地编译与调试。",
+        description: "在 Linux、macOS 或从源码安装 MindSpore Quantum。",
         href: "/docs/zh/",
+        meta: "Jupyter Book",
       },
       {
         title: "案例库",
-        description:
-          "通用量子算法与变分量子算法领域的全面案例教程，助你快速入门相关研究。",
+        description: "涵盖通用与变分量子算法的端到端教程。",
         href: "/docs/zh/",
+        meta: "Jupyter Book",
       },
       {
-        title: "API",
-        description: "MindSpore Quantum API 说明列表。",
+        title: "API 参考",
+        description: "MindSpore Quantum 的每个模块、类与函数说明。",
         href: "/api/zh/",
+        meta: "Sphinx",
       },
       {
         title: "带代码的论文",
         description: "基于学术论文的开源贡献与官方复现代码。",
         href: "/zh/community/",
+        meta: "社区",
       },
       {
         title: "发行说明",
-        description: "包含每个版本的主要特性、增强与 API 变更信息。",
+        description: "每个版本的主要特性、增强与 API 变更。",
         href: "/docs/zh/",
+        meta: "GitHub",
       },
     ],
-    searchPlaceholder: "搜索文档",
-    downloadLabel: "下载",
+    install: {
+      command: "pip install mindquantum",
+      meta: "稳定版 · Python 3.9+ · Linux / macOS / Windows (WSL)",
+      copyLabel: "复制",
+      copiedLabel: "已复制",
+      manualLabel: "请按 \u2318C / Ctrl+C",
+    },
     nextLabel: "安装指南",
   },
 };

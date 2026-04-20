@@ -11,7 +11,7 @@ const href = withBase(pathForLang(pathUnbased, other), BASE);
 const label = other === "en" ? "EN" : "中文";
 ---
 <a
-  class="lang-switcher inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-secondary transition-colors"
+  class="lang-switcher mq-focus-ring inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-secondary transition-colors"
   href={href}
   aria-label={`Switch language to ${label}`}
 >

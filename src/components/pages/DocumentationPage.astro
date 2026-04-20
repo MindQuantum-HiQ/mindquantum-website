@@ -17,65 +17,144 @@ function resolveHref(href: string) {
 }
 ---
 
-<section class="mq-container py-10">
-  <div class="flex gap-8">
-    <aside class="w-60 shrink-0 hidden md:block">
-      <div class="relative mb-4">
-        <svg aria-hidden="true" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" viewBox="0 0 24 24">
-          <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.3-4.3M11 19a8 8 0 1 1 0-16a8 8 0 0 1 0 16Z" />
-        </svg>
-        <input
-          type="search"
-          placeholder={messages.searchPlaceholder}
-          class="w-full rounded-lg border border-border bg-background pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-        />
-      </div>
-      <nav class="space-y-0.5" aria-label={messages.eyebrow}>
-        {messages.sidebar.map((item, index) => (
+<section class="mq-container py-10 md:py-16">
+  <div class="grid gap-10 lg:gap-12 lg:grid-cols-[220px_minmax(0,1fr)]">
+    <aside class="hidden lg:block lg:sticky lg:top-24 lg:self-start">
+      <nav aria-label={messages.eyebrow} class="space-y-0.5">
+        {messages.sidebar.map((item, i) => (
           <a
             href={resolveHref(item.href)}
             class:list={[
-              "flex items-center justify-between px-3 py-2 text-sm rounded-md transition-colors",
-              index === 0
+              "mq-focus-ring flex items-center px-3 py-2 text-sm rounded-md transition-colors",
+              i === 0
                 ? "text-primary font-medium bg-primary/5"
                 : "text-muted-foreground hover:text-foreground hover:bg-secondary",
             ]}
           >
-            <span>{item.label}</span>
-            <svg aria-hidden="true" class="w-3 h-3 opacity-70" viewBox="0 0 24 24">
-              <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 18l6-6l-6-6" />
-            </svg>
+            {item.label}
           </a>
         ))}
       </nav>
     </aside>
 
-    <div class="flex-1 min-w-0">
-      <div class="flex items-center justify-between mb-6">
-        <p class="text-sm text-muted-foreground">{messages.eyebrow}</p>
-        <button type="button" class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
-          <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24">
-            <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5l5-5m-5 5V3" />
-          </svg>
-          {messages.downloadLabel}
-        </button>
-      </div>
-
-      <h1 class="text-2xl md:text-3xl font-bold text-foreground mb-8">{messages.title}</h1>
-
-      <div class="space-y-4">
-        {messages.sections.map((section) => (
+    <div class="min-w-0">
+      <nav aria-label={messages.eyebrow} class="lg:hidden flex gap-2 overflow-x-auto pb-3 -mx-6 px-6 scrollbar-thin">
+        {messages.sidebar.map((item, i) => (
           <a
-            href={resolveHref(section.href)}
-            class="mq-card p-6 block transition-colors hover:border-foreground/20 hover:bg-muted/40 group"
+            href={resolveHref(item.href)}
+            class:list={[
+              "mq-focus-ring inline-flex items-center whitespace-nowrap px-3 py-1.5 text-xs font-medium rounded-full border transition-colors shrink-0",
+              i === 0
+                ? "bg-primary text-primary-foreground border-primary"
+                : "border-border text-muted-foreground hover:text-foreground hover:bg-secondary",
+            ]}
           >
-            <h3 class="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-              {section.title}
-            </h3>
-            <p class="text-sm text-muted-foreground leading-relaxed">{section.description}</p>
+            {item.label}
           </a>
         ))}
+      </nav>
+
+      <header class="max-w-2xl">
+        <p class="mq-eyebrow mb-3">{messages.eyebrow}</p>
+        <h1 class="text-display-lg text-foreground mb-5">{messages.title}</h1>
+        <p class="mq-measure text-base md:text-lg text-muted-foreground leading-relaxed">{messages.lede}</p>
+      </header>
+
+      <div class="mt-10 mb-14">
+        <div class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-secondary/40 pl-4 pr-2 py-2 font-mono text-sm">
+          <code class="text-foreground truncate py-1">
+            <span class="text-muted-foreground select-none">$ </span>{messages.install.command}
+          </code>
+          <button
+            type="button"
+            class="mq-btn-run gap-2 text-xs py-1.5 px-3 shrink-0"
+            data-install-copy
+            data-copy-text={messages.install.command}
+            data-copied-label={messages.install.copiedLabel}
+            data-manual-label={messages.install.manualLabel}
+            aria-label={`Copy ${messages.install.command}`}
+          >
+            <span data-install-label>{messages.install.copyLabel}</span>
+            <svg aria-hidden="true" class="w-3.5 h-3.5 opacity-80" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M9 2h9a2 2 0 0 1 2 2v13h-2V4H9V2Zm-4 4h9a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Zm0 2v13h9V8H5Z" />
+            </svg>
+          </button>
+        </div>
+        <p class="mt-2.5 text-xs text-muted-foreground">{messages.install.meta}</p>
       </div>
+
+      <section aria-labelledby="docs-sections-heading">
+        <h2 id="docs-sections-heading" class="mq-eyebrow text-foreground mb-4">{messages.sectionsHeading}</h2>
+        <ul class="divide-y divide-border border-y border-border">
+          {messages.sections.map((section) => {
+            const isExternal = /^https?:\/\//.test(section.href);
+            return (
+              <li>
+                <a
+                  href={resolveHref(section.href)}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener" : undefined}
+                  class="mq-focus-ring group flex items-center gap-4 py-4 -mx-3 md:-mx-4 px-3 md:px-4 rounded-lg hover:bg-secondary/40 transition-colors"
+                >
+                  <div class="flex-1 min-w-0">
+                    <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">{section.title}</h3>
+                    <p class="hidden sm:block text-sm text-muted-foreground mt-0.5 leading-relaxed">{section.description}</p>
+                  </div>
+                  {section.meta && (
+                    <span class="hidden sm:inline-block text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground shrink-0">
+                      {section.meta}
+                    </span>
+                  )}
+                  <svg aria-hidden="true" class="w-4 h-4 text-muted-foreground/60 shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" viewBox="0 0 24 24">
+                    <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 18l6-6l-6-6" />
+                  </svg>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
     </div>
   </div>
 </section>
+
+<script>
+  (function () {
+    document.querySelectorAll("[data-install-copy]").forEach((button) => {
+      const btn = button as HTMLButtonElement;
+      const text = btn.getAttribute("data-copy-text") || "";
+      const copiedLabel = btn.getAttribute("data-copied-label") || "Copied";
+      const manualLabel =
+        btn.getAttribute("data-manual-label") ||
+        "Copy failed \u2014 press \u2318C / Ctrl+C";
+      const labelEl = btn.querySelector("[data-install-label]") as HTMLElement | null;
+      const originalLabel = labelEl?.textContent || text;
+
+      function flashLabel(label: string, holdMs: number) {
+        if (labelEl) labelEl.textContent = label;
+        btn.classList.remove("mq-flash");
+        void btn.offsetWidth;
+        btn.classList.add("mq-flash");
+        setTimeout(() => {
+          if (labelEl) labelEl.textContent = originalLabel;
+          btn.classList.remove("mq-flash");
+          btn.removeAttribute("data-copy-state");
+        }, holdMs);
+      }
+
+      btn.addEventListener("click", async () => {
+        try {
+          if (!navigator.clipboard || !navigator.clipboard.writeText) {
+            throw new Error("clipboard unavailable");
+          }
+          await navigator.clipboard.writeText(text);
+          btn.setAttribute("data-copy-state", "success");
+          flashLabel(copiedLabel, 1500);
+        } catch (_) {
+          btn.setAttribute("data-copy-state", "error");
+          flashLabel(manualLabel, 2800);
+        }
+      });
+    });
+  })();
+</script>

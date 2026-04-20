@@ -15,78 +15,78 @@ function resolveHref(href: string) {
   if (/^https?:\/\//.test(href)) return href;
   return withBase(href, BASE);
 }
+
+const [prereq, ...pathSteps] = messages.cards;
 ---
 
-<section class="mq-container py-10">
-  <div class="flex gap-8">
-    <aside class="w-60 shrink-0 hidden md:block">
-      <div class="relative mb-4">
-        <svg aria-hidden="true" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" viewBox="0 0 24 24">
-          <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.3-4.3M11 19a8 8 0 1 1 0-16a8 8 0 0 1 0 16Z" />
-        </svg>
-        <input
-          type="search"
-          placeholder={messages.searchPlaceholder}
-          class="w-full rounded-lg border border-border bg-background pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-        />
-      </div>
-      <nav class="space-y-0.5" aria-label={messages.sidebar.sectionTitle}>
-        <h3 class="text-sm font-semibold text-foreground mb-2 px-3">{messages.sidebar.sectionTitle}</h3>
-        {messages.sidebar.tabs.map((item, index) => (
-          <a
-            href={resolveHref(item.href)}
-            class:list={[
-              "block px-3 py-2 text-sm rounded-md transition-colors",
-              index === 0
-                ? "text-primary font-medium bg-primary/5"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary",
-            ]}
-          >
-            {item.label}
-          </a>
-        ))}
-        <div class="pt-4 space-y-0.5 border-t border-border mt-3">
-          {messages.sidebar.tutorials.map((item) => (
-            <a
-              href={resolveHref(item.href)}
-              class="flex items-center justify-between px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary rounded-md"
-            >
-              <span>{item.label}</span>
-              <svg aria-hidden="true" class="w-3 h-3 opacity-70" viewBox="0 0 24 24">
-                <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 18l6-6l-6-6" />
-              </svg>
-            </a>
-          ))}
-        </div>
-      </nav>
-    </aside>
+<section class="mq-container py-10 md:py-16">
+  <header class="max-w-2xl">
+    <p class="mq-eyebrow mb-3">{messages.eyebrow}</p>
+    <h1 class="text-display-lg text-foreground mb-5">{messages.title}</h1>
+    <p class="mq-measure text-base md:text-lg text-muted-foreground leading-relaxed">{messages.lede}</p>
+  </header>
 
-    <div class="flex-1 min-w-0">
-      <div class="flex items-center justify-between mb-6">
-        <p class="text-sm text-muted-foreground">{messages.eyebrow}</p>
-        <button type="button" class="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
-          <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24">
-            <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4m4-5l5 5l5-5m-5 5V3" />
+  <div class="mt-12 md:mt-16 grid gap-10 lg:gap-12 lg:grid-cols-[minmax(0,1fr)_260px]">
+    <div class="min-w-0">
+      <section aria-labelledby="learning-prereq-heading" class="mb-12">
+        <h2 id="learning-prereq-heading" class="mq-eyebrow text-foreground mb-4">{messages.prereqLabel}</h2>
+        <a
+          href={resolveHref(prereq.href)}
+          class="mq-focus-ring group flex items-start gap-5 md:gap-7 py-5 -mx-3 md:-mx-4 px-3 md:px-4 rounded-lg border-y border-border hover:bg-secondary/40 transition-colors"
+        >
+          <span class="text-brand-orange font-semibold tabular-nums text-2xl md:text-3xl leading-none shrink-0 pt-1">00</span>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">{prereq.title}</h3>
+            <p class="text-sm text-muted-foreground mt-1.5 leading-relaxed">{prereq.description}</p>
+          </div>
+          <svg aria-hidden="true" class="w-4 h-4 text-muted-foreground/60 shrink-0 mt-2 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 18l6-6l-6-6" />
           </svg>
-          {messages.downloadLabel}
-        </button>
-      </div>
+        </a>
+      </section>
 
-      <h1 class="text-2xl md:text-3xl font-bold text-foreground mb-8">{messages.title}</h1>
-
-      <div class="grid md:grid-cols-2 gap-6">
-        {messages.cards.map((card) => (
-          <a
-            href={resolveHref(card.href)}
-            class="mq-card p-6 transition-colors hover:border-foreground/20 hover:bg-muted/40 group"
-          >
-            <h3 class="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
-              {card.title}
-            </h3>
-            <p class="text-sm text-muted-foreground leading-relaxed">{card.description}</p>
-          </a>
-        ))}
-      </div>
+      <section aria-labelledby="learning-path-heading">
+        <h2 id="learning-path-heading" class="mq-eyebrow text-foreground mb-4">{messages.pathHeading}</h2>
+        <div class="divide-y divide-border border-y border-border">
+          {pathSteps.map((card, i) => {
+            const idx = String(i + 1).padStart(2, "0");
+            return (
+              <a
+                href={resolveHref(card.href)}
+                class="mq-focus-ring group flex items-start gap-5 md:gap-7 py-5 -mx-3 md:-mx-4 px-3 md:px-4 rounded-lg hover:bg-secondary/40 transition-colors"
+              >
+                <span class="text-muted-foreground font-semibold tabular-nums text-2xl md:text-3xl leading-none shrink-0 pt-1">{idx}</span>
+                <div class="flex-1 min-w-0">
+                  <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">{card.title}</h3>
+                  <p class="text-sm text-muted-foreground mt-1.5 leading-relaxed">{card.description}</p>
+                </div>
+                <svg aria-hidden="true" class="w-4 h-4 text-muted-foreground/60 shrink-0 mt-2 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" viewBox="0 0 24 24">
+                  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 18l6-6l-6-6" />
+                </svg>
+              </a>
+            );
+          })}
+        </div>
+      </section>
     </div>
+
+    <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">
+      <div class="mq-card p-5">
+        <p class="mq-eyebrow text-foreground mb-2">{messages.sideRail.videoTitle}</p>
+        <p class="text-sm text-muted-foreground leading-relaxed mb-4">{messages.sideRail.videoDescription}</p>
+        <a href={resolveHref(messages.sideRail.videoHref)} class="mq-link-arrow text-sm">
+          {messages.sideRail.videoLinkLabel}
+          <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6l-6 6" /></svg>
+        </a>
+      </div>
+      <div class="px-5 py-1">
+        <p class="mq-eyebrow text-foreground mb-2">{messages.sideRail.helpTitle}</p>
+        <p class="text-sm text-muted-foreground leading-relaxed mb-4">{messages.sideRail.helpDescription}</p>
+        <a href={resolveHref(messages.sideRail.helpHref)} class="mq-link-arrow text-sm">
+          {messages.sideRail.helpLinkLabel}
+          <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6l-6 6" /></svg>
+        </a>
+      </div>
+    </aside>
   </div>
 </section>

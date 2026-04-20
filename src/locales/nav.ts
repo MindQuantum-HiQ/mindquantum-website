@@ -8,8 +8,10 @@ export type NavMessages = {
   benchmark: string;
   community: string;
   code: string;
-  courses?: string;
-  docs: string;
+  // Documentation submenu labels — distinct from the parent "Documentation"
+  // button so the dropdown doesn't duplicate its own trigger.
+  overview: string;
+  guides: string;
   api: string;
   // Community submenus
   communityGroups: {
@@ -29,22 +31,21 @@ export type NavMessages = {
   learningItems: {
     courses: string;
     videoCourses: string;
-    whitePaper: string;
-    paperCode: string;
   };
 };
 
 export const NAV_MESSAGES: Record<Lang, NavMessages> = {
   en: {
-    about: "About",
+    about: "Home",
     composer: "Composer",
     learning: "Learning",
     documentation: "Documentation",
     benchmark: "Benchmark",
     community: "Community",
     code: "Code",
-    docs: "Docs",
-    api: "API",
+    overview: "Overview",
+    guides: "Guides",
+    api: "API Reference",
     communityGroups: {
       contribution: "Contribution and Growth",
       competitions: "Competition Activities",
@@ -62,21 +63,19 @@ export const NAV_MESSAGES: Record<Lang, NavMessages> = {
     learningItems: {
       courses: "Courses",
       videoCourses: "Video Courses",
-      whitePaper: "White Paper",
-      paperCode: "Paper Code",
     },
   },
   zh: {
-    about: "关于",
+    about: "主页",
     composer: "编辑器",
     learning: "学习",
     documentation: "文档",
     benchmark: "性能",
     community: "社区",
     code: "代码",
-    courses: "课程",
-    docs: "文档",
-    api: "API",
+    overview: "概览",
+    guides: "指南",
+    api: "API 参考",
     communityGroups: {
       contribution: "贡献与成长",
       competitions: "竞赛活动",
@@ -94,8 +93,6 @@ export const NAV_MESSAGES: Record<Lang, NavMessages> = {
     learningItems: {
       courses: "课程",
       videoCourses: "视频课程",
-      whitePaper: "白皮书",
-      paperCode: "论文代码",
     },
   },
 };

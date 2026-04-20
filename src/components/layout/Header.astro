@@ -21,15 +21,19 @@ const localized = (path: string) => withBase(pathForLang(path, lang), BASE);
 const apiOverviewRel =
   lang === "en" ? "api_python_en/overview.html" : "api_python/overview.html";
 
+type NavLeaf = { label: string; href: string; external?: boolean };
+type NavGroup = { title: string; items: NavLeaf[] };
 type NavItem = {
   label: string;
   href: string;
   id: string;
-  children?: Array<{ label: string; href: string; external?: boolean }>;
-  groups?: Array<{
-    title: string;
-    items: Array<{ label: string; href: string; external?: boolean }>;
-  }>;
+  // When a dropdown is open, the parent route is still reachable via the
+  // first row in the menu. Items without children keep parent as a plain <a>.
+  children?: NavLeaf[];
+  groups?: NavGroup[];
+  // Override for the "back to parent page" row inside the dropdown. Defaults
+  // to the item's own label so the dropdown always has one clear way home.
+  overviewLabel?: string;
 };
 
 const navItems: NavItem[] = [
@@ -42,8 +46,6 @@ const navItems: NavItem[] = [
     children: [
       { label: nav.learningItems.courses, href: localized("/learning/") },
       { label: nav.learningItems.videoCourses, href: withBase("/courses/", BASE) },
-      { label: nav.learningItems.whitePaper, href: localized("/documentation/") },
-      { label: nav.learningItems.paperCode, href: localized("/community/") },
     ],
   },
   {
@@ -51,8 +53,8 @@ const navItems: NavItem[] = [
     label: nav.documentation,
     href: localized("/documentation/"),
     children: [
-      { label: nav.documentation, href: localized("/documentation/") },
-      { label: nav.docs, href: `${BASE}docs/${lang}/` },
+      { label: nav.overview, href: localized("/documentation/") },
+      { label: nav.guides, href: `${BASE}docs/${lang}/` },
       {
         label: nav.api,
         href: `${BASE}api/${lang}/#/${apiOverviewRel}`,
@@ -64,6 +66,7 @@ const navItems: NavItem[] = [
     id: "community",
     label: nav.community,
     href: localized("/community/"),
+    overviewLabel: nav.overview,
     groups: [
       {
         title: nav.communityGroups.contribution,
@@ -116,47 +119,76 @@ function isActive(itemHref: string, currentPath: string) {
 }
 ---
 
-<header class="site-header sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75">
-  <div class="mq-container flex h-16 items-center gap-6">
-    <a href={homeHref} class="flex items-center gap-2 shrink-0" aria-label="MindSpore Quantum home">
-      <Image src={logo} alt="MindSpore Quantum" width={32} height={32} class="h-8 w-8 object-contain" loading="eager" />
-      <span class="text-sm font-semibold leading-tight hidden sm:block">
-        MindSpore<br />Quantum
+<header class="site-header sticky top-0 z-40 w-full border-b border-border bg-background">
+  <div class="mq-container flex h-16 items-center gap-4">
+    <a href={homeHref} class="flex items-center gap-2.5 shrink-0" aria-label="MindSpore Quantum home">
+      <Image src={logo} alt="" width={32} height={32} class="h-8 w-8 object-contain" loading="eager" />
+      <span class="hidden xl:flex flex-col text-[0.8125rem] font-semibold tracking-tight text-foreground leading-[1.05]">
+        <span>MindSpore</span>
+        <span>Quantum</span>
       </span>
     </a>
 
-    <nav class="hidden lg:flex items-center gap-1 flex-1" aria-label="Primary">
+    <nav class="hidden md:flex items-center gap-0.5 flex-1" aria-label="Primary">
       {navItems.map((item) => {
         const hasDropdown = Boolean(item.children || item.groups);
         const active = isActive(item.href, Astro.url.pathname);
+        const menuId = `nav-menu-${item.id}`;
+        const triggerId = `nav-trigger-${item.id}`;
+        const commonClasses = [
+          "mq-focus-ring relative px-2 lg:px-3 py-2 text-sm font-medium transition-colors inline-flex items-center gap-1 rounded-md",
+          active
+            ? "text-primary after:absolute after:bottom-0 after:left-2 lg:after:left-3 after:right-2 lg:after:right-3 after:h-[2px] after:bg-primary"
+            : "text-foreground hover:text-primary",
+        ];
         return (
-          <div class="nav-group relative">
-            <a
-              href={item.href}
-              class:list={[
-                "px-3 py-2 text-sm font-medium transition-colors inline-flex items-center gap-1",
-                active
-                  ? "text-primary after:absolute after:bottom-0 after:left-3 after:right-3 after:h-[2px] after:bg-primary"
-                  : "text-foreground hover:text-primary",
-              ]}
-            >
-              {item.label}
-              {hasDropdown && (
-                <svg aria-hidden="true" class="w-3 h-3 opacity-70" viewBox="0 0 24 24">
+          <div class="nav-group relative" data-nav-group>
+            {hasDropdown ? (
+              <button
+                type="button"
+                id={triggerId}
+                aria-haspopup="menu"
+                aria-expanded="false"
+                aria-controls={menuId}
+                data-nav-trigger
+                class:list={commonClasses}
+              >
+                {item.label}
+                <svg aria-hidden="true" class="w-3 h-3 opacity-70 transition-transform nav-chevron" viewBox="0 0 24 24">
                   <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m6 9l6 6l6-6" />
                 </svg>
-              )}
-            </a>
+              </button>
+            ) : (
+              <a href={item.href} class:list={commonClasses}>
+                {item.label}
+              </a>
+            )}
+
             {item.children && (
-              <div class="nav-menu absolute top-full left-0 mt-0 pt-1 min-w-[16rem] z-50" role="menu">
-                <div class="rounded-xl border border-border bg-popover text-popover-foreground shadow-lg p-2">
-                  {item.children.map((child) => (
+              <div
+                id={menuId}
+                role="menu"
+                aria-labelledby={triggerId}
+                class="nav-menu absolute top-full left-0 mt-0 pt-1 min-w-[14rem] z-50"
+              >
+                <div class="rounded-xl border border-border bg-popover text-popover-foreground shadow-sm p-1.5">
+                  <a
+                    href={item.href}
+                    role="menuitem"
+                    class="mq-focus-ring block px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-secondary rounded-md"
+                    data-nav-menuitem
+                  >
+                    {item.overviewLabel ?? item.children[0]?.label ?? item.label}
+                  </a>
+                  {/* Skip the first child when it already points to the parent to avoid duplication */}
+                  {item.children.slice(item.children[0]?.href === item.href ? 1 : 0).map((child) => (
                     <a
                       href={child.href}
                       target={child.external ? "_blank" : undefined}
                       rel={child.external ? "noopener" : undefined}
-                      class="block px-3 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-secondary rounded-md"
                       role="menuitem"
+                      class="mq-focus-ring block px-3 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-secondary rounded-md"
+                      data-nav-menuitem
                     >
                       {child.label}
                     </a>
@@ -164,21 +196,41 @@ function isActive(itemHref: string, currentPath: string) {
                 </div>
               </div>
             )}
+
             {item.groups && (
-              <div class="nav-menu absolute top-full left-0 mt-0 pt-1 min-w-[18rem] z-50" role="menu">
-                <div class="rounded-xl border border-border bg-popover text-popover-foreground shadow-lg p-3 space-y-3">
+              <div
+                id={menuId}
+                role="menu"
+                aria-labelledby={triggerId}
+                class="nav-menu absolute top-full left-0 mt-0 pt-1 min-w-[18rem] z-50"
+              >
+                <div class="rounded-xl border border-border bg-popover text-popover-foreground shadow-sm p-1.5 space-y-2">
+                  <a
+                    href={item.href}
+                    role="menuitem"
+                    class="mq-focus-ring block px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-secondary rounded-md"
+                    data-nav-menuitem
+                  >
+                    {item.overviewLabel ?? item.label}
+                  </a>
                   {item.groups.map((group) => (
                     <div>
-                      <p class="text-xs font-semibold text-foreground mb-1 px-2">{group.title}</p>
+                      <p class="text-xs font-semibold text-foreground mb-1 px-3 mt-1">{group.title}</p>
                       {group.items.map((sub) => (
                         <a
                           href={sub.href}
                           target={sub.external ? "_blank" : undefined}
                           rel={sub.external ? "noopener" : undefined}
-                          class="block px-2 py-1.5 text-sm text-muted-foreground hover:text-primary hover:bg-secondary rounded-md"
                           role="menuitem"
+                          class="mq-focus-ring flex items-center justify-between gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-secondary rounded-md"
+                          data-nav-menuitem
                         >
-                          {sub.label}
+                          <span>{sub.label}</span>
+                          {sub.external && (
+                            <svg aria-hidden="true" class="w-3 h-3 opacity-70 shrink-0" viewBox="0 0 24 24">
+                              <path fill="currentColor" d="M14 3h7v7h-2V6.414l-9.293 9.293l-1.414-1.414L17.586 5H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z" />
+                            </svg>
+                          )}
                         </a>
                       ))}
                     </div>
@@ -191,24 +243,38 @@ function isActive(itemHref: string, currentPath: string) {
       })}
     </nav>
 
-    <div class="flex items-center gap-2 ml-auto">
-      <div class="nav-group relative hidden md:block">
-        <button type="button" class="inline-flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary px-3 py-2" aria-haspopup="menu" aria-expanded="false" data-nav-toggle>
+    <div class="flex items-center gap-1 ml-auto">
+      <div class="nav-group relative hidden lg:block" data-nav-group>
+        <button
+          type="button"
+          id="nav-trigger-code"
+          class="mq-focus-ring inline-flex items-center gap-1 text-sm font-medium text-foreground hover:text-primary px-3 py-2 rounded-md"
+          aria-haspopup="menu"
+          aria-expanded="false"
+          aria-controls="nav-menu-code"
+          data-nav-trigger
+        >
           {nav.code}
-          <svg aria-hidden="true" class="w-3 h-3 opacity-70" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m6 9l6 6l6-6" /></svg>
+          <svg aria-hidden="true" class="w-3 h-3 opacity-70 nav-chevron transition-transform" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m6 9l6 6l6-6" /></svg>
         </button>
-        <div class="nav-menu absolute top-full right-0 mt-0 pt-1 min-w-[12rem] z-50" role="menu">
-          <div class="rounded-xl border border-border bg-popover text-popover-foreground shadow-lg p-2">
+        <div
+          id="nav-menu-code"
+          role="menu"
+          aria-labelledby="nav-trigger-code"
+          class="nav-menu absolute top-full right-0 mt-0 pt-1 min-w-[12rem] z-50"
+        >
+          <div class="rounded-xl border border-border bg-popover text-popover-foreground shadow-sm p-1.5">
             {CODE_MIRRORS.map((mirror) => (
               <a
                 href={mirror.href}
                 target="_blank"
                 rel="noopener"
-                class="flex items-center justify-between gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-secondary rounded-md"
                 role="menuitem"
+                class="mq-focus-ring flex items-center justify-between gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-primary hover:bg-secondary rounded-md"
+                data-nav-menuitem
               >
                 <span>{mirror.label}</span>
-                <svg aria-hidden="true" class="w-3.5 h-3.5 opacity-70" viewBox="0 0 24 24">
+                <svg aria-hidden="true" class="w-3 h-3 opacity-70" viewBox="0 0 24 24">
                   <path fill="currentColor" d="M14 3h7v7h-2V6.414l-9.293 9.293l-1.414-1.414L17.586 5H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z" />
                 </svg>
               </a>
@@ -221,89 +287,278 @@ function isActive(itemHref: string, currentPath: string) {
 
       <button
         type="button"
-        class="lg:hidden inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-secondary"
-        aria-label="Toggle navigation"
+        class="mq-focus-ring md:hidden inline-flex items-center justify-center rounded-md p-3 -mr-1 text-foreground hover:bg-secondary"
+        aria-label="Open navigation menu"
+        aria-expanded="false"
+        aria-controls="mobile-menu-sheet"
         data-mobile-toggle
       >
-        <svg aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <svg aria-hidden="true" class="w-5 h-5 icon-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <svg aria-hidden="true" class="w-5 h-5 icon-close hidden" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M6 18L18 6"/></svg>
       </button>
     </div>
   </div>
 
-  <div class="lg:hidden border-t border-border hidden" data-mobile-menu>
-    <div class="mq-container py-3 flex flex-col gap-1">
-      {navItems.map((item) => (
-        <a
-          href={item.href}
-          class="block px-3 py-2 text-sm font-medium text-foreground hover:text-primary rounded-md"
-        >
-          {item.label}
-        </a>
-      ))}
-      <div class="border-t border-border my-2"></div>
-      {CODE_MIRRORS.map((mirror) => (
-        <a
-          href={mirror.href}
-          target="_blank"
-          rel="noopener"
-          class="flex items-center justify-between px-3 py-2 text-sm text-muted-foreground hover:text-primary rounded-md"
-        >
-          <span>{nav.code} · {mirror.label}</span>
-          <svg aria-hidden="true" class="w-3.5 h-3.5 opacity-70" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M14 3h7v7h-2V6.414l-9.293 9.293l-1.414-1.414L17.586 5H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z" />
-          </svg>
-        </a>
-      ))}
+  {/* Mobile sheet: full panel with accordion submenus and 48px touch targets */}
+  <div
+    id="mobile-menu-sheet"
+    class="md:hidden fixed inset-x-0 top-16 bottom-0 z-40 bg-background border-t border-border overflow-y-auto hidden"
+    aria-label="Mobile navigation"
+  >
+    <div class="mq-container py-4 space-y-1">
+      {navItems.map((item) => {
+        const hasDropdown = Boolean(item.children || item.groups);
+        const panelId = `mobile-panel-${item.id}`;
+        const triggerId = `mobile-trigger-${item.id}`;
+        if (!hasDropdown) {
+          return (
+            <a
+              href={item.href}
+              class="mq-focus-ring flex items-center min-h-[48px] px-3 py-3 text-base font-medium text-foreground hover:bg-secondary rounded-md"
+              data-mobile-link
+            >
+              {item.label}
+            </a>
+          );
+        }
+        return (
+          <div class="mobile-accordion" data-mobile-accordion>
+            <button
+              type="button"
+              id={triggerId}
+              aria-expanded="false"
+              aria-controls={panelId}
+              class="mq-focus-ring flex items-center justify-between w-full min-h-[48px] px-3 py-3 text-base font-medium text-foreground hover:bg-secondary rounded-md"
+              data-mobile-accordion-trigger
+            >
+              <span>{item.label}</span>
+              <svg aria-hidden="true" class="w-4 h-4 opacity-70 transition-transform mobile-accordion-chevron" viewBox="0 0 24 24">
+                <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m6 9l6 6l6-6" />
+              </svg>
+            </button>
+            <div id={panelId} role="region" aria-labelledby={triggerId} class="hidden pl-3 border-l border-border ml-3 my-1 space-y-0.5">
+              {/* Overview row */}
+              <a
+                href={item.href}
+                class="mq-focus-ring flex items-center min-h-[44px] px-3 py-2 text-sm font-medium text-foreground hover:bg-secondary rounded-md"
+                data-mobile-link
+              >
+                {item.overviewLabel ?? item.children?.[0]?.label ?? item.label}
+              </a>
+              {item.children && item.children.slice(item.children[0]?.href === item.href ? 1 : 0).map((child) => (
+                <a
+                  href={child.href}
+                  target={child.external ? "_blank" : undefined}
+                  rel={child.external ? "noopener" : undefined}
+                  class="mq-focus-ring flex items-center justify-between min-h-[44px] px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary rounded-md"
+                  data-mobile-link
+                >
+                  <span>{child.label}</span>
+                  {child.external && (
+                    <svg aria-hidden="true" class="w-3 h-3 opacity-70" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M14 3h7v7h-2V6.414l-9.293 9.293l-1.414-1.414L17.586 5H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z" />
+                    </svg>
+                  )}
+                </a>
+              ))}
+              {item.groups && item.groups.map((group) => (
+                <div class="pt-2">
+                  <p class="text-xs font-semibold text-foreground px-3 mb-1">{group.title}</p>
+                  {group.items.map((sub) => (
+                    <a
+                      href={sub.href}
+                      target={sub.external ? "_blank" : undefined}
+                      rel={sub.external ? "noopener" : undefined}
+                      class="mq-focus-ring flex items-center justify-between min-h-[44px] px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary rounded-md"
+                      data-mobile-link
+                    >
+                      <span>{sub.label}</span>
+                      {sub.external && (
+                        <svg aria-hidden="true" class="w-3 h-3 opacity-70" viewBox="0 0 24 24">
+                          <path fill="currentColor" d="M14 3h7v7h-2V6.414l-9.293 9.293l-1.414-1.414L17.586 5H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z" />
+                        </svg>
+                      )}
+                    </a>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      <div class="pt-4 mt-2 border-t border-border">
+        <p class="text-xs font-semibold text-foreground px-3 mb-2">{nav.code}</p>
+        {CODE_MIRRORS.map((mirror) => (
+          <a
+            href={mirror.href}
+            target="_blank"
+            rel="noopener"
+            class="mq-focus-ring flex items-center justify-between min-h-[44px] px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-secondary rounded-md"
+            data-mobile-link
+          >
+            <span>{mirror.label}</span>
+            <svg aria-hidden="true" class="w-3 h-3 opacity-70" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M14 3h7v7h-2V6.414l-9.293 9.293l-1.414-1.414L17.586 5H14V3ZM5 5h6v2H7v10h10v-4h2v6H5V5Z" />
+            </svg>
+          </a>
+        ))}
+      </div>
     </div>
   </div>
 </header>
 
 <script>
-  // Simple dropdown + mobile menu behavior.
+  // Desktop dropdowns: click-to-toggle, keyboard, hover as progressive enhancement.
   (function () {
-    const groups = document.querySelectorAll(".nav-group");
-    groups.forEach((group) => {
-      const el = group as HTMLElement;
-      const toggle = el.querySelector("[data-nav-toggle]") as HTMLElement | null;
-      const open = () => {
-        el.classList.add("group-open");
-        toggle?.setAttribute("aria-expanded", "true");
-      };
-      const close = () => {
-        el.classList.remove("group-open");
-        toggle?.setAttribute("aria-expanded", "false");
-      };
-      el.addEventListener("mouseenter", open);
-      el.addEventListener("mouseleave", close);
-      el.addEventListener("focusin", open);
-      el.addEventListener("focusout", (e) => {
-        if (!el.contains(e.relatedTarget as Node)) close();
+    const groups = Array.from(document.querySelectorAll("[data-nav-group]")) as HTMLElement[];
+
+    function closeGroup(group: HTMLElement) {
+      group.classList.remove("group-open");
+      const trigger = group.querySelector("[data-nav-trigger]") as HTMLElement | null;
+      trigger?.setAttribute("aria-expanded", "false");
+    }
+    function openGroup(group: HTMLElement) {
+      groups.forEach((g) => {
+        if (g !== group) closeGroup(g);
       });
-      if (toggle) {
-        toggle.addEventListener("click", (e) => {
+      group.classList.add("group-open");
+      const trigger = group.querySelector("[data-nav-trigger]") as HTMLElement | null;
+      trigger?.setAttribute("aria-expanded", "true");
+    }
+    function toggleGroup(group: HTMLElement) {
+      if (group.classList.contains("group-open")) closeGroup(group);
+      else openGroup(group);
+    }
+
+    const hasFinePointer =
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+    groups.forEach((group) => {
+      const trigger = group.querySelector("[data-nav-trigger]") as HTMLElement | null;
+      if (!trigger) return;
+
+      trigger.addEventListener("click", (e) => {
+        e.preventDefault();
+        toggleGroup(group);
+      });
+
+      trigger.addEventListener("keydown", (e) => {
+        const key = (e as KeyboardEvent).key;
+        if (key === "ArrowDown" || key === "Enter" || key === " ") {
           e.preventDefault();
-          if (el.classList.contains("group-open")) close();
-          else open();
+          openGroup(group);
+          const firstItem = group.querySelector("[data-nav-menuitem]") as HTMLElement | null;
+          firstItem?.focus();
+        } else if (key === "Escape") {
+          closeGroup(group);
+        }
+      });
+
+      // Hover as progressive enhancement on fine-pointer devices only.
+      if (hasFinePointer) {
+        let closeTimer: number | null = null;
+        group.addEventListener("mouseenter", () => {
+          if (closeTimer) window.clearTimeout(closeTimer);
+          openGroup(group);
+        });
+        group.addEventListener("mouseleave", () => {
+          closeTimer = window.setTimeout(() => closeGroup(group), 120);
         });
       }
-    });
-    document.addEventListener("click", (e) => {
-      groups.forEach((g) => {
-        if (!(g as HTMLElement).contains(e.target as Node)) {
-          (g as HTMLElement).classList.remove("group-open");
-          const t = (g as HTMLElement).querySelector("[data-nav-toggle]");
-          t?.setAttribute("aria-expanded", "false");
-        }
+
+      // Menu item keyboard navigation
+      const items = Array.from(group.querySelectorAll("[data-nav-menuitem]")) as HTMLElement[];
+      items.forEach((item, index) => {
+        item.addEventListener("keydown", (e) => {
+          const key = (e as KeyboardEvent).key;
+          if (key === "ArrowDown") {
+            e.preventDefault();
+            items[(index + 1) % items.length]?.focus();
+          } else if (key === "ArrowUp") {
+            e.preventDefault();
+            items[(index - 1 + items.length) % items.length]?.focus();
+          } else if (key === "Escape") {
+            e.preventDefault();
+            closeGroup(group);
+            trigger.focus();
+          } else if (key === "Tab") {
+            // Let native Tab proceed but close on the way out.
+            window.setTimeout(() => {
+              if (!group.contains(document.activeElement)) closeGroup(group);
+            }, 0);
+          }
+        });
       });
     });
 
-    const mobileToggle = document.querySelector("[data-mobile-toggle]");
-    const mobileMenu = document.querySelector("[data-mobile-menu]") as HTMLElement | null;
-    if (mobileToggle && mobileMenu) {
-      mobileToggle.addEventListener("click", () => {
-        mobileMenu.classList.toggle("hidden");
+    // Click outside closes all.
+    document.addEventListener("click", (e) => {
+      groups.forEach((g) => {
+        if (!g.contains(e.target as Node)) closeGroup(g);
       });
+    });
+  })();
+
+  // Mobile sheet + accordions
+  (function () {
+    const sheet = document.getElementById("mobile-menu-sheet");
+    const toggle = document.querySelector("[data-mobile-toggle]") as HTMLButtonElement | null;
+    if (!sheet || !toggle) return;
+
+    const iconMenu = toggle.querySelector(".icon-menu") as HTMLElement | null;
+    const iconClose = toggle.querySelector(".icon-close") as HTMLElement | null;
+
+    function setOpen(open: boolean) {
+      sheet!.classList.toggle("hidden", !open);
+      toggle!.setAttribute("aria-expanded", open ? "true" : "false");
+      toggle!.setAttribute(
+        "aria-label",
+        open ? "Close navigation menu" : "Open navigation menu",
+      );
+      iconMenu?.classList.toggle("hidden", open);
+      iconClose?.classList.toggle("hidden", !open);
+      document.documentElement.classList.toggle("mq-scroll-lock", open);
     }
+
+    toggle.addEventListener("click", () => {
+      const open = sheet.classList.contains("hidden");
+      setOpen(open);
+    });
+
+    // Close sheet on any inner navigation link tap (but not accordion triggers).
+    sheet.querySelectorAll("[data-mobile-link]").forEach((link) => {
+      link.addEventListener("click", () => setOpen(false));
+    });
+
+    // Accordions inside the sheet.
+    sheet.querySelectorAll("[data-mobile-accordion]").forEach((acc) => {
+      const t = acc.querySelector("[data-mobile-accordion-trigger]") as HTMLButtonElement | null;
+      const panelId = t?.getAttribute("aria-controls") ?? "";
+      const panel = panelId ? document.getElementById(panelId) : null;
+      const chev = acc.querySelector(".mobile-accordion-chevron") as HTMLElement | null;
+      if (!t || !panel) return;
+      t.addEventListener("click", () => {
+        const expanded = t.getAttribute("aria-expanded") === "true";
+        t.setAttribute("aria-expanded", expanded ? "false" : "true");
+        panel.classList.toggle("hidden", expanded);
+        if (chev) chev.style.transform = expanded ? "" : "rotate(180deg)";
+      });
+    });
+
+    // Escape closes the sheet.
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !sheet.classList.contains("hidden")) setOpen(false);
+    });
+
+    // Close on viewport cross to md+
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onChange = () => {
+      if (mq.matches && !sheet.classList.contains("hidden")) setOpen(false);
+    };
+    if (mq.addEventListener) mq.addEventListener("change", onChange);
+    else mq.addListener(onChange);
   })();
 </script>
 
@@ -313,5 +568,11 @@ function isActive(itemHref: string, currentPath: string) {
   }
   .nav-group.group-open > .nav-menu {
     display: block;
+  }
+  .nav-group.group-open .nav-chevron {
+    transform: rotate(180deg);
+  }
+  :global(.mq-scroll-lock) {
+    overflow: hidden;
   }
 </style>

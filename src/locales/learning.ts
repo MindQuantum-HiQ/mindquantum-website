@@ -6,46 +6,35 @@ export type LearningCardItem = {
   href: string;
 };
 
-export type LearningSidebarItem = { label: string; href: string };
-
 export type LearningMessages = {
   metaDescription: string;
   title: string;
   eyebrow: string;
-  sidebar: {
-    sectionTitle: string;
-    tabs: LearningSidebarItem[];
-    tutorials: LearningSidebarItem[];
-  };
+  lede: string;
+  prereqLabel: string;
+  pathHeading: string;
   cards: LearningCardItem[];
-  searchPlaceholder: string;
-  downloadLabel: string;
+  sideRail: {
+    videoTitle: string;
+    videoDescription: string;
+    videoHref: string;
+    videoLinkLabel: string;
+    helpTitle: string;
+    helpDescription: string;
+    helpHref: string;
+    helpLinkLabel: string;
+  };
 };
 
 export const LEARNING_MESSAGES: Record<Lang, LearningMessages> = {
   en: {
     metaDescription:
       "MindQuantum learning resources: courses, video tutorials, papers, and reference code.",
-    title: "MindSpore Quantum Courses",
+    title: "Learn MindSpore Quantum",
     eyebrow: "Learning",
-    sidebar: {
-      sectionTitle: "Learning",
-      tabs: [
-        { label: "Courses", href: "/learning/" },
-        { label: "Video Courses", href: "/courses/" },
-        { label: "White Paper", href: "/documentation/" },
-        { label: "Paper Code", href: "/community/" },
-      ],
-      tutorials: [
-        {
-          label: "Quantum Computing Fundamentals Course",
-          href: "/courses/",
-        },
-        { label: "Beginner Tutorial", href: "/docs/en/" },
-        { label: "Middle Level Tutorial", href: "/docs/en/" },
-        { label: "Advanced Tutorial", href: "/docs/en/" },
-      ],
-    },
+    lede: "A guided path from quantum computing fundamentals to variational algorithms — built for students new to quantum.",
+    prereqLabel: "Start here",
+    pathHeading: "Learning path",
     cards: [
       {
         title: "Quantum Computing Fundamentals Course",
@@ -56,44 +45,40 @@ export const LEARNING_MESSAGES: Record<Lang, LearningMessages> = {
       {
         title: "Beginner Tutorial",
         description:
-          "Understand the basic components of MindSpore Quantum, including quantum gates, quantum circuits, hamiltonian, and the usage of quantum simulators.",
+          "Quantum gates, circuits, Hamiltonians, and the MindQuantum simulator — the primitives you'll use in every program.",
         href: "/docs/en/",
       },
       {
         title: "Middle Level Tutorial",
         description:
-          "Understand the applications of MindSpore Quantum in noisy quantum simulation, quantum circuit compilation, qubit mapping, and other scenarios that are closer to real quantum chip environments.",
+          "Noisy simulation, circuit compilation, and qubit mapping — scenarios that bring your code closer to real quantum hardware.",
         href: "/docs/en/",
       },
       {
         title: "Advanced Tutorial",
         description:
-          "Understand the design and usage of MindSpore Quantum for NISQ algorithms, particularly how to design variational quantum algorithms and collaborate with MindSpore to train hybrid quantum-classical algorithms.",
+          "NISQ algorithms and variational quantum circuits, training hybrid quantum-classical models alongside MindSpore.",
         href: "/docs/en/",
       },
     ],
-    searchPlaceholder: "Search in Docs",
-    downloadLabel: "Download",
+    sideRail: {
+      videoTitle: "Video courses",
+      videoDescription: "Watch the group-meeting recordings on Bilibili and Koushare.",
+      videoHref: "/courses/",
+      videoLinkLabel: "Watch video courses",
+      helpTitle: "New here?",
+      helpDescription: "Get the lay of the land before diving into a tutorial.",
+      helpHref: "/",
+      helpLinkLabel: "Read the overview",
+    },
   },
   zh: {
     metaDescription: "MindQuantum 学习资源：课程、视频教程、论文与参考代码。",
-    title: "MindSpore Quantum 课程",
+    title: "学习 MindSpore Quantum",
     eyebrow: "学习",
-    sidebar: {
-      sectionTitle: "学习",
-      tabs: [
-        { label: "课程", href: "/zh/learning/" },
-        { label: "视频课程", href: "/courses/" },
-        { label: "白皮书", href: "/zh/documentation/" },
-        { label: "论文代码", href: "/zh/community/" },
-      ],
-      tutorials: [
-        { label: "量子计算基础课", href: "/courses/" },
-        { label: "初级教程", href: "/docs/zh/" },
-        { label: "中级教程", href: "/docs/zh/" },
-        { label: "高级教程", href: "/docs/zh/" },
-      ],
-    },
+    lede: "从量子计算基础到变分量子算法的完整学习路径 — 为初学者设计。",
+    prereqLabel: "从这里开始",
+    pathHeading: "学习路径",
     cards: [
       {
         title: "量子计算基础课",
@@ -102,24 +87,29 @@ export const LEARNING_MESSAGES: Record<Lang, LearningMessages> = {
       },
       {
         title: "初级教程",
-        description:
-          "了解 MindSpore Quantum 的基本组件，包括量子门、量子电路、哈密顿量，以及量子模拟器的使用。",
+        description: "量子门、量子电路、哈密顿量与 MindQuantum 模拟器——每个程序都会用到的基础组件。",
         href: "/docs/zh/",
       },
       {
         title: "中级教程",
-        description:
-          "了解 MindSpore Quantum 在噪声量子模拟、量子电路编译、量子比特映射等更贴近真实量子芯片场景中的应用。",
+        description: "噪声模拟、量子电路编译与量子比特映射——让代码更贴近真实量子硬件的场景。",
         href: "/docs/zh/",
       },
       {
         title: "高级教程",
-        description:
-          "了解 MindSpore Quantum 面向 NISQ 算法的设计与使用，特别是变分量子算法设计以及与 MindSpore 配合训练混合量子-经典算法。",
+        description: "NISQ 算法与变分量子电路，以及与 MindSpore 协同训练混合量子-经典模型。",
         href: "/docs/zh/",
       },
     ],
-    searchPlaceholder: "搜索文档",
-    downloadLabel: "下载",
+    sideRail: {
+      videoTitle: "视频课程",
+      videoDescription: "在 B 站或蔻享观看组会录播。",
+      videoHref: "/courses/",
+      videoLinkLabel: "观看视频课程",
+      helpTitle: "初次访问？",
+      helpDescription: "先快速了解一下 MindSpore Quantum 再深入教程。",
+      helpHref: "/zh/",
+      helpLinkLabel: "阅读简介",
+    },
   },
 };
