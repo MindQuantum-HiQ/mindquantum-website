@@ -1,0 +1,80 @@
+---
+import BenchmarkChart from "../charts/BenchmarkChart.tsx";
+import type { Lang } from "../../config/i18n";
+import type { BenchmarkMessages } from "../../locales/benchmark";
+
+interface Props {
+  lang: Lang;
+  messages: BenchmarkMessages;
+}
+
+const { messages } = Astro.props as Props;
+
+const randomCircuitData = [
+  { qubits: 4, Cirq: 0.001, MindQuantum: 0.002, PennyLane: 0.003, Qiskit: 0.005, Quilts: 0.006, TFQ: 0.008 },
+  { qubits: 8, Cirq: 0.003, MindQuantum: 0.004, PennyLane: 0.005, Qiskit: 0.010, Quilts: 0.012, TFQ: 0.018 },
+  { qubits: 12, Cirq: 0.008, MindQuantum: 0.010, PennyLane: 0.012, Qiskit: 0.025, Quilts: 0.030, TFQ: 0.045 },
+  { qubits: 16, Cirq: 0.020, MindQuantum: 0.025, PennyLane: 0.030, Qiskit: 0.060, Quilts: 0.075, TFQ: 0.100 },
+  { qubits: 20, Cirq: 0.060, MindQuantum: 0.080, PennyLane: 0.100, Qiskit: 0.180, Quilts: 0.220, TFQ: 0.280 },
+  { qubits: 24, Cirq: 0.180, MindQuantum: 0.250, PennyLane: 0.320, Qiskit: 0.550, Quilts: 0.700, TFQ: 0.800 },
+];
+
+const qaoaData = [
+  { qubits: 4, Cirq: 0.05, MindQuantum: 0.03, PennyLane: 0.02, Qiskit: 0.04, Quilts: 0.03, TFQ: 0.04 },
+  { qubits: 8, Cirq: 0.20, MindQuantum: 0.10, PennyLane: 0.08, Qiskit: 0.15, Quilts: 0.10, TFQ: 0.10 },
+  { qubits: 12, Cirq: 0.80, MindQuantum: 0.40, PennyLane: 0.30, Qiskit: 0.60, Quilts: 0.40, TFQ: 0.40 },
+  { qubits: 16, Cirq: 3.00, MindQuantum: 1.50, PennyLane: 1.20, Qiskit: 2.50, Quilts: 1.50, TFQ: 1.50 },
+  { qubits: 20, Cirq: 12.00, MindQuantum: 6.00, PennyLane: 5.00, Qiskit: 10.00, Quilts: 6.00, TFQ: 6.00 },
+  { qubits: 24, Cirq: 50.00, MindQuantum: 25.00, PennyLane: 20.00, Qiskit: 40.00, Quilts: 25.00, TFQ: 25.00 },
+];
+
+const vqeData = [
+  { qubits: 4, Cirq: 0.005, MindQuantum: 0.002, "MQ-mqchem": 0.002, PennyLane: 0.003, Qiskit: 0.004, Quilts: 0.003, TFQ: 0.004 },
+  { qubits: 8, Cirq: 0.05, MindQuantum: 0.02, "MQ-mqchem": 0.02, PennyLane: 0.03, Qiskit: 0.04, Quilts: 0.03, TFQ: 0.04 },
+  { qubits: 12, Cirq: 0.50, MindQuantum: 0.20, "MQ-mqchem": 0.20, PennyLane: 0.30, Qiskit: 0.40, Quilts: 0.30, TFQ: 0.40 },
+  { qubits: 16, Cirq: 5.00, MindQuantum: 2.00, "MQ-mqchem": 2.00, PennyLane: 3.00, Qiskit: 4.00, Quilts: 3.00, TFQ: 4.00 },
+  { qubits: 20, Cirq: 50.00, MindQuantum: 20.00, "MQ-mqchem": 20.00, PennyLane: 30.00, Qiskit: 40.00, Quilts: 30.00, TFQ: 40.00 },
+];
+---
+
+<section class="relative overflow-hidden bg-hero-gradient">
+  <div class="mq-container py-16">
+    <h1 class="text-4xl md:text-5xl font-bold text-foreground mb-3">{messages.title}</h1>
+    <p class="text-sm md:text-base text-muted-foreground max-w-2xl leading-relaxed">
+      {messages.subtitle}
+    </p>
+  </div>
+</section>
+
+<section class="mq-container my-10 space-y-8">
+  <BenchmarkChart
+    client:load
+    title={messages.charts.randomCircuit.title}
+    description={messages.charts.randomCircuit.description}
+    hardwareNote={messages.charts.randomCircuit.hardwareNote}
+    xAxisLabel={messages.xAxisLabel}
+    yAxisLabel={messages.yAxisLabel}
+    data={randomCircuitData}
+    keys={["Cirq", "MindQuantum", "PennyLane", "Qiskit", "Quilts", "TFQ"]}
+  />
+  <BenchmarkChart
+    client:visible
+    title={messages.charts.qaoa.title}
+    description={messages.charts.qaoa.description}
+    hardwareNote={messages.charts.qaoa.hardwareNote}
+    xAxisLabel={messages.xAxisLabel}
+    yAxisLabel={messages.yAxisLabel}
+    data={qaoaData}
+    keys={["Cirq", "MindQuantum", "PennyLane", "Qiskit", "Quilts", "TFQ"]}
+  />
+  <BenchmarkChart
+    client:visible
+    title={messages.charts.vqe.title}
+    description={messages.charts.vqe.description}
+    hardwareNote={messages.charts.vqe.hardwareNote}
+    xAxisLabel={messages.xAxisLabel}
+    yAxisLabel={messages.yAxisLabel}
+    data={vqeData}
+    keys={["Cirq", "MindQuantum", "MQ-mqchem", "PennyLane", "Qiskit", "Quilts", "TFQ"]}
+  />
+</section>

@@ -24,3 +24,7 @@ courses/_build
 
 # MacOS
 .DS_Store
+
+.agents/
+.factory/
+skills-lock.json

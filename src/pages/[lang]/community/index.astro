@@ -1,0 +1,21 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import CommunityPage from "../../../components/pages/CommunityPage.astro";
+import { COMMUNITY_MESSAGES } from "../../../locales/community";
+import { LANGS, DEFAULT_LANG, type Lang } from "../../../config/i18n";
+
+export function getStaticPaths() {
+  return LANGS.filter((l) => l !== DEFAULT_LANG).map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang?: string };
+const safeLang: Lang = LANGS.includes((lang as Lang) || ("" as Lang))
+  ? (lang as Lang)
+  : DEFAULT_LANG;
+const messages = COMMUNITY_MESSAGES[safeLang];
+---
+<BaseLayout lang={safeLang} title={`MindQuantum – ${messages.title}`} description={messages.subtitle}>
+  <CommunityPage lang={safeLang} messages={messages} />
+</BaseLayout>

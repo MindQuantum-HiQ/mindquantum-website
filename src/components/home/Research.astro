@@ -1,0 +1,27 @@
+---
+import type { HomeMessages } from "../../locales/home";
+
+interface Props {
+  research: HomeMessages["research"];
+}
+
+const { research } = Astro.props as Props;
+const featured = new Set(research.featuredUniversities);
+---
+
+<section class="mq-container mb-16">
+  <h2 class="mq-section-title mb-3">{research.heading}</h2>
+  <p class="text-center text-foreground font-medium mb-8">{research.subtitle}</p>
+  <div class="flex flex-wrap justify-center gap-2">
+    {research.featuredUniversities.map((uni) => (
+      <span class="inline-block rounded-full bg-primary text-primary-foreground px-5 py-2 text-sm font-semibold shadow-sm">
+        {uni}
+      </span>
+    ))}
+    {research.universities.filter((u) => !featured.has(u)).map((uni) => (
+      <span class="inline-block rounded-full bg-primary/10 text-primary px-4 py-1.5 text-xs font-medium">
+        {uni}
+      </span>
+    ))}
+  </div>
+</section>

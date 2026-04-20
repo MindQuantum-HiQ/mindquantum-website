@@ -1,0 +1,55 @@
+---
+import type { HomeMessages } from "../../locales/home";
+import { withBase } from "../../config/urls";
+
+interface Props {
+  learning: HomeMessages["learning"];
+}
+
+const { learning } = Astro.props as Props;
+const BASE = import.meta.env.BASE_URL || "/";
+
+const colorClasses: Record<string, string> = {
+  primary: "bg-primary text-primary-foreground",
+  green: "bg-brand-green text-primary-foreground",
+  orange: "bg-brand-orange text-primary-foreground",
+  teal: "bg-brand-teal text-primary-foreground",
+};
+
+const badgeClasses: Record<string, string> = {
+  primary: "bg-primary text-primary-foreground",
+  green: "bg-brand-green text-primary-foreground",
+  orange: "bg-brand-orange text-primary-foreground",
+  teal: "bg-brand-teal text-primary-foreground",
+};
+---
+
+<section class="mq-container mb-16">
+  <h2 class="mq-section-title mb-10">{learning.heading}</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    {learning.cards.map((card) => {
+      const href = /^https?:\/\//.test(card.href)
+        ? card.href
+        : withBase(card.href, BASE);
+      return (
+        <a
+          href={href}
+          class="group relative mq-card p-6 block hover:shadow-lg hover:-translate-y-0.5 transition-all"
+        >
+          {card.badge && (
+            <span class:list={["absolute top-4 right-4 rounded-full px-2.5 py-0.5 text-xs", badgeClasses[card.color]]}>
+              {card.badge}
+            </span>
+          )}
+          <div class:list={["w-12 h-12 rounded-full flex items-center justify-center text-xl mb-4", colorClasses[card.color]]}>
+            {card.icon}
+          </div>
+          <h3 class="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+            {card.title}
+          </h3>
+          <p class="text-sm text-muted-foreground leading-relaxed">{card.description}</p>
+        </a>
+      );
+    })}
+  </div>
+</section>

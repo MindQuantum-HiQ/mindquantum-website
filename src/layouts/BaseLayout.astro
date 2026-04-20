@@ -1,97 +1,82 @@
 ---
 import "../styles/tokens.css";
 import "../styles/global.css";
-import LanguageSwitcher from "../components/LanguageSwitcher.astro";
-import BrandIcon from "../components/BrandIcon.astro";
-import { NAV_MESSAGES } from "../locales/nav";
+
+import Header from "../components/layout/Header.astro";
+import Footer from "../components/layout/Footer.astro";
 import { stripBase, withBase, pathForLang, detectLang } from "../config/urls";
 import { LANGS, DEFAULT_LANG, type Lang } from "../config/i18n";
-import CommunityLinks from "../components/community/CommunityLinks.astro";
-const { title = 'MindQuantum', description = 'Quantum computing with MindQuantum', lang, fullBleed = false, hideFooter = false } = Astro.props as { title?: string; description?: string; lang?: Lang; fullBleed?: boolean; hideFooter?: boolean };
-const BASE = import.meta.env.BASE_URL || '/';
+
+interface Props {
+  title?: string;
+  description?: string;
+  lang?: Lang;
+  fullBleed?: boolean;
+  hideFooter?: boolean;
+  hideHeader?: boolean;
+  bodyClass?: string;
+}
+
+const {
+  title = "MindQuantum",
+  description = "Quantum computing with MindQuantum",
+  lang,
+  fullBleed = false,
+  hideFooter = false,
+  hideHeader = false,
+  bodyClass = "",
+} = Astro.props as Props;
+
+const BASE = import.meta.env.BASE_URL || "/";
 const pathUnbased = stripBase(Astro.url.pathname, BASE);
 const currentLang = ((lang as Lang) || detectLang(pathUnbased)) as Lang;
-const nav = NAV_MESSAGES[currentLang];
-const homeHref = withBase(pathForLang('/', currentLang), BASE);
-const apiOverviewRel = currentLang === 'en' ? 'api_python_en/overview.html' : 'api_python/overview.html';
 
 // Build canonical and hreflang alternates
 const hrefFor = (l: Lang) => withBase(pathForLang(pathUnbased, l), BASE);
-const alternates = Object.fromEntries(LANGS.map((l) => [l, hrefFor(l)])) as Record<Lang, string>;
+const alternates = Object.fromEntries(
+  LANGS.map((l) => [l, hrefFor(l)])
+) as Record<Lang, string>;
 const xDefaultHref = hrefFor(DEFAULT_LANG);
 const canonicalHref = hrefFor(currentLang);
-const abs = (href: string) => (Astro.site ? new URL(href, Astro.site).toString() : href);
+const abs = (href: string) =>
+  Astro.site ? new URL(href, Astro.site).toString() : href;
 ---
+
 <!doctype html>
-<html lang={currentLang} data-full-bleed={fullBleed ? 'true' : undefined}>
+<html lang={currentLang} data-full-bleed={fullBleed ? "true" : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#0066FF" />
     <link rel="icon" type="image/svg+xml" href={`${BASE}favicon.svg`} />
     <link rel="canonical" href={abs(canonicalHref)} />
-    {Object.entries(alternates).map(([code, href]) => (
-      <link rel="alternate" hreflang={code} href={abs(href)} />
-    ))}
+    {
+      Object.entries(alternates).map(([code, href]) => (
+        <link rel="alternate" hreflang={code} href={abs(href)} />
+      ))
+    }
     <link rel="alternate" hreflang="x-default" href={abs(xDefaultHref)} />
     <title>{title}</title>
   </head>
-  <body>
-    <header class="site-header">
-      <nav class="nav">
-        <a class="brand" href={homeHref}>
-          <BrandIcon size={28} />
-          <span>MindQuantum</span>
-        </a>
-        <div class="spacer" />
-        {nav.courses && <a href={`${BASE}courses/`}>{nav.courses}</a>}
-        <a href={`${BASE}docs/${currentLang}/`}>{nav.docs}</a>
-        <a href={`${BASE}api/${currentLang}/#/${apiOverviewRel}`}>{nav.api}</a>
-        <div class="nav-group" data-kind="community">
-          <a class="nav-label" href={withBase(pathForLang('/community/', currentLang), BASE)} aria-haspopup="menu">{nav.community}</a>
-          <div class="nav-menu" role="menu">
-            <CommunityLinks lang={currentLang} variant="menu" />
-          </div>
-        </div>
-        <LanguageSwitcher lang={currentLang} />
-      </nav>
-    </header>
-    <main class={fullBleed ? 'container full-bleed' : 'container'}>
+  <body class:list={["min-h-screen flex flex-col", bodyClass]}>
+    {!hideHeader && <Header lang={currentLang} pathUnbased={pathUnbased} />}
+    <main class:list={["flex-1", fullBleed ? "w-full" : ""]}>
       <slot />
     </main>
-    { !hideFooter && (
-      <footer class="site-footer">
-        <div class="container">
-          <p>© {new Date().getFullYear()} MindQuantum. All rights reserved.</p>
-        </div>
-      </footer>
-    )}
+    {!hideFooter && <Footer lang={currentLang} />}
   </body>
   <script>
     // Persist preferred language for future visits
-    try { localStorage.setItem('mq_lang', document.documentElement.lang || 'en'); } catch (e) {}
+    try {
+      localStorage.setItem("mq_lang", document.documentElement.lang || "en");
+    } catch (e) {
+      /* no-op */
+    }
   </script>
-  <style>
-    .site-header { position: sticky; top: 0; backdrop-filter: saturate(150%) blur(6px); background: color-mix(in oklab, var(--mq-surface), transparent 20%); border-bottom: 1px solid var(--mq-border); z-index: 20; }
-    .nav { display: flex; align-items: center; gap: 1rem; padding: .75rem 1rem; max-width: var(--mq-page-max); margin: 0 auto; }
-    .brand { display: inline-flex; align-items: center; gap: .5rem; font-weight: 700; color: var(--mq-text); text-decoration: none; }
-    .brand:hover { color: var(--mq-primary); }
-    .spacer { flex: 1; }
-    .nav a { color: var(--mq-text-muted); text-decoration: none; font-weight: 600; padding: .25rem .5rem; border-radius: .375rem; }
-    .nav a:hover { color: var(--mq-text); background: var(--mq-surface-2); }
-    .nav-group { position: relative; display: inline-flex; align-items: center; }
-    .nav-group .nav-label { padding-right: .25rem; }
-    .nav-menu { position: absolute; top: 100%; right: 0; margin-top: 0; background: var(--mq-surface); border: 1px solid var(--mq-border); border-radius: .5rem; min-width: 14rem; box-shadow: 0 6px 24px rgba(0,0,0,.08); padding: .25rem; z-index: 25; display: none; }
-    .nav-group:hover .nav-menu,
-    .nav-group:focus-within .nav-menu { display: block; }
-    @media (hover: none) { .nav-group .nav-menu { display: none !important; } }
-    @media (max-width: 640px) { .nav-menu { right: auto; left: 0; min-width: 12rem; } }
-    .container { max-width: var(--mq-page-max); padding: 2rem 1rem; margin: 0 auto; }
-    .container.full-bleed { max-width: none; padding: 0; margin: 0; }
-    .site-footer { border-top: 1px solid var(--mq-border); background: var(--mq-surface); color: var(--mq-text-muted); }
-
-    /* Full-bleed pages (e.g., embedded docs) should not scroll the parent */
-    html[data-full-bleed] body { overflow: hidden; }
-    html[data-full-bleed] .site-footer { display: none; }
+  <style is:global>
+    html[data-full-bleed] body {
+      overflow: hidden;
+    }
   </style>
 </html>

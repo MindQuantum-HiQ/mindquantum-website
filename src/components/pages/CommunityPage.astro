@@ -1,0 +1,68 @@
+---
+import type { Lang } from "../../config/i18n";
+import type { CommunityMessages } from "../../locales/community";
+import { CODE_MIRRORS } from "../../config/site";
+import { withBase } from "../../config/urls";
+
+interface Props {
+  lang: Lang;
+  messages: CommunityMessages;
+}
+
+const { messages } = Astro.props as Props;
+const BASE = import.meta.env.BASE_URL || "/";
+
+function resolveHref(href: string) {
+  if (/^https?:\/\//.test(href)) return href;
+  return withBase(href, BASE);
+}
+
+const actionClass = (id: string) =>
+  id === "gitee"
+    ? "mq-btn-orange"
+    : "mq-btn-primary";
+---
+
+<section class="relative overflow-hidden bg-hero-gradient">
+  <div class="mq-container py-16">
+    <h1 class="text-4xl md:text-5xl font-bold text-foreground mb-3">{messages.title}</h1>
+    <p class="text-sm md:text-base text-muted-foreground max-w-2xl leading-relaxed mb-6">
+      {messages.subtitle}
+    </p>
+    <div class="flex flex-wrap gap-3">
+      {CODE_MIRRORS.map((mirror) => (
+        <a
+          href={mirror.href}
+          target="_blank"
+          rel="noopener"
+          class:list={["px-6", actionClass(mirror.id)]}
+        >
+          {mirror.label}
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<section class="mq-container my-10 space-y-10">
+  {messages.sections.map((section) => (
+    <div>
+      <h2 class="text-xl md:text-2xl font-bold text-foreground mb-4">{section.title}</h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {section.items.map((item) => (
+          <a
+            href={resolveHref(item.href)}
+            target={/^https?:\/\//.test(item.href) ? "_blank" : undefined}
+            rel={/^https?:\/\//.test(item.href) ? "noopener" : undefined}
+            class="mq-card p-6 block hover:shadow-md hover:-translate-y-0.5 transition-all group"
+          >
+            <h3 class="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
+              {item.label}
+            </h3>
+            <p class="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  ))}
+</section>

@@ -1,0 +1,12 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ComposerPage from "../../components/pages/ComposerPage.astro";
+import { COMPOSER_MESSAGES } from "../../locales/composer";
+import { DEFAULT_LANG } from "../../config/i18n";
+
+const lang = DEFAULT_LANG;
+const messages = COMPOSER_MESSAGES[lang];
+---
+<BaseLayout lang={lang} title={`MindQuantum – ${messages.title}`} description={messages.metaDescription}>
+  <ComposerPage lang={lang} messages={messages} />
+</BaseLayout>

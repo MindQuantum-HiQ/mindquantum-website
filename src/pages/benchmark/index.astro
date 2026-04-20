@@ -1,0 +1,12 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import BenchmarkPage from "../../components/pages/BenchmarkPage.astro";
+import { BENCHMARK_MESSAGES } from "../../locales/benchmark";
+import { DEFAULT_LANG } from "../../config/i18n";
+
+const lang = DEFAULT_LANG;
+const messages = BENCHMARK_MESSAGES[lang];
+---
+<BaseLayout lang={lang} title={`MindQuantum – ${messages.title}`} description={messages.metaDescription}>
+  <BenchmarkPage lang={lang} messages={messages} />
+</BaseLayout>

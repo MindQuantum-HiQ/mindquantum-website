@@ -1,0 +1,32 @@
+---
+import type { HomeMessages } from "../../locales/home";
+import { withBase } from "../../config/urls";
+
+interface Props {
+  announcement: HomeMessages["announcement"];
+}
+
+const { announcement } = Astro.props as Props;
+const BASE = import.meta.env.BASE_URL || "/";
+const href = /^https?:\/\//.test(announcement.href)
+  ? announcement.href
+  : withBase(announcement.href, BASE);
+---
+
+<section class="mq-container my-8">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-xl border border-border bg-background px-6 py-4 shadow-sm">
+    <div class="flex items-center gap-3">
+      <svg aria-hidden="true" class="w-5 h-5 text-muted-foreground shrink-0" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M14 8v8l5 4V4l-5 4Zm-2 10H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h7v12Z" />
+      </svg>
+      <span class="text-sm text-foreground">{announcement.text}</span>
+    </div>
+    <a
+      href={href}
+      class="mq-btn border border-brand-orange text-brand-orange hover:bg-brand-orange/10"
+    >
+      {announcement.cta}
+      <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6l-6 6" /></svg>
+    </a>
+  </div>
+</section>

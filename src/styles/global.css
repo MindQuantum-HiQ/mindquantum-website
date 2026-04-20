@@ -1,13 +1,108 @@
-html { color-scheme: light; }
-:root { font-family: var(--mq-font-sans); }
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--mq-bg); color: var(--mq-text); }
-img { max-width: 100%; height: auto; }
-pre, code, kbd, samp { font-family: var(--mq-font-mono); }
-a { color: var(--mq-primary); }
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Prose */
-.prose { line-height: 1.65; }
-.prose h1, .prose h2, .prose h3 { line-height: 1.2; }
-.prose h2 { margin-top: 2rem; }
+@layer base {
+  :root {
+    color-scheme: light;
+    font-family: theme("fontFamily.sans");
+  }
 
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    margin: 0;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  pre,
+  code,
+  kbd,
+  samp {
+    font-family: theme("fontFamily.mono");
+  }
+
+  a {
+    color: hsl(var(--primary));
+  }
+}
+
+@layer components {
+  .mq-container {
+    @apply mx-auto w-full max-w-[1200px] px-6 md:px-8;
+  }
+
+  .mq-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium
+           transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+           focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .mq-btn-primary {
+    @apply mq-btn bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+
+  .mq-btn-orange {
+    @apply mq-btn bg-brand-orange text-primary-foreground hover:bg-brand-orange/90;
+  }
+
+  .mq-btn-outline {
+    @apply mq-btn border border-border bg-background text-foreground hover:bg-secondary;
+  }
+
+  .mq-btn-ghost {
+    @apply mq-btn text-foreground hover:bg-secondary;
+  }
+
+  .mq-card {
+    @apply rounded-xl border border-border bg-card text-card-foreground shadow-sm;
+  }
+
+  .mq-section-title {
+    @apply text-3xl md:text-4xl font-bold tracking-tight text-foreground text-center;
+  }
+
+  .mq-link-arrow {
+    @apply inline-flex items-center gap-1 text-primary font-medium hover:underline;
+  }
+}
+
+@layer utilities {
+  .text-gradient-brand {
+    background-image: var(--cta-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+}
+
+/* ---------------------------------------------------------------------
+ * Prose — used by content pages and the landing description blocks
+ * ---------------------------------------------------------------------*/
+.prose {
+  line-height: 1.65;
+}
+.prose h1,
+.prose h2,
+.prose h3 {
+  line-height: 1.2;
+}
+.prose h2 {
+  margin-top: 2rem;
+}

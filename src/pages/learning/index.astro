@@ -1,0 +1,12 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import LearningPage from "../../components/pages/LearningPage.astro";
+import { LEARNING_MESSAGES } from "../../locales/learning";
+import { DEFAULT_LANG } from "../../config/i18n";
+
+const lang = DEFAULT_LANG;
+const messages = LEARNING_MESSAGES[lang];
+---
+<BaseLayout lang={lang} title={`MindQuantum – ${messages.title}`} description={messages.metaDescription}>
+  <LearningPage lang={lang} messages={messages} />
+</BaseLayout>

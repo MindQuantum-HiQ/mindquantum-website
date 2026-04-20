@@ -1,0 +1,27 @@
+---
+import QuantumCircuitBuilder from "../QuantumCircuitBuilder.astro";
+import type { Lang } from "../../config/i18n";
+import type { ComposerMessages } from "../../locales/composer";
+
+interface Props {
+  lang: Lang;
+  messages: ComposerMessages;
+}
+
+const { lang, messages } = Astro.props as Props;
+---
+
+<section class="relative overflow-hidden bg-hero-gradient">
+  <div class="mq-container py-16">
+    <h1 class="text-4xl md:text-5xl font-bold text-foreground mb-3">{messages.title}</h1>
+    <p class="text-sm md:text-base text-muted-foreground max-w-2xl leading-relaxed">
+      {messages.subtitle}
+    </p>
+  </div>
+</section>
+
+<section class="mq-container my-10">
+  <div class="mq-card bg-background p-4 sm:p-6">
+    <QuantumCircuitBuilder lang={lang} heading="" />
+  </div>
+</section>

@@ -1,0 +1,194 @@
+---
+import { Image } from "astro:assets";
+import heroQuantum from "../../assets/home/hero-bg-quantum.jpg";
+import heroInternship from "../../assets/home/hero-bg-internship.jpg";
+import heroMeeting from "../../assets/home/hero-bg-meeting.jpg";
+import type { HeroSlide } from "../../locales/home";
+import { withBase } from "../../config/urls";
+
+interface Props {
+  slides: HeroSlide[];
+}
+
+const { slides } = Astro.props as Props;
+const BASE = import.meta.env.BASE_URL || "/";
+
+const backgrounds = {
+  quantum: heroQuantum,
+  internship: heroInternship,
+  meeting: heroMeeting,
+};
+
+const actionClasses: Record<string, string> = {
+  primary: "mq-btn-primary",
+  orange: "mq-btn-orange",
+  outline:
+    "mq-btn border border-white/40 bg-white/20 backdrop-blur text-white hover:bg-white/30",
+};
+
+function resolveHref(href: string) {
+  if (/^https?:\/\//.test(href)) return href;
+  return withBase(href, BASE);
+}
+---
+
+<section class="relative overflow-hidden border-b border-border" aria-label="About MindSpore Quantum" data-hero-carousel>
+  <div class="relative" data-hero-track>
+    {slides.map((slide, index) => {
+      const bg = backgrounds[slide.background];
+      const titleColor = slide.tone === "light" ? "text-foreground" : "text-white";
+      const subColor = slide.tone === "light" ? "text-muted-foreground" : "text-white/85";
+      const eyebrowColor = slide.tone === "light" ? "text-primary" : "text-white";
+      return (
+        <article
+          class="hero-slide absolute inset-0 opacity-0 transition-opacity duration-700 ease-out"
+          data-hero-slide
+          data-index={index}
+          aria-hidden={index === 0 ? "false" : "true"}
+        >
+          <Image
+            src={bg}
+            alt=""
+            class="absolute inset-0 h-full w-full object-cover"
+            loading={index === 0 ? "eager" : "lazy"}
+            widths={[800, 1280, 1920]}
+            sizes="100vw"
+          />
+          {slide.tone === "light" ? (
+            <div class="absolute inset-0 bg-gradient-to-r from-background/90 via-background/60 to-transparent" />
+          ) : (
+            <div class="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+          )}
+
+          <div class="relative mq-container py-20 md:py-28">
+            <div class="max-w-xl">
+              {slide.eyebrow && (
+                <p class:list={["text-sm font-semibold uppercase tracking-wider mb-3", eyebrowColor]}>
+                  {slide.eyebrow}
+                </p>
+              )}
+              <h1 class:list={["text-4xl md:text-5xl font-bold leading-tight mb-4", titleColor]}>
+                {slide.title}
+              </h1>
+              <p class:list={["text-lg mb-8 max-w-lg", subColor]}>{slide.subtitle}</p>
+              <div class="flex flex-wrap gap-3">
+                {slide.actions.map((action) => (
+                  <a
+                    href={resolveHref(action.href)}
+                    target={action.external ? "_blank" : undefined}
+                    rel={action.external ? "noopener" : undefined}
+                    class:list={["px-6 gap-2", actionClasses[action.variant]]}
+                  >
+                    {action.icon === "play" && (
+                      <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5v14l11-7L8 5Z" /></svg>
+                    )}
+                    <span>{action.label}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </article>
+      );
+    })}
+    <div class="min-h-[420px] md:min-h-[520px]" aria-hidden="true"></div>
+  </div>
+
+  <button
+    type="button"
+    aria-label="Previous slide"
+    data-hero-prev
+    class="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background/70 backdrop-blur border border-border flex items-center justify-center text-foreground hover:bg-background transition"
+  >
+    <svg aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m15 18l-6-6l6-6" /></svg>
+  </button>
+  <button
+    type="button"
+    aria-label="Next slide"
+    data-hero-next
+    class="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background/70 backdrop-blur border border-border flex items-center justify-center text-foreground hover:bg-background transition"
+  >
+    <svg aria-hidden="true" class="w-5 h-5" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 18l6-6l-6-6" /></svg>
+  </button>
+
+  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10" role="tablist" aria-label="Slide selector">
+    {slides.map((_slide, index) => (
+      <button
+        type="button"
+        data-hero-dot
+        data-index={index}
+        role="tab"
+        aria-selected={index === 0 ? "true" : "false"}
+        aria-label={`Go to slide ${index + 1}`}
+        class="h-2 w-2 rounded-full bg-background/60 hover:bg-background/80 transition-all data-[active=true]:w-8 data-[active=true]:bg-primary"
+        data-active={index === 0 ? "true" : "false"}
+      />
+    ))}
+  </div>
+</section>
+
+<script>
+  (function () {
+    const root = document.querySelector("[data-hero-carousel]") as HTMLElement | null;
+    if (!root) return;
+    const slides = Array.from(root.querySelectorAll<HTMLElement>("[data-hero-slide]"));
+    const dots = Array.from(root.querySelectorAll<HTMLElement>("[data-hero-dot]"));
+    const prev = root.querySelector<HTMLButtonElement>("[data-hero-prev]");
+    const next = root.querySelector<HTMLButtonElement>("[data-hero-next]");
+    if (slides.length === 0) return;
+
+    let index = 0;
+    let timer: ReturnType<typeof setInterval> | null = null;
+    const DELAY = 6500;
+
+    function show(i: number) {
+      index = (i + slides.length) % slides.length;
+      slides.forEach((el, j) => {
+        const isActive = j === index;
+        el.style.opacity = isActive ? "1" : "0";
+        el.style.pointerEvents = isActive ? "auto" : "none";
+        el.setAttribute("aria-hidden", isActive ? "false" : "true");
+      });
+      dots.forEach((dot, j) => {
+        const isActive = j === index;
+        dot.dataset.active = isActive ? "true" : "false";
+        dot.setAttribute("aria-selected", isActive ? "true" : "false");
+      });
+    }
+
+    function start() {
+      stop();
+      timer = setInterval(() => show(index + 1), DELAY);
+    }
+    function stop() {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    prev?.addEventListener("click", () => {
+      show(index - 1);
+      start();
+    });
+    next?.addEventListener("click", () => {
+      show(index + 1);
+      start();
+    });
+    dots.forEach((dot, i) => {
+      dot.addEventListener("click", () => {
+        show(i);
+        start();
+      });
+    });
+    root.addEventListener("mouseenter", stop);
+    root.addEventListener("mouseleave", start);
+    root.addEventListener("focusin", stop);
+    root.addEventListener("focusout", (e) => {
+      if (!root.contains(e.relatedTarget as Node)) start();
+    });
+
+    show(0);
+    start();
+  })();
+</script>

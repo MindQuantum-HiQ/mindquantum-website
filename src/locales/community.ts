@@ -6,6 +6,17 @@ export type CommunityItemMessages = {
   cta: string;
 };
 
+export type CommunitySectionItem = {
+  label: string;
+  description: string;
+  href: string;
+};
+
+export type CommunitySection = {
+  title: string;
+  items: CommunitySectionItem[];
+};
+
 export type CommunityMessages = {
   title: string;
   subtitle: string;
@@ -15,40 +26,107 @@ export type CommunityMessages = {
     website: CommunityItemMessages;
     evangelists: CommunityItemMessages;
   };
+  heroActions: {
+    atomgit: string;
+    github: string;
+    gitee: string;
+  };
+  sections: CommunitySection[];
 };
 
 export const COMMUNITY_MESSAGES: Record<Lang, CommunityMessages> = {
   en: {
     title: "Community",
-    subtitle: "Connect with MindQuantum – explore the code, visit MindSpore, or join our evangelist program.",
+    subtitle:
+      "Join the MindSpore Quantum community to contribute, learn, and grow together.",
     opensInNewTab: "(opens in new tab)",
     items: {
       repo: {
-        label: "Code on Gitee",
-        description: "Browse the open-source MindQuantum repository, report issues, and contribute.",
-        cta: "Open Gitee",
+        label: "Code on AtomGit",
+        description:
+          "Browse the open-source MindQuantum repository, report issues, and contribute.",
+        cta: "Open AtomGit",
       },
       website: {
         label: "MindSpore Website",
-        description: "Discover the broader MindSpore ecosystem, news, and documentation.",
+        description:
+          "Discover the broader MindSpore ecosystem, news, and documentation.",
         cta: "Visit MindSpore",
       },
       evangelists: {
         label: "Join as Evangelist",
-        description: "Apply to become a MindSpore/MindQuantum evangelist and help grow the community.",
+        description:
+          "Apply to become a MindSpore/MindQuantum evangelist and help grow the community.",
         cta: "Apply Now",
       },
     },
+    heroActions: {
+      atomgit: "AtomGit",
+      github: "GitHub",
+      gitee: "Gitee",
+    },
+    sections: [
+      {
+        title: "Contribution and Growth",
+        items: [
+          {
+            label: "Contribution Guide",
+            description: "Learn how to contribute to MindSpore Quantum.",
+            href: "https://atomgit.com/mindspore/mindquantum",
+          },
+          {
+            label: "Developer Growth and Certification",
+            description: "Track your progress and get certified.",
+            href: "https://www.mindspore.cn/developers",
+          },
+        ],
+      },
+      {
+        title: "Competition Activities",
+        items: [
+          {
+            label: "Internship",
+            description: "Online open-source internship tasks and opportunities.",
+            href: "https://www.mindspore.cn/community",
+          },
+          {
+            label: "Hackathon Competition",
+            description: "Participate in quantum computing hackathons.",
+            href: "https://www.mindspore.cn/community",
+          },
+        ],
+      },
+      {
+        title: "Resources",
+        items: [
+          {
+            label: "Group Meeting Live Stream — Koushare",
+            description: "Watch live streams on Koushare.",
+            href: "https://www.koushare.com/",
+          },
+          {
+            label: "Group Meeting Live Stream — BiliBili",
+            description: "Watch live streams on BiliBili.",
+            href: "https://www.bilibili.com/",
+          },
+          {
+            label: "Paper Intensive Lecture",
+            description: "Deep dive into quantum computing papers.",
+            href: "https://www.koushare.com/",
+          },
+        ],
+      },
+    ],
   },
   zh: {
     title: "社区",
-    subtitle: "与 MindQuantum 连接：查看代码、访问 MindSpore 官网，或申请成为布道师。",
+    subtitle: "加入 MindSpore Quantum 社区，与大家一起贡献、学习与成长。",
     opensInNewTab: "（在新标签页打开）",
     items: {
       repo: {
-        label: "代码仓库（Gitee）",
+        label: "AtomGit 代码仓库",
         description: "浏览 MindQuantum 开源仓库，提交问题并参与贡献。",
-        cta: "前往 Gitee",
+        cta: "前往 AtomGit",
       },
       website: {
         label: "MindSpore 官网",
@@ -56,10 +134,68 @@ export const COMMUNITY_MESSAGES: Record<Lang, CommunityMessages> = {
         cta: "访问官网",
       },
       evangelists: {
-        label: "布道师申请",
-        description: "申请成为 MindSpore/MindQuantum 布道师，共同壮大社区。",
+        label: "申请布道师",
+        description:
+          "申请成为 MindSpore/MindQuantum 布道师，共同壮大社区。",
         cta: "立即申请",
       },
     },
+    heroActions: {
+      atomgit: "AtomGit",
+      github: "GitHub",
+      gitee: "Gitee",
+    },
+    sections: [
+      {
+        title: "贡献与成长",
+        items: [
+          {
+            label: "贡献指南",
+            description: "了解如何为 MindSpore Quantum 贡献代码。",
+            href: "https://atomgit.com/mindspore/mindquantum",
+          },
+          {
+            label: "开发者成长与认证",
+            description: "跟踪你的成长路径，获取认证。",
+            href: "https://www.mindspore.cn/developers",
+          },
+        ],
+      },
+      {
+        title: "竞赛活动",
+        items: [
+          {
+            label: "实习",
+            description: "在线开源实习任务与机会。",
+            href: "https://www.mindspore.cn/community",
+          },
+          {
+            label: "黑客松比赛",
+            description: "参加量子计算黑客松。",
+            href: "https://www.mindspore.cn/community",
+          },
+        ],
+      },
+      {
+        title: "资源",
+        items: [
+          {
+            label: "组会直播 — 蔻享",
+            description: "在蔻享观看组会直播。",
+            href: "https://www.koushare.com/",
+          },
+          {
+            label: "组会直播 — 哔哩哔哩",
+            description: "在哔哩哔哩观看组会直播。",
+            href: "https://www.bilibili.com/",
+          },
+          {
+            label: "论文精讲",
+            description: "深入解读量子计算相关论文。",
+            href: "https://www.koushare.com/",
+          },
+        ],
+      },
+    ],
   },
 };

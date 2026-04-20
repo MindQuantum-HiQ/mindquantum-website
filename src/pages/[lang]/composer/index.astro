@@ -1,0 +1,21 @@
+---
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import ComposerPage from "../../../components/pages/ComposerPage.astro";
+import { COMPOSER_MESSAGES } from "../../../locales/composer";
+import { LANGS, DEFAULT_LANG, type Lang } from "../../../config/i18n";
+
+export function getStaticPaths() {
+  return LANGS.filter((l) => l !== DEFAULT_LANG).map((lang) => ({
+    params: { lang },
+  }));
+}
+
+const { lang } = Astro.params as { lang?: string };
+const safeLang: Lang = LANGS.includes((lang as Lang) || ("" as Lang))
+  ? (lang as Lang)
+  : DEFAULT_LANG;
+const messages = COMPOSER_MESSAGES[safeLang];
+---
+<BaseLayout lang={safeLang} title={`MindQuantum – ${messages.title}`} description={messages.metaDescription}>
+  <ComposerPage lang={safeLang} messages={messages} />
+</BaseLayout>

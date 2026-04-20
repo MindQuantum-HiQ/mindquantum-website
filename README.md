@@ -4,11 +4,13 @@ Astro + Jupyter Book monorepo for the MindQuantum website and bilingual document
 
 ## Overview
 
-- Astro powers the homepage and overall site shell.
+- Astro powers the marketing pages (home, composer, learning, documentation, benchmark, community) and the overall site shell.
+- Tailwind CSS drives layout/utility styling on top of shared design tokens.
+- React islands (hydrated sparingly) render the Recharts-based benchmark charts; every other interactive piece (hero carousel, header menus, quantum circuit composer) is vanilla JS or a Web Component.
 - Jupyter Book builds bilingual tutorials only (EN+ZH).
 - Jupyter Book also builds the self-contained course notebooks under `/courses`.
 - Sphinx builds the API reference as two projects (EN+ZH) using the internal `mqdocs` extension.
-- Shared design tokens keep visual consistency across both.
+- Shared design tokens keep visual consistency across the site and the Jupyter Book theme.
 - GitHub Pages workflow builds and deploys both outputs together.
 
 ## Local Development
@@ -83,31 +85,54 @@ The extension avoids monkey-patches and implements stable `mscnautosummary`/`ms*
 
 ## Build and Deploy
 
+- `npm run build` runs `scripts/prepare-tokens.mjs` (which syncs design tokens into the Jupyter Book theme) and then `astro build`.
 - `npm run build:all` builds Jupyter Books (tutorials + courses) and Sphinx into `public/{docs,courses}/**`, then builds Astro into `dist/`. Temporary artifacts are centralized under `docs/_build/` and `courses/_build/`.
 - GitHub Actions workflow `.github/workflows/deploy.yml` builds both and deploys the `dist/` folder to GitHub Pages. It auto-detects committed custom domains via `public/CNAME`, exporting `ASTRO_BASE` and `SITE_URL` before the Astro build.
 
-## Docs Routing
+## Site Routes
 
-- Tutorials (Jupyter Book): `/docs/en` and `/docs/zh` (from `public/docs/en` and `public/docs/zh`).
-- Courses (Jupyter Book): `/courses` (from `public/courses/zh`).
-- API (Sphinx): `/docs/api/en` and `/docs/api/zh` (from `public/docs/api/en` and `public/docs/api/zh`).
-- The site header should link to Tutorials and API for both languages.
+Marketing pages (EN at the shown path, ZH mirrored under `/zh/…`):
+
+- `/` – Home (hero carousel, announcement, architecture, features, research, learning, CTA)
+- `/composer/` – Interactive quantum circuit composer
+- `/learning/` – Learning landing (courses, video courses, white paper, paper code)
+- `/documentation/` – Documentation landing (installation, case library, API, etc.)
+- `/benchmark/` – Recharts benchmark comparisons
+- `/community/` – Community hub (contribution, competitions, resources)
+
+Docs routes:
+
+- Tutorials (Jupyter Book): `/docs/en/` and `/docs/zh/` (from `public/docs/en` and `public/docs/zh`).
+- Courses (Jupyter Book): `/courses/` (from `public/courses/zh`).
+- API (Sphinx): `/api/en/` and `/api/zh/` (from `public/docs/api/en` and `public/docs/api/zh`).
 
 ## Theming
 
-- Shared CSS tokens live in `src/styles/tokens.css`.
-- A small build step copies tokens to `docs/_static/mq-variables.css` so Jupyter Book can consume them.
+- Shared CSS tokens live in `src/styles/tokens.css`. The file defines two parallel systems: HSL tokens consumed by Tailwind (`tailwind.config.mjs`) and legacy `--mq-*` tokens consumed by the Jupyter Book theme.
+- `scripts/prepare-tokens.mjs` copies `tokens.css` into `docs/_static/mq-variables.css` so Jupyter Book can consume the same tokens.
 - Jupyter Book loads `mq-variables.css` and `mq-theme.css` to style pages in line with the homepage.
+- Reusable Tailwind component classes (`mq-container`, `mq-btn-*`, `mq-card`, `mq-section-title`, `mq-link-arrow`) and gradients (`bg-cta-gradient`, `bg-hero-gradient`) live in `src/styles/global.css`.
 
 ## Structure
 
 - `src/` – Astro pages, layouts, and styles.
+  - `src/components/layout/` – Site header and footer.
+  - `src/components/home/` – Homepage sections (hero carousel, announcement, framework intro, features, research, start learning, CTA).
+  - `src/components/pages/` – Per-route page components (Composer, Learning, Documentation, Benchmark, Community).
+  - `src/components/charts/` – React chart islands (Recharts).
+  - `src/components/circuit/` – Web Component implementation of the quantum circuit composer.
+  - `src/locales/` – Typed i18n strings, one module per content area.
+  - `src/config/` – Shared config (`i18n.ts`, `site.ts`, `urls.ts`, `community.ts`).
+  - `src/styles/` – `tokens.css` (design tokens) and `global.css` (Tailwind entry + base layers).
+  - `src/pages/` – Astro routes (`/`, `/composer/`, `/learning/`, `/documentation/`, `/benchmark/`, `/community/`, plus the iframe wrappers for docs, API, and courses; `[lang]/…` mirrors each page for non-default languages).
 - `public/` – static assets. Built docs are copied to `public/docs` (ignored by Git).
 - `docs/` – Documentation workspace:
   - Jupyter Book projects: `docs/en` and `docs/zh` (tutorials only)
   - Sphinx API projects: `docs/api-en` and `docs/api-zh`
   - Shared assets: `docs/_ext`, `docs/_static`, `docs/_templates`
 - `scripts/` – helper scripts (token sync, upstream sync, local build).
+- `tailwind.config.mjs` – Tailwind theme wired into the shared design tokens.
+- `astro.config.mjs` – registers `@astrojs/react` and `@astrojs/tailwind`.
 
 ## Interactive Tutorials (Thebe + Binder)
 
@@ -130,15 +155,14 @@ Customization & maintenance:
 - To limit per-cell buttons: adjust the selector logic in `mq-thebe.js` (function `attachRunButtons`) to match only your preferred patterns (e.g., only `.cell` or only `code.language-python`). Cells inside `.thebe-ignored` are skipped automatically.
 - The script avoids private Thebe internals: it triggers the standard launch button and clicks the cell’s built-in `.thebe-run-button`. This keeps it resilient across Thebe/Jupyter Book updates.
 
-## Quantum Graphical Programming (Homepage)
+## Quantum Graphical Programming (Composer)
 
-The homepage includes an interactive circuit builder that enables quantum graphical programming directly in the browser.
+A dedicated `/composer/` page hosts the interactive circuit builder that enables quantum graphical programming directly in the browser.
 
 - Drag-and-drop gates, pick controls/targets, and view simulated results live.
 - Implemented as a standalone web component `mq-circuit-builder` with:
   - UI logic in `src/components/circuit/QuantumCircuitElement.ts`
   - Styles in `src/components/circuit/styles.css`
-- Wrapped for Astro via `src/components/QuantumCircuitBuilder.astro` and rendered on
-  `src/pages/index.astro` and `src/pages/[lang]/index.astro`.
-- Labels/i18n come from `src/locales/home.ts` under the `builder` section.
+- Wrapped for Astro via `src/components/QuantumCircuitBuilder.astro` and composed by `src/components/pages/ComposerPage.astro`, which is rendered at `src/pages/composer/index.astro` and `src/pages/[lang]/composer/index.astro`.
+- Labels/i18n come from `src/locales/composer.ts` and `src/locales/home.ts` (`builder` section, consumed by the web component).
 - Runs fully client-side; no server or Python environment required.

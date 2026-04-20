@@ -1,0 +1,12 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import DocumentationPage from "../../components/pages/DocumentationPage.astro";
+import { DOCUMENTATION_MESSAGES } from "../../locales/documentation";
+import { DEFAULT_LANG } from "../../config/i18n";
+
+const lang = DEFAULT_LANG;
+const messages = DOCUMENTATION_MESSAGES[lang];
+---
+<BaseLayout lang={lang} title={`MindQuantum – ${messages.title}`} description={messages.metaDescription}>
+  <DocumentationPage lang={lang} messages={messages} />
+</BaseLayout>

@@ -4,11 +4,13 @@ MindQuantum 网站和双语文档的 Astro + Jupyter Book 单一代码库。
 
 ## 概述
 
-- Astro 驱动主页和整个网站外壳。
+- Astro 驱动全部营销页面（首页、Composer、Learning、Documentation、Benchmark、Community）以及整个站点外壳。
+- Tailwind CSS 在共享设计令牌之上提供布局与工具类样式。
+- React 岛屿（按需水合）仅用于 Recharts 基准测试图表；其它交互（Hero 轮播、头部菜单、量子电路编辑器）均使用原生 JS 或 Web Component。
 - Jupyter Book 仅构建双语教程（英文+中文）。
 - Jupyter Book 还会构建位于 `/courses` 下的独立课程笔记本。
 - Sphinx 使用内部 `mqdocs` 扩展构建两个项目（英文+中文）的 API 参考。
-- 共享设计令牌保持两者之间的视觉一致性。
+- 共享设计令牌保持网站与 Jupyter Book 主题之间的视觉一致性。
 - GitHub Pages 工作流同时构建和部署这两个输出。
 
 ## 本地开发
@@ -83,31 +85,54 @@ sphinx-build -b html docs/api-zh docs/_build/api/zh
 
 ## 构建和部署
 
+- `npm run build` 会先执行 `scripts/prepare-tokens.mjs`（将设计令牌同步到 Jupyter Book 主题），随后运行 `astro build`。
 - `npm run build:all` 会将 Jupyter Books（教程 + 课程）和 Sphinx 构建到 `public/{docs,courses}/**`，然后将 Astro 构建到 `dist/`。临时工件集中在 `docs/_build/` 与 `courses/_build/` 下。
 - GitHub Actions 工作流 `.github/workflows/deploy.yml` 会构建两者并将 `dist/` 文件夹部署到 GitHub Pages。它会通过检测 `public/CNAME` 中提交的自定义域名，在构建前导出 `ASTRO_BASE` 与 `SITE_URL`。
 
-## 文档路由
+## 站点路由
 
-- 教程 (Jupyter Book)：`/docs/en` 和 `/docs/zh` (来自 `public/docs/en` 和 `public/docs/zh`)。
-- 课程 (Jupyter Book)：`/courses` (来自 `public/courses/zh`)。
-- API (Sphinx)：`/docs/api/en` 和 `/docs/api/zh` (来自 `public/docs/api/en` 和 `public/docs/api/zh`)。
-- 网站头部应链接到两种语言的教程和 API。
+营销页面（英文版位于所示路径，中文版镜像到 `/zh/…`）：
+
+- `/` — 首页（Hero 轮播、公告栏、架构图、核心特性、研究高校、学习入口、CTA）
+- `/composer/` — 交互式量子电路编辑器
+- `/learning/` — 学习落地页（课程、视频课程、白皮书、论文代码）
+- `/documentation/` — 文档落地页（安装、案例库、API 等）
+- `/benchmark/` — 基于 Recharts 的性能基准对比
+- `/community/` — 社区中心（贡献、竞赛、资源）
+
+文档路由：
+
+- 教程 (Jupyter Book)：`/docs/en/` 和 `/docs/zh/`（来自 `public/docs/en` 和 `public/docs/zh`）。
+- 课程 (Jupyter Book)：`/courses/`（来自 `public/courses/zh`）。
+- API (Sphinx)：`/api/en/` 和 `/api/zh/`（来自 `public/docs/api/en` 和 `public/docs/api/zh`）。
 
 ## 主题
 
-- 共享 CSS 令牌位于 `src/styles/tokens.css`。
-- 一个小的构建步骤会将令牌复制到 `docs/_static/mq-variables.css`，以便 Jupyter Book 可以使用它们。
+- 共享 CSS 令牌位于 `src/styles/tokens.css`。该文件维护两套并行体系：由 Tailwind (`tailwind.config.mjs`) 使用的 HSL 令牌，以及由 Jupyter Book 主题使用的遗留 `--mq-*` 令牌。
+- `scripts/prepare-tokens.mjs` 将 `tokens.css` 复制到 `docs/_static/mq-variables.css`，以便 Jupyter Book 可以使用相同的令牌。
 - Jupyter Book 加载 `mq-variables.css` 和 `mq-theme.css` 以使页面样式与主页保持一致。
+- 可复用的 Tailwind 组件类（`mq-container`、`mq-btn-*`、`mq-card`、`mq-section-title`、`mq-link-arrow`）与渐变工具类（`bg-cta-gradient`、`bg-hero-gradient`）定义在 `src/styles/global.css` 中。
 
 ## 结构
 
-- `src/` – Astro 页面、布局和样式。
-- `public/` – 静态资产。构建的文档会复制到 `public/docs`（被 Git 忽略）。
-- `docs/` – 文档工作区：
+- `src/` — Astro 页面、布局和样式。
+  - `src/components/layout/` — 站点头部与页脚。
+  - `src/components/home/` — 首页分区（Hero 轮播、公告栏、框架介绍、核心特性、研究高校、学习入口、CTA）。
+  - `src/components/pages/` — 每条路由对应的页面组件（Composer、Learning、Documentation、Benchmark、Community）。
+  - `src/components/charts/` — React 图表岛屿（Recharts）。
+  - `src/components/circuit/` — 量子电路编辑器的 Web Component 实现。
+  - `src/locales/` — 类型化 i18n 文案，按内容分区组织。
+  - `src/config/` — 共享配置（`i18n.ts`、`site.ts`、`urls.ts`、`community.ts`）。
+  - `src/styles/` — `tokens.css`（设计令牌）与 `global.css`（Tailwind 入口 + 基础层）。
+  - `src/pages/` — Astro 路由（`/`、`/composer/`、`/learning/`、`/documentation/`、`/benchmark/`、`/community/`，以及 docs/API/courses 的 iframe 封装；`[lang]/…` 为非默认语言生成镜像页面）。
+- `public/` — 静态资产。构建的文档会复制到 `public/docs`（被 Git 忽略）。
+- `docs/` — 文档工作区：
   - Jupyter Book 项目：`docs/en` 和 `docs/zh`（仅限教程）
   - Sphinx API 项目：`docs/api-en` 和 `docs/api-zh`
   - 共享资产：`docs/_ext`、`docs/_static`、`docs/_templates`
-- `scripts/` – 辅助脚本（令牌同步、上游同步、本地构建）。
+- `scripts/` — 辅助脚本（令牌同步、上游同步、本地构建）。
+- `tailwind.config.mjs` — Tailwind 主题，与共享设计令牌对齐。
+- `astro.config.mjs` — 注册 `@astrojs/react` 与 `@astrojs/tailwind`。
 
 ## 交互式教程 (Thebe + Binder)
 
@@ -120,7 +145,6 @@ sphinx-build -b html docs/api-zh docs/_build/api/zh
 ### 增强的用户体验附加功能
 
 - 每个单元格的运行按钮：在 `docs/_static/mq-thebe.js` 中实现，并由 `docs/_static/mq-thebe.css` 样式化。它在 Python 代码单元格和笔记本单元格上叠加一个小的“运行”按钮。首次点击时，它会自动激活 Thebe，然后运行被点击的单元格。
-
 - 页面横幅：教程页面顶部有一个紧凑的横幅，宣传该页面可在浏览器中运行。它提供“激活”和“运行所有示例”操作，并镜像内置的 Thebe 状态行。
 - 包含：这两个资产都在 `docs/en/_config.yml` 和 `docs/zh/_config.yml` 中注册，位于 `sphinx.config.html_css_files` 和 `sphinx.config.html_js_files` 下。
 - 可访问性：按钮包含 `aria-label`；颜色使用共享令牌以确保对比度。默认情况下，叠加层会避开复制按钮，并且如果给定页面上没有 Thebe，则会优雅地回退。
@@ -131,14 +155,14 @@ sphinx-build -b html docs/api-zh docs/_build/api/zh
 - 要限制每个单元格的按钮：调整 `mq-thebe.js` 中（函数 `attachRunButtons`）的选择器逻辑，使其仅匹配您偏好的模式（例如，仅 `.cell` 或仅 `code.language-python`）。`.thebe-ignored` 内部的单元格会自动跳过。
 - 该脚本避免了私有的 Thebe 内部机制：它触发标准的启动按钮并点击单元格内置的 `.thebe-run-button`。这使其在 Thebe/Jupyter Book 更新时仍能保持弹性。
 
-## 量子图形化编程（主页）
+## 量子图形化编程（Composer 页面）
 
-主页提供交互式电路搭建器，可在浏览器中完成量子图形化编程。
+独立的 `/composer/` 页面承载交互式电路编辑器，可在浏览器中完成量子图形化编程。
 
 - 支持拖拽量子门、选择控制/目标，并即时查看仿真结果。
 - 以 Web 组件 `mq-circuit-builder` 实现：
   - 核心逻辑：`src/components/circuit/QuantumCircuitElement.ts`
   - 样式：`src/components/circuit/styles.css`
-- 通过 `src/components/QuantumCircuitBuilder.astro` 封装，并在 `src/pages/index.astro` 与 `src/pages/[lang]/index.astro` 渲染。
-- 文案与国际化来自 `src/locales/home.ts` 的 `builder` 段。
+- 通过 `src/components/QuantumCircuitBuilder.astro` 封装，并由 `src/components/pages/ComposerPage.astro` 组合，分别在 `src/pages/composer/index.astro` 与 `src/pages/[lang]/composer/index.astro` 渲染。
+- 文案与国际化来自 `src/locales/composer.ts` 与 `src/locales/home.ts` 的 `builder` 段（后者被 Web 组件使用）。
 - 完全在浏览器端运行，无需服务器或 Python 环境。

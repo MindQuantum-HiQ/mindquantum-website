@@ -1,0 +1,38 @@
+---
+import type { HomeMessages } from "../../locales/home";
+import { withBase } from "../../config/urls";
+
+interface Props {
+  cta: HomeMessages["cta"];
+}
+
+const { cta } = Astro.props as Props;
+const BASE = import.meta.env.BASE_URL || "/";
+
+function resolveHref(href: string) {
+  if (/^https?:\/\//.test(href)) return href;
+  return withBase(href, BASE);
+}
+---
+
+<section class="bg-cta-gradient">
+  <div class="mq-container py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+    <p class="text-primary-foreground font-medium text-lg">
+      {cta.title}
+    </p>
+    <div class="flex flex-wrap gap-3">
+      <a
+        href={resolveHref(cta.installHref)}
+        class="mq-btn border border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10"
+      >
+        {cta.installLabel}
+      </a>
+      <a
+        href={resolveHref(cta.docsHref)}
+        class="mq-btn border border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10"
+      >
+        {cta.docsLabel}
+      </a>
+    </div>
+  </div>
+</section>
