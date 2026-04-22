@@ -1,0 +1,478 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import DocsSidebar from "../components/docs/DocsSidebar.astro";
+import DocsPageToc from "../components/docs/DocsPageToc.astro";
+import { DOCS_MESSAGES } from "../locales/docs";
+import { withBase, pathForLang } from "../config/urls";
+import type { DocPage, DocSidebarSection } from "../lib/docs/types";
+
+interface Props {
+  page: DocPage;
+  sections: DocSidebarSection[];
+  prevNext: { prev: DocPage["prev"]; next: DocPage["next"] };
+  /** Current URL (with base) used by the sidebar to highlight the active item. */
+  currentUrl: string;
+}
+
+const { page, sections, prevNext, currentUrl } = Astro.props as Props;
+const BASE = import.meta.env.BASE_URL || "/";
+const messages = DOCS_MESSAGES[page.lang];
+const langRoot = withBase(`/docs/${page.lang}/`, BASE);
+
+// Scripts/styles shipped by Sphinx that we still need for interactive cells.
+const staticBase = `${langRoot}_static/`;
+const stylesheets = [
+  "pygments.css",
+  "mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css",
+  "sphinx-thebe.css",
+  "sphinx-design.min.css",
+  "togglebutton.css",
+  "copybutton.css",
+  "mq-variables.css",
+  "mq-theme.css",
+  "mq-thebe.css",
+];
+const scripts = [
+  "clipboard.min.js",
+  "copybutton.js",
+  "togglebutton.js",
+  "design-tabs.js",
+  "sphinx-thebe.js",
+  "mq-thebe.js",
+];
+
+const hubHref = withBase(pathForLang("/documentation/", page.lang), BASE);
+const prevHref = prevNext.prev
+  ? (prevNext.prev.href ? `${langRoot}${prevNext.prev.href}/` : langRoot)
+  : null;
+const nextHref = prevNext.next
+  ? (prevNext.next.href ? `${langRoot}${prevNext.next.href}/` : langRoot)
+  : null;
+
+const title = `${page.title} — ${messages.docsLabel}`;
+---
+
+<BaseLayout title={title} description={page.title} lang={page.lang}>
+  {stylesheets.map((file) => (
+    <link slot="head" rel="stylesheet" href={`${staticBase}${file}`} />
+  ))}
+
+  <div class="docs-shell">
+    <div class="docs-shell-grid">
+      <DocsSidebar
+        sections={sections}
+        currentUrl={currentUrl}
+        messages={messages}
+        backToHubHref={hubHref}
+      />
+
+      <article class="docs-main" aria-labelledby="docs-main-heading">
+        <header class="docs-main-header">
+          <p class="mq-eyebrow">{messages.docsLabel}</p>
+        </header>
+
+        <details class="docs-mobile-nav">
+          <summary class="mq-focus-ring">
+            <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24">
+              <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <span>{messages.sidebarToggle}</span>
+          </summary>
+          <DocsSidebar
+            sections={sections}
+            currentUrl={currentUrl}
+            messages={messages}
+            backToHubHref={hubHref}
+          />
+        </details>
+
+        <Fragment set:html={page.bodyHtml} />
+
+        {(prevHref || nextHref) && (
+          <nav class="docs-prev-next" aria-label="Pagination">
+            {prevHref && prevNext.prev && (
+              <a href={prevHref} class="docs-prev-next-link docs-prev-next-link--prev mq-focus-ring">
+                <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24">
+                  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m15 18l-6-6l6-6" />
+                </svg>
+                <span class="docs-prev-next-meta">
+                  <span class="docs-prev-next-label">{messages.prev}</span>
+                  <span class="docs-prev-next-title">{prevNext.prev.title}</span>
+                </span>
+              </a>
+            )}
+            {nextHref && prevNext.next && (
+              <a href={nextHref} class="docs-prev-next-link docs-prev-next-link--next mq-focus-ring">
+                <span class="docs-prev-next-meta">
+                  <span class="docs-prev-next-label">{messages.next}</span>
+                  <span class="docs-prev-next-title">{prevNext.next.title}</span>
+                </span>
+                <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24">
+                  <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 18l6-6l-6-6" />
+                </svg>
+              </a>
+            )}
+          </nav>
+        )}
+      </article>
+
+      <div class="docs-toc-column">
+        <DocsPageToc items={page.pageToc} messages={messages} />
+      </div>
+    </div>
+  </div>
+
+  {page.thebeConfig && (
+    <script type="text/x-thebe-config" set:html={page.thebeConfig} is:inline />
+  )}
+  <script is:inline>
+    // Thebe + MathJax globals that the Sphinx/Thebe/MathJax scripts read.
+    window.thebe_selector = ".thebe,.cell";
+    window.thebe_selector_input = "pre";
+    window.thebe_selector_output = ".output, .cell_output";
+    window.MathJax = {
+      options: {
+        processHtmlClass: "tex2jax_process|mathjax_process|math|output_area",
+      },
+    };
+  </script>
+  <script is:inline defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  {scripts.map((file) => (
+    <script is:inline src={`${staticBase}${file}`} async></script>
+  ))}
+</BaseLayout>
+
+<style is:global>
+  /* Layout shell ---------------------------------------------------- */
+  .docs-shell {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem 1.5rem 4rem;
+  }
+  @media (min-width: 1024px) {
+    .docs-shell { padding: 2rem 2rem 6rem; }
+  }
+
+  .docs-shell-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2rem;
+  }
+  @media (min-width: 960px) {
+    .docs-shell-grid {
+      grid-template-columns: 260px minmax(0, 1fr);
+    }
+  }
+  @media (min-width: 1280px) {
+    .docs-shell-grid {
+      grid-template-columns: 260px minmax(0, 1fr) 240px;
+    }
+  }
+
+  .docs-sidebar {
+    display: none;
+  }
+  @media (min-width: 960px) {
+    .docs-sidebar {
+      display: block;
+      position: sticky;
+      top: 5rem;
+      align-self: start;
+      max-height: calc(100vh - 6rem);
+      overflow-y: auto;
+      padding-right: 0.75rem;
+      scrollbar-width: thin;
+    }
+  }
+
+  /* Mobile: the sidebar lives inside a collapsible disclosure above the article. */
+  .docs-mobile-nav {
+    display: block;
+    margin-bottom: 1.5rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.5rem;
+    background-color: hsl(var(--secondary) / 0.4);
+  }
+  @media (min-width: 960px) {
+    .docs-mobile-nav { display: none; }
+  }
+  .docs-mobile-nav > summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: hsl(var(--foreground));
+    cursor: pointer;
+  }
+  .docs-mobile-nav > summary::-webkit-details-marker { display: none; }
+  .docs-mobile-nav[open] > summary {
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  .docs-mobile-nav > .docs-sidebar {
+    display: block;
+    position: static;
+    padding: 0.75rem 1rem 0.5rem;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .docs-toc-column {
+    display: none;
+  }
+  @media (min-width: 1280px) {
+    .docs-toc-column {
+      display: block;
+      position: sticky;
+      top: 5rem;
+      align-self: start;
+      max-height: calc(100vh - 6rem);
+      overflow-y: auto;
+      padding-left: 0.5rem;
+      scrollbar-width: thin;
+    }
+  }
+
+  .docs-main {
+    min-width: 0;
+  }
+  .docs-main-header { margin-bottom: 1.75rem; }
+
+  /* Article typography --------------------------------------------- */
+  .docs-main article.bd-article,
+  .docs-main .bd-article {
+    max-width: 760px;
+    color: hsl(var(--foreground));
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+  .docs-main h1 {
+    font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    margin: 0 0 1.25rem;
+  }
+  .docs-main h2 {
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.75rem);
+    line-height: 1.25;
+    font-weight: 700;
+    letter-spacing: -0.012em;
+    margin: 2.75rem 0 1rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  .docs-main h3 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+    font-weight: 700;
+    margin: 2.25rem 0 0.75rem;
+  }
+  .docs-main h4 {
+    font-size: 1.05rem;
+    line-height: 1.35;
+    font-weight: 700;
+    margin: 2rem 0 0.5rem;
+  }
+  .docs-main p { margin: 0 0 1rem; }
+  .docs-main p + p { margin-top: 0.5rem; }
+  .docs-main ul, .docs-main ol {
+    margin: 0 0 1rem;
+    padding-left: 1.5rem;
+  }
+  .docs-main li { margin: 0.25rem 0; }
+  .docs-main a {
+    color: hsl(var(--primary));
+    text-decoration-color: hsl(var(--primary) / 0.4);
+    text-underline-offset: 2px;
+  }
+  .docs-main a:hover { text-decoration: underline; }
+
+  /* Inline + block code -------------------------------------------- */
+  .docs-main code,
+  .docs-main .docutils.literal,
+  .docs-main .docutils.literal > .pre {
+    font-family: theme("fontFamily.mono");
+    font-size: 0.875em;
+  }
+  .docs-main code {
+    background-color: hsl(var(--secondary));
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    border: 1px solid hsl(var(--border));
+  }
+  .docs-main pre {
+    font-family: theme("fontFamily.mono");
+    font-size: 0.8125rem;
+    background-color: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.5rem;
+    padding: 1rem 1.125rem;
+    overflow-x: auto;
+    line-height: 1.5;
+    margin: 0 0 1rem;
+  }
+  .docs-main pre code {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  /* Copy button (copybutton.js injects .copybtn.btn-copybtn onto pre) */
+  .docs-main pre .copybtn {
+    background: hsl(var(--background));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.25rem;
+    color: hsl(var(--muted-foreground));
+  }
+  .docs-main pre .copybtn:hover { color: hsl(var(--foreground)); }
+
+  /* MyST notebook cells ------------------------------------------- */
+  .docs-main .cell { margin: 1rem 0; }
+  .docs-main .cell_input { margin-bottom: 0.25rem; }
+  .docs-main .cell_output {
+    border-left: 1px solid hsl(var(--border));
+    background-color: hsl(var(--muted) / 0.35);
+    margin-left: 0;
+    padding: 0.5rem 0.875rem;
+    border-radius: 0 0.375rem 0.375rem 0;
+    overflow-x: auto;
+  }
+  .docs-main .cell_output pre {
+    background: transparent;
+    border: 0;
+    padding: 0;
+  }
+  .docs-main .cell_output img { max-width: 100%; height: auto; margin: 0.5rem 0; }
+
+  /* Admonitions --------------------------------------------------- */
+  .docs-main .admonition,
+  .docs-main details.dropdown {
+    border: 1px solid hsl(var(--border));
+    background-color: hsl(var(--muted) / 0.35);
+    border-radius: 0.5rem;
+    padding: 0.875rem 1rem;
+    margin: 1rem 0;
+  }
+  .docs-main .admonition > .admonition-title,
+  .docs-main details.dropdown > summary {
+    font-weight: 700;
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: hsl(var(--foreground));
+    margin: 0 0 0.5rem;
+    padding: 0;
+    cursor: default;
+  }
+  .docs-main details.dropdown > summary { cursor: pointer; }
+  .docs-main .admonition.note { background-color: hsl(var(--primary) / 0.06); }
+  .docs-main .admonition.tip,
+  .docs-main .admonition.hint { background-color: hsl(152 52% 40% / 0.07); }
+  .docs-main .admonition.warning,
+  .docs-main .admonition.caution { background-color: hsl(32 78% 55% / 0.1); }
+  .docs-main .admonition.danger,
+  .docs-main .admonition.error { background-color: hsl(0 68% 52% / 0.08); }
+
+  /* Images & figures ---------------------------------------------- */
+  .docs-main img { max-width: 100%; height: auto; border-radius: 0.375rem; }
+  .docs-main figure { margin: 1.5rem 0; }
+  .docs-main figcaption {
+    font-size: 0.8125rem;
+    color: hsl(var(--muted-foreground));
+    margin-top: 0.5rem;
+  }
+
+  /* Tables --------------------------------------------------------- */
+  .docs-main table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.25rem 0;
+    font-size: 0.875rem;
+  }
+  .docs-main thead th {
+    text-align: left;
+    font-weight: 700;
+    background-color: hsl(var(--secondary));
+    border-bottom: 1px solid hsl(var(--border));
+  }
+  .docs-main th,
+  .docs-main td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid hsl(var(--border));
+    vertical-align: top;
+  }
+
+  /* Prev / next footer -------------------------------------------- */
+  .docs-prev-next {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid hsl(var(--border));
+  }
+  .docs-prev-next-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1 1 0;
+    max-width: 50%;
+    padding: 0.875rem 1rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.5rem;
+    color: hsl(var(--foreground));
+    text-decoration: none;
+    transition: border-color 120ms ease-out, background-color 120ms ease-out;
+  }
+  .docs-prev-next-link:hover {
+    border-color: hsl(var(--primary));
+    background-color: hsl(var(--primary) / 0.04);
+  }
+  .docs-prev-next-link--next {
+    margin-left: auto;
+    text-align: right;
+    justify-content: flex-end;
+  }
+  .docs-prev-next-meta { display: flex; flex-direction: column; gap: 0.15rem; }
+  .docs-prev-next-label {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+  .docs-prev-next-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  /* Thebe banner (injected by mq-thebe.js) --------------------------
+     Keep matches narrow; mq-thebe.css already scopes to .mq-thebe-banner. */
+
+  /* sphinx-design tabs -------------------------------------------- */
+  .docs-main .sd-tab-set .sd-tab-label {
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: 2px solid transparent;
+    border-radius: 0.25rem 0.25rem 0 0;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    color: hsl(var(--muted-foreground));
+  }
+  .docs-main .sd-tab-set input[type="radio"]:checked + label {
+    background: hsl(var(--background));
+    color: hsl(var(--primary));
+    border-color: hsl(var(--border));
+    border-bottom-color: transparent;
+  }
+  .docs-main .sd-tab-content {
+    padding: 1rem;
+    border: 1px solid hsl(var(--border));
+    border-radius: 0 0.375rem 0.375rem 0.375rem;
+    margin-top: -1px;
+  }
+</style>

@@ -1,0 +1,84 @@
+---
+import DocsLayout from "../../../layouts/DocsLayout.astro";
+import { LANGS, type Lang } from "../../../config/i18n";
+import { buildDocTree } from "../../../lib/docs";
+import { withBase } from "../../../config/urls";
+
+const BASE_URL = import.meta.env.BASE_URL || "/";
+
+export async function getStaticPaths() {
+  const base = import.meta.env.BASE_URL || "/";
+  const out: Array<{
+    params: { lang: Lang; slug: string | undefined };
+    props: {
+      tree: ReturnType<typeof buildDocTree>;
+      slug: string;
+    };
+  }> = [];
+
+  for (const lang of LANGS) {
+    const tree = buildDocTree(lang, base);
+    for (const page of tree.pages) {
+      out.push({
+        params: { lang, slug: page.slug || undefined },
+        props: { tree, slug: page.slug },
+      });
+    }
+  }
+  return out;
+}
+
+const { lang } = Astro.params as { lang: Lang };
+const { tree, slug } = Astro.props as {
+  tree: ReturnType<typeof buildDocTree>;
+  slug: string;
+};
+
+const page = tree.flat[slug];
+if (!page) {
+  throw new Error(`Missing doc page for slug "${slug}" in lang "${lang}"`);
+}
+
+// Fill prev/next from the article metadata when possible, otherwise fall back
+// to the sidebar's flat order so every tutorial always has a walkable thread.
+const prev = page.prev
+  ? page.prev
+  : (() => {
+      const idx = tree.order.indexOf(
+        `${withBase(`/docs/${lang}/`, BASE_URL)}${slug ? `${slug}/` : ""}`,
+      );
+      if (idx <= 0) return null;
+      const prevHref = tree.order[idx - 1];
+      const prevSlug = extractSlugFromHref(prevHref, lang, BASE_URL);
+      const prevPage = tree.flat[prevSlug];
+      return prevPage ? { href: prevSlug, title: prevPage.title } : null;
+    })();
+
+const next = page.next
+  ? page.next
+  : (() => {
+      const idx = tree.order.indexOf(
+        `${withBase(`/docs/${lang}/`, BASE_URL)}${slug ? `${slug}/` : ""}`,
+      );
+      if (idx === -1 || idx >= tree.order.length - 1) return null;
+      const nextHref = tree.order[idx + 1];
+      const nextSlug = extractSlugFromHref(nextHref, lang, BASE_URL);
+      const nextPage = tree.flat[nextSlug];
+      return nextPage ? { href: nextSlug, title: nextPage.title } : null;
+    })();
+
+function extractSlugFromHref(href: string, l: Lang, base: string): string {
+  const root = withBase(`/docs/${l}/`, base);
+  if (!href.startsWith(root)) return "";
+  return href.slice(root.length).replace(/\/$/, "");
+}
+
+const currentUrl = `${withBase(`/docs/${lang}/`, BASE_URL)}${slug ? `${slug}/` : ""}`;
+---
+
+<DocsLayout
+  page={page}
+  sections={tree.sections}
+  prevNext={{ prev, next }}
+  currentUrl={currentUrl}
+/>

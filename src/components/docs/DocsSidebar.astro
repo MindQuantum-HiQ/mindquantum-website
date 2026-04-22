@@ -1,0 +1,206 @@
+---
+import type { DocSidebarSection, DocTocEntry } from "../../lib/docs/types";
+import type { DocsMessages } from "../../locales/docs";
+
+interface Props {
+  sections: DocSidebarSection[];
+  currentUrl: string;
+  messages: DocsMessages;
+  backToHubHref: string;
+}
+
+const { sections, currentUrl, messages, backToHubHref } = Astro.props as Props;
+
+function isActiveHref(href: string, current: string) {
+  if (!href) return false;
+  // Compare without trailing slashes and without URL fragments.
+  const norm = (s: string) =>
+    s.replace(/#.*$/, "").replace(/\/$/, "");
+  return norm(href) === norm(current);
+}
+
+function isAncestor(item: DocTocEntry, current: string): boolean {
+  if (isActiveHref(item.href, current)) return true;
+  return (item.children ?? []).some((c) => isAncestor(c, current));
+}
+---
+
+<aside class="docs-sidebar">
+  <div class="docs-sidebar-inner">
+    <a href={backToHubHref} class="mq-focus-ring docs-sidebar-back group">
+      <svg aria-hidden="true" class="w-3.5 h-3.5" viewBox="0 0 24 24">
+        <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m15 18l-6-6l6-6" />
+      </svg>
+      <span>{messages.backToHub}</span>
+    </a>
+
+    <nav aria-label={messages.docsLabel} class="docs-sidebar-nav">
+      {sections.map((section) => (
+        <div class="docs-sidebar-section">
+          {section.caption && (
+            <p class="docs-sidebar-caption">{section.caption}</p>
+          )}
+          <ul>
+            {section.items.map((item) => {
+              const openByDefault = isAncestor(item, currentUrl);
+              const active = isActiveHref(item.href, currentUrl);
+              const hasChildren = Boolean(item.children?.length);
+              if (!hasChildren) {
+                return (
+                  <li>
+                    <a
+                      href={item.href}
+                      class:list={[
+                        "mq-focus-ring docs-sidebar-link",
+                        active ? "is-active" : "",
+                      ]}
+                      aria-current={active ? "page" : undefined}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                );
+              }
+              return (
+                <li>
+                  <details open={openByDefault} class="docs-sidebar-group">
+                    <summary class="docs-sidebar-summary mq-focus-ring">
+                      <a
+                        href={item.href}
+                        class:list={[
+                          "docs-sidebar-link docs-sidebar-link--parent",
+                          active ? "is-active" : "",
+                        ]}
+                        aria-current={active ? "page" : undefined}
+                      >
+                        {item.label}
+                      </a>
+                      <span class="docs-sidebar-chev" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" class="w-3 h-3">
+                          <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 18l6-6l-6-6" />
+                        </svg>
+                      </span>
+                    </summary>
+                    <ul class="docs-sidebar-subtree">
+                      {(item.children ?? []).map((child) => {
+                        const childActive = isActiveHref(child.href, currentUrl);
+                        return (
+                          <li>
+                            <a
+                              href={child.href}
+                              class:list={[
+                                "mq-focus-ring docs-sidebar-link docs-sidebar-link--child",
+                                childActive ? "is-active" : "",
+                              ]}
+                              aria-current={childActive ? "page" : undefined}
+                            >
+                              {child.label}
+                            </a>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </details>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </nav>
+  </div>
+</aside>
+
+<style>
+  .docs-sidebar-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-bottom: 2rem;
+  }
+  .docs-sidebar-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+    text-decoration: none;
+    transition: color 120ms ease-out;
+    align-self: flex-start;
+  }
+  .docs-sidebar-back:hover { color: hsl(var(--primary)); }
+
+  .docs-sidebar-nav { display: flex; flex-direction: column; gap: 1.5rem; }
+  .docs-sidebar-section ul { list-style: none; margin: 0; padding: 0; }
+  .docs-sidebar-caption {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: hsl(var(--foreground));
+    margin: 0 0 0.5rem;
+    padding-left: 0.25rem;
+  }
+  .docs-sidebar-link {
+    display: block;
+    padding: 0.4rem 0.625rem;
+    font-size: 0.875rem;
+    color: hsl(var(--muted-foreground));
+    border-radius: 0.375rem;
+    line-height: 1.4;
+    text-decoration: none;
+    transition: color 120ms ease-out, background-color 120ms ease-out;
+  }
+  .docs-sidebar-link:hover {
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--secondary));
+  }
+  .docs-sidebar-link.is-active {
+    color: hsl(var(--primary));
+    background-color: hsl(var(--primary) / 0.07);
+    font-weight: 600;
+  }
+  .docs-sidebar-link--parent {
+    flex: 1 1 auto;
+  }
+  .docs-sidebar-group {
+    position: relative;
+  }
+  .docs-sidebar-summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: pointer;
+    border-radius: 0.375rem;
+    padding-right: 0.25rem;
+  }
+  .docs-sidebar-summary::-webkit-details-marker { display: none; }
+  .docs-sidebar-chev {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: hsl(var(--muted-foreground));
+    transition: transform 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  details[open] > .docs-sidebar-summary .docs-sidebar-chev {
+    transform: rotate(90deg);
+  }
+  .docs-sidebar-subtree {
+    margin-top: 0.125rem;
+    padding-left: 0.5rem;
+    border-left: 1px solid hsl(var(--border));
+    margin-left: 0.625rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.0625rem;
+  }
+  .docs-sidebar-link--child {
+    padding-left: 0.5rem;
+  }
+</style>

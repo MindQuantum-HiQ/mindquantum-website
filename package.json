@@ -24,6 +24,7 @@
     "astro": "^5.14.5",
     "clsx": "^2.1.1",
     "lucide-react": "^0.462.0",
+    "node-html-parser": "^7.1.0",
     "quantum-circuit": "^0.9.241",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -33,8 +34,10 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.8",
     "@types/react": "^18.3.28",
-    "@types/react-dom": "^18.3.7"
+    "@types/react-dom": "^18.3.7",
+    "typescript": "^5.9.3"
   },
   "overrides": {
     "mathjs": "^7.5.1"

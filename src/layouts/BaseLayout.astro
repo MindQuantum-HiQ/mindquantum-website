@@ -64,6 +64,7 @@ const abs = (href: string) =>
     }
     <link rel="alternate" hreflang="x-default" href={abs(xDefaultHref)} />
     <title>{title}</title>
+    <slot name="head" />
   </head>
   <body class:list={["min-h-screen flex flex-col", bodyClass]}>
     <a

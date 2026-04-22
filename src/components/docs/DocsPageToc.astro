@@ -1,0 +1,121 @@
+---
+import type { DocPageTocItem } from "../../lib/docs/types";
+import type { DocsMessages } from "../../locales/docs";
+
+interface Props {
+  items: DocPageTocItem[];
+  messages: DocsMessages;
+}
+
+const { items, messages } = Astro.props as Props;
+---
+
+{items.length > 0 && (
+  <aside class="docs-page-toc" aria-labelledby="docs-page-toc-heading">
+    <p id="docs-page-toc-heading" class="docs-page-toc-heading">{messages.tocHeading}</p>
+    <nav aria-label={messages.tocHeading}>
+      <ul>
+        {items.map((item) => (
+          <li>
+            <a href={item.href} class="docs-toc-link mq-focus-ring">{item.label}</a>
+            {item.children && item.children.length > 0 && (
+              <ul>
+                {item.children.map((child) => (
+                  <li>
+                    <a href={child.href} class="docs-toc-link docs-toc-link--sub mq-focus-ring">{child.label}</a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </aside>
+)}
+
+<style>
+  .docs-page-toc {
+    font-size: 0.8125rem;
+    color: hsl(var(--muted-foreground));
+  }
+  .docs-page-toc-heading {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: hsl(var(--foreground));
+    margin: 0 0 0.625rem;
+  }
+  .docs-page-toc ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+  .docs-page-toc ul ul {
+    margin-top: 0.125rem;
+    padding-left: 0.75rem;
+    border-left: 1px solid hsl(var(--border));
+    margin-left: 0.25rem;
+  }
+  .docs-toc-link {
+    display: block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    color: hsl(var(--muted-foreground));
+    text-decoration: none;
+    line-height: 1.4;
+    transition: color 120ms ease-out, background-color 120ms ease-out;
+  }
+  .docs-toc-link:hover {
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--secondary));
+  }
+  .docs-toc-link.is-active {
+    color: hsl(var(--primary));
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  (function () {
+    const toc = document.querySelector(".docs-page-toc") as HTMLElement | null;
+    if (!toc) return;
+    const links = Array.from(
+      toc.querySelectorAll(".docs-toc-link"),
+    ) as HTMLAnchorElement[];
+    if (!links.length) return;
+
+    const map = new Map<string, HTMLAnchorElement>();
+    links.forEach((a) => {
+      const href = a.getAttribute("href") ?? "";
+      if (href.startsWith("#")) map.set(href.slice(1), a);
+    });
+
+    const headings = Array.from(map.keys())
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+    if (!headings.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        const active = visible[0]?.target as HTMLElement | undefined;
+        if (!active) return;
+        links.forEach((l) => l.classList.remove("is-active"));
+        const match = map.get(active.id);
+        if (match) match.classList.add("is-active");
+      },
+      {
+        rootMargin: "-88px 0px -55% 0px",
+        threshold: [0, 1],
+      },
+    );
+    headings.forEach((h) => observer.observe(h));
+  })();
+</script>
