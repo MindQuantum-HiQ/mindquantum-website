@@ -2,13 +2,12 @@
 import type { Lang } from "../../config/i18n";
 import type { HomeMessages } from "../../locales/home";
 
-import HeroCarousel from "./HeroCarousel.astro";
+import Hero from "./Hero.astro";
 import AnnouncementBar from "./AnnouncementBar.astro";
 import FrameworkIntro from "./FrameworkIntro.astro";
 import Features from "./Features.astro";
 import Research from "./Research.astro";
-import StartLearning from "./StartLearning.astro";
-import CTABanner from "./CTABanner.astro";
+import GettingStarted from "./GettingStarted.astro";
 
 interface Props {
   lang: Lang;
@@ -19,10 +18,9 @@ interface Props {
 const { messages } = Astro.props as Props;
 ---
 
-<HeroCarousel hero={messages.hero} framework={messages.framework} />
+<Hero hero={messages.hero} bell={messages.bell} />
 <AnnouncementBar announcements={messages.announcements} />
-<FrameworkIntro architecture={messages.architecture} framework={messages.framework} />
 <Features features={messages.features} />
+<GettingStarted learning={messages.learning} framework={messages.framework} />
+<FrameworkIntro architecture={messages.architecture} />
 <Research research={messages.research} />
-<StartLearning learning={messages.learning} />
-<CTABanner cta={messages.cta} />
