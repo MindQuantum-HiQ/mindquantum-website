@@ -50,7 +50,9 @@ sphinx:
     mathjax_path: mathjax/tex-mml-chtml.js
     html_static_path: ["../_static"]
     html_css_files:
+      - mq-fonts.css
       - mq-variables.css
+      - mq-controls.css
       - mq-theme.css
       - mq-thebe.css
     html_js_files:

@@ -149,7 +149,7 @@ function isAncestor(item: DocTocEntry, current: string): boolean {
     padding: 0.4rem 0.625rem;
     font-size: 0.875rem;
     color: hsl(var(--muted-foreground));
-    border-radius: 0.375rem;
+    border-radius: var(--mq-radius-control);
     line-height: 1.4;
     text-decoration: none;
     transition: color 120ms ease-out, background-color 120ms ease-out;
@@ -159,8 +159,8 @@ function isAncestor(item: DocTocEntry, current: string): boolean {
     background-color: hsl(var(--secondary));
   }
   .docs-sidebar-link.is-active {
-    color: hsl(var(--primary));
-    background-color: hsl(var(--primary) / 0.07);
+    color: var(--mq-selected-text);
+    background-color: var(--mq-selected);
     font-weight: 600;
   }
   .docs-sidebar-link--parent {

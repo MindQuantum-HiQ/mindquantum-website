@@ -1,25 +1,14 @@
-import { readFile, writeFile, mkdir } from 'node:fs/promises'
-import { dirname } from 'node:path'
+import { copyFile, readFile, writeFile } from 'node:fs/promises'
 
-async function main() {
-  try {
-    const src = 'src/styles/tokens.css'
-    const dest = 'docs/_static/mq-variables.css'
-    const css = await readFile(src, 'utf8')
-    await mkdir(dirname(dest), { recursive: true })
-    const header = '/* Auto-synced from src/styles/tokens.css during build. */\n'
-    await writeFile(dest, header + css, 'utf8')
-    console.log(`Synced design tokens: ${src} -> ${dest}`)
-    // Ensure favicon is available for Jupyter Book too
-    const favSrc = 'public/favicon.png'
-    const favDst = 'docs/_static/favicon.png'
-    await mkdir(dirname(favDst), { recursive: true })
-    const fav = await readFile(favSrc)
-    await writeFile(favDst, fav)
-    console.log(`Copied favicon: ${favSrc} -> ${favDst}`)
-  } catch (err) {
-    console.warn('Skipping token sync:', err?.message)
-  }
+// Missing assets are build errors, never permission to deploy stale styles.
+for (const [source, destination] of [
+  ['tokens.css', 'mq-variables.css'],
+  ['controls.css', 'mq-controls.css'],
+  ['fonts.css', 'mq-fonts.css'],
+]) {
+  const src = `src/styles/${source}`
+  const css = await readFile(src, 'utf8')
+  await writeFile(`docs/_static/${destination}`, `/* Generated from ${src}; do not edit. */\n${css}`)
 }
-
-main()
+await copyFile('public/favicon.png', 'docs/_static/favicon.png')
+console.log('Synced shared design system → docs/_static')

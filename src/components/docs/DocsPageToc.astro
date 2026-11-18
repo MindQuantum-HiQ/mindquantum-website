@@ -64,7 +64,7 @@ const { items, messages } = Astro.props as Props;
   .docs-toc-link {
     display: block;
     padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
+    border-radius: var(--mq-radius-small);
     color: hsl(var(--muted-foreground));
     text-decoration: none;
     line-height: 1.4;
@@ -75,7 +75,8 @@ const { items, messages } = Astro.props as Props;
     background-color: hsl(var(--secondary));
   }
   .docs-toc-link.is-active {
-    color: hsl(var(--primary));
+    color: var(--mq-selected-text);
+    background-color: var(--mq-selected);
     font-weight: 600;
   }
 </style>

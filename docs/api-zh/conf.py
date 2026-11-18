@@ -36,11 +36,10 @@ html_search_language = "zh"
 
 html_theme = "sphinx_book_theme"
 html_static_path = [str(DOCS_ROOT / "_static")]
-html_css_files = ["mq-sphinx.css"]
+html_css_files = ["mq-fonts.css", "mq-variables.css", "mq-controls.css", "mq-theme.css"]
 
 # 自托管 MathJax（由 scripts/prepare-mathjax.mjs 拷贝），避免依赖境外 CDN
 mathjax_path = "mathjax/tex-mml-chtml.js"
 
 autosummary_generate = False  # Let mqdocs.autogen handle ms* directives
 autosummary_imported_members = False
-

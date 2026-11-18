@@ -17,10 +17,6 @@ function resolveHref(href: string) {
   return withBase(href, BASE);
 }
 
-const actionClass = (id: string) =>
-  id === "gitee"
-    ? "mq-btn-orange"
-    : "mq-btn-primary";
 ---
 
 <section class="relative overflow-hidden bg-hero-gradient">
@@ -35,7 +31,7 @@ const actionClass = (id: string) =>
           href={mirror.href}
           target="_blank"
           rel="noopener"
-          class:list={["px-6", actionClass(mirror.id)]}
+          class="mq-btn-outline px-6"
         >
           {mirror.label}
         </a>

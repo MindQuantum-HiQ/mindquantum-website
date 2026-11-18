@@ -65,7 +65,9 @@ async function buildSphinx(api, lang) {
   const proj = resolve(`docs/${api}`) // api-en or api-zh
   const out = resolve(`docs/_build/api/${lang}`)
   const dst = resolve(`public/docs/api/${lang}`)
-  await run('sphinx-build', ['-b', 'html', proj, out])
+  // Always write output so shared static assets refresh even when no RST
+  // changed; Sphinx otherwise skips its writing/static-copy phase.
+  await run('sphinx-build', ['-b', 'html', '-a', proj, out])
   if (await exists(dst)) await rm(dst, { recursive: true, force: true })
   await mkdir(dst, { recursive: true })
   await cp(out, dst, { recursive: true })

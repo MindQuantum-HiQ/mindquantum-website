@@ -1,13 +1,66 @@
-/* MindQuantum Jupyter Book theme overrides.
-   This file is loaded after the base theme and variables. */
-
-:root {
-  /* Map shared tokens to Sphinx Book Theme variables when relevant */
+/* Sphinx Book / PyData adapter: maps the public theme API to canonical tokens.
+   Reading and reference density stay with Sphinx; no second brand palette. */
+html, html[data-theme="light"], html[data-theme="dark"] {
+  --pst-font-family-base: var(--mq-font-sans);
+  --pst-font-family-heading: var(--mq-font-sans);
+  --pst-font-family-monospace: var(--mq-font-mono);
   --pst-color-primary: var(--mq-primary);
-}
-
-/* Global surface colors */
-html[data-theme="light"], :root {
+  --pst-color-primary-bg: var(--mq-selected);
+  --pst-color-secondary: var(--mq-primary);
+  --pst-color-secondary-bg: var(--mq-selected);
+  --pst-color-accent: var(--mq-primary);
+  --pst-color-accent-bg: var(--mq-selected);
+  --pst-color-link-higher-contrast: var(--mq-primary-hover);
+  --pst-color-blockquote-notch: var(--mq-border);
+  --pst-color-text-base: var(--mq-text);
+  --pst-color-text-muted: var(--mq-text-muted);
+  --pst-color-heading: var(--mq-text);
+  --pst-color-link: var(--mq-primary);
+  --pst-color-link-hover: var(--mq-primary-hover);
+  --pst-color-background: var(--mq-bg);
+  --pst-color-on-background: var(--mq-surface);
+  --pst-color-surface: var(--mq-surface-2);
+  --pst-color-on-surface: var(--mq-selected);
+  --pst-color-border: var(--mq-border);
+  --pst-color-border-muted: var(--mq-border);
+  --pst-color-inline-code: var(--mq-text);
+  --pst-color-inline-code-links: var(--mq-primary);
+  --pst-color-info: var(--mq-primary);
+  --pst-color-info-bg: var(--mq-selected);
+  --pst-color-primary-text: var(--mq-primary-contrast);
+  --pst-color-primary-highlight: var(--mq-primary-hover);
+  --pst-color-primary-highlight-text: var(--mq-primary-contrast);
+  --pst-color-secondary-text: var(--mq-primary-contrast);
+  --pst-color-secondary-highlight: var(--mq-primary-hover);
+  --pst-color-secondary-highlight-text: var(--mq-primary-contrast);
+  --pst-color-info-text: var(--mq-primary-contrast);
+  --pst-color-info-highlight: var(--mq-primary-hover);
+  --pst-color-info-highlight-text: var(--mq-primary-contrast);
+  --pst-color-success: var(--mq-success);
+  --pst-color-success-bg: color-mix(in srgb, var(--mq-success), var(--mq-bg) 94%);
+  --pst-color-warning: var(--mq-warning);
+  --pst-color-warning-bg: color-mix(in srgb, var(--mq-warning), var(--mq-bg) 94%);
+  --pst-color-attention: var(--mq-warning);
+  --pst-color-attention-bg: color-mix(in srgb, var(--mq-warning), var(--mq-bg) 94%);
+  --pst-color-danger: var(--mq-danger);
+  --pst-color-danger-bg: color-mix(in srgb, var(--mq-danger), var(--mq-bg) 94%);
+  --pst-color-target: var(--mq-selected);
+  --pst-color-table: var(--mq-surface);
+  --pst-color-table-heading-bg: var(--mq-surface-2);
+  --pst-color-table-row-zebra-high-bg: var(--mq-bg);
+  --pst-color-table-row-zebra-low-bg: var(--mq-surface);
+  --pst-color-table-row-hover-bg: var(--mq-selected);
+  --pst-color-table-inner-border: var(--mq-border);
+  --pst-color-table-outer-border: var(--mq-border);
+  --pst-color-shadow: transparent;
+  --pst-font-weight-heading: 700;
+  --mystnb-source-bg-color: var(--mq-surface-2);
+  --mystnb-source-border-color: var(--mq-border);
+  --mystnb-source-margin-color: var(--mq-border);
+  --mystnb-source-border-radius: var(--mq-radius-control);
+  --mystnb-source-border-width: 1px;
+  --mystnb-stdout-bg-color: var(--mq-bg);
+  --mystnb-stdout-border-color: var(--mq-border);
   --sb-foreground: var(--mq-text);
   --sb-foreground-muted: var(--mq-text-muted);
   --sb-background: var(--mq-bg);
@@ -15,31 +68,37 @@ html[data-theme="light"], :root {
   --sb-surface-2: var(--mq-surface-2);
   --sb-border: var(--mq-border);
 }
-
-/* Navbar tweak: add Home link styling parity */
-.mq-home-link {
-  font-weight: 600;
-  color: var(--mq-text);
-  text-decoration: none;
-}
+body { font-family: var(--mq-font-sans); color: var(--mq-text); background: var(--mq-bg); }
+.bd-article :is(h1, h2, h3, h4) { font-family: var(--mq-font-sans); font-weight: 700; }
+.bd-article :is(pre, code, kbd, samp) { font-family: var(--mq-font-mono); }
+.bd-article :is(pre, div.cell div.cell_input) { background: var(--mq-surface-2); border-color: var(--mq-border); border-radius: var(--mq-radius-control); }
+.bd-article div.cell div.cell_input { border-left-width: 1px; }
+.bd-article :is(.admonition, details) { border-radius: var(--mq-radius-control); box-shadow: none; }
+.bd-article a { text-underline-offset: 2px; }
+.bd-article table.docutils { width: 100%; border-color: var(--mq-border); }
+.bd-article table.docutils :is(th, td) { padding: .5rem .75rem; border-color: var(--mq-border); }
+.bd-article table.docutils th { background: var(--mq-surface-2); font-weight: 600; }
+.bd-article .sig { background: var(--mq-surface-2); border-color: var(--mq-border); border-radius: var(--mq-radius-control); }
+.bd-header, .bd-sidebar-primary { border-color: var(--mq-border); }
+.bd-sidebar-primary li > a { border-radius: var(--mq-radius-small); }
+.bd-sidebar-primary li.current > a { background: var(--mq-selected); color: var(--mq-selected-text); }
+.bd-search input { border-color: var(--mq-border); border-radius: var(--mq-radius-control); }
+.bd-header :is(.btn, button), .sidebar-header-items :is(.btn, button) { border-radius: var(--mq-radius-control); color: var(--mq-text-muted); }
+.bd-header :is(.btn, button):hover { background: var(--mq-surface-2); color: var(--mq-text); }
+:is(a, button, input, summary):focus-visible { outline: var(--mq-focus-width) solid var(--mq-primary); outline-offset: var(--mq-focus-offset); }
+.prev-next-area a { min-width: 0; overflow-wrap: anywhere; }
+.prev-next-area .prev-next-info { min-width: 0; }
+.mq-home-link { font-weight: 600; color: var(--mq-text); text-decoration: none; }
 .mq-home-link:hover { color: var(--mq-primary); }
-
-/* Cards, admonitions, code blocks feel */
-.bd-content .admonition, .bd-content details {
-  border-radius: var(--mq-radius);
-  border-color: var(--mq-border);
-}
-.bd-content pre { border-radius: var(--mq-radius); }
-
-/* Footer */
 .mq-footer { color: var(--mq-text-muted); }
-
-/* Minimal grid to support raw HTML blocks copied from upstream */
+/* Raw HTML card grids from imported tutorials. */
 .row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; margin: 1rem 0; }
 @media (max-width: 960px) { .row { grid-template-columns: 1fr; } }
 .col-md-6 { display: contents; }
 .doc-article-list { display: grid; gap: 1rem; }
-.doc-article-item { border: 1px solid var(--sb-border); border-radius: var(--mq-radius); background: var(--sb-surface-2); padding: 1rem; }
+.doc-article-item { border: 1px solid var(--mq-border); border-radius: var(--mq-radius); background: var(--mq-surface); padding: 1rem; }
 .doc-article-item .article-link { text-decoration: none; color: inherit; }
 .doc-article-head { font-weight: 700; margin-bottom: .25rem; }
-.doc-article-desc { color: var(--sb-foreground-muted); }
+.doc-article-desc { color: var(--mq-text-muted); }
+.mq-article-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+.mq-article-actions a.mq-btn { color: var(--mq-text); text-decoration: none; }
