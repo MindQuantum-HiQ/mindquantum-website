@@ -15,7 +15,7 @@ This repository hosts both the MindQuantum website (Astro) and the documentation
 - Astro site at repo root. Static output in `dist/`.
 - Two Jupyter Book projects in `docs/en` and `docs/zh`. Build outputs are centralized under `docs/_build/books/{lang}` and copied to `public/docs/{lang}`, which Astro serves at `/docs/{lang}/`.
 - API (Sphinx) builds as two projects in `docs/api-en` and `docs/api-zh`. Outputs are centralized under `docs/_build/api/{lang}` and copied to `public/docs/api/{lang}`.
-- GitHub Actions builds docs (Jupyter Book + Sphinx) first, then Astro, and deploys the combined `dist/`.
+- `.github/workflows/site.yml` shares one build between PRs and deploys: Node 24 from `.nvmrc`, Python 3.11, `npm ci`, pinned Python requirements and upstream SHAs, then type check, unit tests, docs build, Astro build, and offline `npm run verify` link/key-page checks. Missing docs fail the build. Only non-PR events deploy the combined `dist/`, with Pages write permissions scoped to the deploy job.
 - The Jupyter Book `_config.yml` files keep a `{year}` placeholder in their `copyright` field (YAML cannot compute the current year). `scripts/update-copyright.mjs` substitutes the build year for the duration of `build:docs` and restores the placeholder afterwards, so the committed configs stay self-documenting and the working tree stays clean. The Astro footer and the Sphinx API configs compute the year dynamically.
 - MathJax is self-hosted: `scripts/prepare-mathjax.mjs` vendors the npm `mathjax` package (combined `tex-mml-chtml.js`, CHTML woff fonts, and the autoload TeX extensions) into the gitignored `docs/_static/mathjax/` during `build:docs`, and every Sphinx/Jupyter Book config sets `mathjax_path: mathjax/tex-mml-chtml.js`. Sphinx's default jsdelivr CDN is unreachable for part of the audience, which would leave all formulas unrendered.
 
@@ -69,7 +69,7 @@ This dual-token approach lets the homepage and Astro chrome move to a modern Tai
 
 ## Content Sourcing
 
-- The build does not depend on external repositories.
+- Docs builds fetch exact upstream commits recorded in `scripts/upstreams.json`; fetch or checkout failures are fatal. Cached clones are always checked out at the pinned SHA.
 - Tutorials: `scripts/sync_mindquantum_from_msdocs.py` copies MindQuantum tutorial sources from a local `mindspore/docs` clone (`docs/mindquantum/docs/source_en` and `source_zh_cn`) into `docs/en/src` and `docs/zh/src`.
 - API: `scripts/sync_mindquantum_api.py` copies API `.rst` sources from a local `mindquantum` clone (`docs/api_python_en` and `docs/api_python`) into the language-specific `src/` folders.
 - Courses: the notebooks in `courses/` are first-party content. After adding or editing a notebook, run `python scripts/normalize_course_math.py` so `$$ … $$` display math conforms to MyST's block rules (blank lines around blocks, indentation inside list items); otherwise formulas render as literal `$` text in Jupyter Book.

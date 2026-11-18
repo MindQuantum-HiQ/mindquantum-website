@@ -17,10 +17,6 @@ const IFRAME_SRC = `${BASE}docs/api/${safeLang}/${API_SUFFIX}`;
 const API_ROOT = `${BASE}docs/api/${safeLang}/`;
 // Default deep-link target: API overview per language
 const API_DEFAULT_REL = safeLang === 'en' ? 'api_python_en/overview.html' : 'api_python/overview.html';
-const alternates = Object.fromEntries(
-  LANGS.map((l: Lang) => [l, `${BASE}api/${l}/`])
-) as Record<Lang, string>;
-const abs = (href: string) => (Astro.site ? new URL(href, Astro.site).toString() : href);
 ---
 <BaseLayout title="MindQuantum API" description="Reference API documentation" lang={safeLang} fullBleed={true} hideFooter={true}>
   <section>
@@ -28,8 +24,8 @@ const abs = (href: string) => (Astro.site ? new URL(href, Astro.site).toString()
   </section>
   <script>
     // Responsive sizing
-    const iframe = document.getElementById('mq-docs-frame');
-    const header = document.querySelector('.site-header');
+    const iframe = document.querySelector<HTMLIFrameElement>('#mq-docs-frame')!;
+    const header = document.querySelector<HTMLElement>('.site-header');
     function sizeFrame() {
       const h = header ? header.offsetHeight : 0;
       iframe.style.height = `calc(100vh - ${h}px)`;
@@ -42,18 +38,18 @@ const abs = (href: string) => (Astro.site ? new URL(href, Astro.site).toString()
     const ROOT = iframe.dataset.root || '/docs/api/${safeLang}/';
     const DEFAULT_REL = iframe.dataset.defaultRel || '';
 
-    function joinUrl(root, rel) {
+    function joinUrl(root: string, rel: string) {
       if (!root.endsWith('/')) root += '/';
       if (rel.startsWith('/')) rel = rel.slice(1);
       return root + rel;
     }
 
-    function relFromPathname(pathname, root) {
+    function relFromPathname(pathname: string, root: string) {
       if (!root.endsWith('/')) root += '/';
       return pathname.startsWith(root) ? pathname.slice(root.length) : null;
     }
 
-    function normalizeRel(rel) {
+    function normalizeRel(rel: string) {
       return rel === 'index.html' ? '' : rel;
     }
 
@@ -86,9 +82,9 @@ const abs = (href: string) => (Astro.site ? new URL(href, Astro.site).toString()
     }
 
     let suppressHashHandler = false;
-    let pendingNavRel = normalizeRel(computeInitialRel());
+    let pendingNavRel: string | null = normalizeRel(computeInitialRel());
 
-    function navigateIframeTo(rel, replace=false) {
+    function navigateIframeTo(rel: string, replace=false) {
       pendingNavRel = normalizeRel(rel || DEFAULT_REL);
       const url = joinUrl(ROOT, rel || DEFAULT_REL);
       if (replace) iframe.setAttribute('src', url);

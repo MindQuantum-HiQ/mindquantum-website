@@ -4,9 +4,11 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=18.14"
+    "node": ">=22.6.0"
   },
   "scripts": {
+    "check": "astro check",
+    "verify": "node scripts/verify-site.mjs",
     "test": "node --experimental-strip-types --test tests/*.test.mjs",
     "dev": "astro dev",
     "build": "node scripts/prepare-tokens.mjs && node scripts/check-arch-links.mjs && astro build",

@@ -131,13 +131,13 @@ const copy = COPY[currentLang] ?? COPY[defaultLang];
       const targetPath = root.dataset.targetPath;
       if (!currentLang || !targetLang || !targetPath) return;
 
-      function hidePrompt() {
+      const hidePrompt = () => {
         root.style.display = "none";
         root.setAttribute("aria-hidden", "true");
         root.classList.remove("mq-animate-in");
       }
 
-      function showPrompt() {
+      const showPrompt = () => {
         root.style.display = "flex";
         root.removeAttribute("aria-hidden");
         root.classList.add("mq-animate-in");

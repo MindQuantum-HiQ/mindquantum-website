@@ -3,11 +3,11 @@
   "repos": {
     "mindspore-docs": {
       "url": "https://atomgit.com/mindspore/docs.git",
-      "ref": "master"
+      "ref": "12ac62ba9c63aa129b88572f9289db2d1225eb91"
     },
     "mindquantum": {
       "url": "https://atomgit.com/mindspore/mindquantum.git",
-      "ref": "master"
+      "ref": "df6d869f3c6070c0d9fdcb5ae5307c038615f2bc"
     }
   }
 }

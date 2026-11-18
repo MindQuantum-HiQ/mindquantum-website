@@ -8,6 +8,7 @@ async function normalizeAssets(dir) {
   for (const entry of await readdir(dir, { withFileTypes: true })) {
     const file = join(dir, entry.name)
     if (entry.isDirectory()) await normalizeAssets(file)
+    else if (entry.name.endsWith('webpack-macros.html')) await rm(file)
     else if (entry.name.endsWith('.html')) {
       const html = await readFile(file, 'utf8')
       const normalized = normalizeSphinxHtml(html)
@@ -38,15 +39,9 @@ async function buildBook(lang) {
   await run('jupyter-book', ['build', proj, '--path-output', outRoot])
   // Jupyter Book writes to <path-output>/_build/html
   const src = resolve(outRoot, '_build/html')
-  // Fallback to legacy location if needed
-  const fallback = resolve(`docs/${lang}/_build/html`)
-  const finalSrc = (await exists(src)) ? src : fallback
-  if (!(await exists(finalSrc))) {
-    throw new Error(`Could not locate Jupyter Book HTML output for ${lang}. Tried: \n- ${src}\n- ${fallback}`)
-  }
   if (await exists(dst)) await rm(dst, { recursive: true, force: true })
   await mkdir(dst, { recursive: true })
-  await cp(finalSrc, dst, { recursive: true })
+  await cp(src, dst, { recursive: true })
   await normalizeAssets(dst)
   console.log(`Copied ${lang} book → ${dst}`)
 }
@@ -59,14 +54,9 @@ async function buildCourses() {
   const dst = resolve(dstRoot, lang)
   await run('jupyter-book', ['build', proj, '--path-output', outRoot])
   const src = resolve(outRoot, '_build/html')
-  const fallback = resolve('courses/_build/html')
-  const finalSrc = (await exists(src)) ? src : fallback
-  if (!(await exists(finalSrc))) {
-    throw new Error(`Could not locate Jupyter Book HTML output for courses. Tried: \n- ${src}\n- ${fallback}`)
-  }
   if (await exists(dstRoot)) await rm(dstRoot, { recursive: true, force: true })
   await mkdir(dst, { recursive: true })
-  await cp(finalSrc, dst, { recursive: true })
+  await cp(src, dst, { recursive: true })
   await normalizeAssets(dst)
   console.log(`Copied courses (${lang}) book → ${dst}`)
 }
@@ -79,16 +69,13 @@ async function buildSphinx(api, lang) {
   if (await exists(dst)) await rm(dst, { recursive: true, force: true })
   await mkdir(dst, { recursive: true })
   await cp(out, dst, { recursive: true })
+  await normalizeAssets(dst)
   console.log(`Copied ${api} → ${dst}`)
 }
 
 async function main() {
   // Ensure docs sources are present (auto-clone upstreams if needed)
-  try {
-    await run('python', ['scripts/sync_all.py'])
-  } catch (err) {
-    console.warn('Skipping upstream sync (non-fatal):', err?.message || err)
-  }
+  await run('python', ['scripts/sync_all.py'])
   // Sync design tokens first so docs use latest variables
   await run('node', ['scripts/prepare-tokens.mjs'])
   // Vendor MathJax into docs/_static so formulas render without a public CDN

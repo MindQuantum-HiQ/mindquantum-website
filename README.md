@@ -15,12 +15,12 @@ Astro + Jupyter Book monorepo for the MindQuantum website and bilingual document
 
 ## Local Development
 
-Prerequisites: Node 18+ and Python 3.9–3.11.
+Prerequisites for building this site: Node 24 LTS (`nvm use`, pinned in `.nvmrc`) and Python 3.11. MindQuantum 0.12.0 supports Python 3.9–3.11.
 
 1. Install Node deps
 
 ```bash
-npm install
+npm ci
 ```
 
 2. (Optional) Create a Python venv and install Jupyter Book
@@ -28,7 +28,7 @@ npm install
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install jupyter-book==1.0.4 sphinx-copybutton sphinx-design sphinx-thebe mindspore mindquantum
+pip install -r requirements-docs.txt
 ```
 
 3. Sync docs content (optional during dev)
@@ -37,7 +37,7 @@ The repo can auto-clone the upstream sources into a local cache on first run. To
 
 ```bash
 npm run sync:all            # clone if missing, reuse cache if present
-# or update to the latest upstreams before syncing
+# or re-fetch the pinned upstream commits before syncing
 python scripts/sync_all.py --update
 ```
 
@@ -87,7 +87,8 @@ The extension avoids monkey-patches and implements stable `mscnautosummary`/`ms*
 
 - `npm run build` runs `scripts/prepare-tokens.mjs` (which syncs design tokens into the Jupyter Book theme) and then `astro build`.
 - `npm run build:all` builds Jupyter Books (tutorials + courses) and Sphinx into `public/{docs,courses}/**`, then builds Astro into `dist/`. Temporary artifacts are centralized under `docs/_build/` and `courses/_build/`.
-- GitHub Actions workflow `.github/workflows/deploy.yml` builds both and deploys the `dist/` folder to GitHub Pages. It auto-detects committed custom domains via `public/CNAME`, exporting `ASTRO_BASE` and `SITE_URL` before the Astro build.
+- GitHub Actions workflow `.github/workflows/site.yml` uses the same build for PRs and deployments: `npm run check`, `npm test`, `npm run build:docs`, `npm run build`, `npm run verify`. Docs must be built before the site; missing API docs fail the architecture-link gate. Upstream commits are pinned in `scripts/upstreams.json`; update those SHAs deliberately to upgrade content. The verifier checks internal links and key pages in `dist/` without network access.
+- Only non-PR builds deploy to GitHub Pages. The workflow detects custom domains via `public/CNAME`, exporting `ASTRO_BASE` and `SITE_URL`; use those same environment values for local build and verification.
 
 ## Site Routes
 
