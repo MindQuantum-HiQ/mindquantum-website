@@ -74,7 +74,9 @@ sphinx:
     html_static_path:
       - ../docs/_static
     html_css_files:
+      - mq-fonts.css
       - mq-variables.css
+      - mq-controls.css
       - mq-theme.css
       - mq-thebe.css
     html_js_files:

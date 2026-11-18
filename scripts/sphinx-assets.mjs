@@ -20,7 +20,55 @@ export function uniqueScripts(root) {
 export function normalizeSphinxHtml(html) {
   const doc = parse(html, { blockTextElements: { script: true, style: true, pre: true, code: true } })
   const head = doc.querySelector('head')
-  return head && uniqueScripts(head) ? doc.toString() : html
+  const scriptsChanged = head ? uniqueScripts(head) : false
+  const actionsChanged = normalizeArticleActions(doc)
+  const iconsChanged = normalizeThemeIcons(doc)
+  return scriptsChanged || actionsChanged || iconsChanged ? doc.toString() : html
+}
+
+// Keep Sphinx's toolbar behavior/data attributes, but render the same outline
+// glyphs as Astro and the shared controls instead of a second icon language.
+const THEME_ICONS = new Map([
+  ['fa-magnifying-glass', 'search'], ['fa-download', 'download'],
+  ['fa-file', 'file'], ['fa-file-pdf', 'file-text'], ['fa-expand', 'expand'],
+  ['fa-sun', 'sun'], ['fa-moon', 'moon'], ['fa-circle-half-stroke', 'monitor'],
+  ['fa-angle-left', 'chevron-left'], ['fa-angle-right', 'chevron-right'],
+  ['fa-arrow-up', 'arrow-up'],
+])
+
+function normalizeThemeIcons(doc) {
+  let changed = false
+  for (const element of doc.querySelectorAll('i')) {
+    const classes = (element.getAttribute('class') || '').split(/\s+/)
+    const icon = classes.map(cls => THEME_ICONS.get(cls)).find(Boolean)
+    if (!icon) continue
+    for (const cls of classes) {
+      if (cls === 'fa' || cls === 'fas' || cls === 'far' || cls.startsWith('fa-')) element.classList.remove(cls)
+    }
+    element.set_content(`<span class="mq-icon mq-icon-${icon}" aria-hidden="true"></span>`)
+    changed = true
+  }
+  return changed
+}
+
+// Imported upstream badge artwork is content metadata, not our control UI.
+// Adapt only the known image-only source/download links, preserving both href
+// and localized accessible label. Never rewrite notebook figures or outputs.
+function normalizeArticleActions(doc) {
+  let changed = false
+  for (const image of doc.querySelectorAll('article.bd-article a > img')) {
+    const match = /\/logo_(notebook|download_code|source)(?:_(?:en|cn|zh))?\.svg(?:\?.*)?$/.exec(image.getAttribute('src') || '')
+    if (!match || !image.getAttribute('alt')) continue
+    const link = image.parentNode
+    if (link.childNodes.length !== 1) continue
+    const icon = { notebook: 'download', download_code: 'code', source: 'external' }[match[1]]
+    const label = image.getAttribute('alt').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    for (const cls of ['mq-btn', 'mq-btn-outline', 'mq-btn-compact']) link.classList.add(cls)
+    link.set_content(`<span class="mq-icon mq-icon-${icon}" aria-hidden="true"></span><span>${label}</span>`)
+    if (link.parentNode.tagName === 'P') link.parentNode.classList.add('mq-article-actions')
+    changed = true
+  }
+  return changed
 }
 
 // Astro owns the shell; Sphinx remains the source of article extension assets
@@ -42,6 +90,8 @@ export function extractSphinxAssets(doc, sourcePath, langRoot) {
     }
     const url = new URL(raw, sourceUrl)
     const local = url.origin === sourceUrl.origin
+    // Astro already imports these exact sources; avoid duplicate global CSS.
+    if (local && /\/_static\/mq-(fonts|variables|controls)\.css$/.test(url.pathname)) continue
     if (local && (/\/_static\/(styles|scripts)\//.test(url.pathname) ||
       /\/(searchtools|language_data|searchindex)\.js$/.test(url.pathname))) continue
     const href = local ? `${langRoot}${url.pathname.slice(1)}${url.search}${url.hash}` : url.href

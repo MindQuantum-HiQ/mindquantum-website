@@ -35,8 +35,8 @@ async function buildBook(lang) {
   const proj = resolve(`docs/${lang}`)
   const outRoot = resolve(`docs/_build/books/${lang}`)
   const dst = resolve(`public/docs/${lang}`)
-  // Build into a per-language folder under docs/_build/books
-  await run('jupyter-book', ['build', proj, '--path-output', outRoot])
+  // Write every page so CSS-only changes also refresh shared static assets.
+  await run('jupyter-book', ['build', proj, '--all', '--path-output', outRoot])
   // Jupyter Book writes to <path-output>/_build/html
   const src = resolve(outRoot, '_build/html')
   if (await exists(dst)) await rm(dst, { recursive: true, force: true })
@@ -52,7 +52,7 @@ async function buildCourses() {
   const dstRoot = resolve('public/courses')
   const lang = 'zh'
   const dst = resolve(dstRoot, lang)
-  await run('jupyter-book', ['build', proj, '--path-output', outRoot])
+  await run('jupyter-book', ['build', proj, '--all', '--path-output', outRoot])
   const src = resolve(outRoot, '_build/html')
   if (await exists(dstRoot)) await rm(dstRoot, { recursive: true, force: true })
   await mkdir(dst, { recursive: true })
@@ -65,7 +65,9 @@ async function buildSphinx(api, lang) {
   const proj = resolve(`docs/${api}`) // api-en or api-zh
   const out = resolve(`docs/_build/api/${lang}`)
   const dst = resolve(`public/docs/api/${lang}`)
-  await run('sphinx-build', ['-b', 'html', proj, out])
+  // Always write output so shared static assets refresh even when no RST
+  // changed; Sphinx otherwise skips its writing/static-copy phase.
+  await run('sphinx-build', ['-b', 'html', '-a', proj, out])
   if (await exists(dst)) await rm(dst, { recursive: true, force: true })
   await mkdir(dst, { recursive: true })
   await cp(out, dst, { recursive: true })

@@ -59,13 +59,13 @@
     banner.innerHTML = `
       <div class="mq-text">${T.banner} <span class="mq-kernel-status" role="status"></span></div>
       <div class="mq-actions" role="group">
-        <button type="button" class="mq-btn mq-btn-primary mq-activate">
-          <i class="fas fa-rocket" aria-hidden="true"></i> ${T.activate}
+        <button type="button" class="mq-btn mq-btn-run mq-btn-compact mq-activate">
+          <span class="mq-icon mq-icon-rocket" aria-hidden="true"></span> ${T.activate}
         </button>
-        <button type="button" class="mq-btn mq-run-all">
-          <i class="fas fa-play" aria-hidden="true"></i> ${T.runAll}
+        <button type="button" class="mq-btn mq-btn-outline mq-btn-compact mq-run-all">
+          <span class="mq-icon mq-icon-play" aria-hidden="true"></span> ${T.runAll}
         </button>
-        <button type="button" class="mq-dismiss" aria-label="${T.dismiss}" title="${T.dismiss}">✕</button>
+        <button type="button" class="mq-btn mq-btn-ghost mq-btn-compact mq-dismiss" aria-label="${T.dismiss}" title="${T.dismiss}"><span class="mq-icon mq-icon-close" aria-hidden="true"></span></button>
       </div>`;
     article.prepend(banner);
 
@@ -162,7 +162,7 @@
       button.className = 'mq-run-btn';
       button.setAttribute('aria-label', T.runCell);
       button.title = T.runCell;
-      button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" stroke-width="1.8" stroke-linejoin="round" fill="none"/></svg>';
+      button.innerHTML = '<span class="mq-icon mq-icon-play" aria-hidden="true"></span>';
       button.addEventListener('click', () => withKernel(() => thebe.cells.get(index).execute()));
       cell.button = button;
       cell.input.appendChild(button);

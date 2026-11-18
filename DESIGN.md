@@ -22,7 +22,7 @@ This repository hosts both the MindQuantum website (Astro) and the documentation
 ## Frontend Stack
 
 - **Astro 5** is the static site generator and the default rendering mode (`output: 'static'`). Every marketing/page route is pre-rendered at build time.
-- **Tailwind CSS v3** (via `@astrojs/tailwind`, `applyBaseStyles: false`) provides the utility layer. Tailwind reads HSL design tokens from CSS variables declared in `src/styles/tokens.css` so the two token systems never drift.
+- **Tailwind CSS v3** (via `@astrojs/tailwind`, `applyBaseStyles: false`) provides the utility layer. Tailwind reads the canonical semantic tokens from `src/styles/tokens.css`.
 - **React islands** (via `@astrojs/react`) are available but currently unused on any shipped page; the surface stays in place for future interactive widgets.
 - **Web Components / vanilla JS** power the Quantum Circuit Composer (`mq-circuit-builder` custom element) and the homepage hero carousel. This keeps JS payload small on the landing page.
 - **lucide-react**, **clsx**, and **tailwind-merge** are opt-in runtime dependencies consumed only where needed. Recharts remains an installed dependency for future dashboards but is no longer imported by any page.
@@ -59,13 +59,13 @@ All page routes share `src/layouts/BaseLayout.astro`, which renders the site-wid
 
 ## Theming Strategy
 
-- `src/styles/tokens.css` maintains two parallel token systems:
-  - **HSL tokens** (`--primary`, `--background`, `--brand-orange`, …) consumed by Tailwind's `theme.extend.colors` in `tailwind.config.mjs`.
-  - **Legacy `--mq-*` tokens** (OKLCH) consumed by the Jupyter Book theme via `scripts/prepare-tokens.mjs`, which syncs the file into `docs/_static/mq-variables.css`. Do not remove these tokens without updating `docs/_static/mq-theme.css`.
-- `src/styles/global.css` imports Tailwind layers and defines shared component classes (`mq-container`, `mq-btn-*`, `mq-card`, `mq-section-title`, `mq-link-arrow`) plus gradient utilities (`bg-cta-gradient`, `bg-hero-gradient`).
-- `docs/_static/mq-theme.css` applies light overrides on top of `sphinx_book_theme` to reflect the brand without forking the upstream theme.
+- **Canonical decisions:** `src/styles/tokens.css` owns color semantics, font stacks, radii, focus, icon geometry and control density. HSL channels support Tailwind opacity utilities; complete-color `--mq-*` aliases reference those channels rather than duplicating values. Blue means navigation/selection, warm orange means execution, neutral controls mean supporting actions, and success/warning/danger are feedback only. Code hosts are equal-priority neutral actions. Chart categories and syntax highlighting are data, not UI accents.
+- **Shared controls:** `src/styles/controls.css` owns buttons, hover/focus/disabled states and the 24px outline icon family. The normal control height is 40px; generated-doc tools and the editor use its 32px compact variant. `src/styles/fonts.css` loads the same font faces for every renderer. Astro imports these directly; `prepare-tokens.mjs` copies all three sources unchanged into `docs/_static/mq-{variables,controls,fonts}.css` and fails the build if a source is unavailable. Edit the sources, never the generated copies.
+- **Sphinx adapter:** tutorials, courses and API configs all load the generated assets. `docs/_static/mq-theme.css` maps the public PyData/Sphinx Book and MyST-NB theme variables to the shared semantics. `mq-thebe.css` owns only the online-runtime layout, not a competing button system. Publishing converts known upstream source/download badge images into labeled shared controls, preserving URLs and localized labels without changing scientific figures.
+- **Composer adapter:** `src/components/circuit/styles.css` is the sole editor stylesheet, imported into its Shadow DOM alongside shared controls. Tokens inherit across the shadow boundary; there are no host-local palette defaults or unused light-DOM copies. Gate labels and standard circuit symbols distinguish operations, not rainbow gradients. The selected gate uses the shared focus/selection colors.
+- **Density stays local:** homepage display sizes, tutorial reading measure, API navigation/tables and editor grid geometry remain with their renderers. `global.css` owns Astro layout/typography utilities; `DocsLayout.astro` owns the article layout. Do not add renderer-local color literals, font stacks or button treatments to make a surface match. Change a semantic token or control once, then map the renderer's public theme API to it.
 
-This dual-token approach lets the homepage and Astro chrome move to a modern Tailwind/utility stack while preserving visual parity with the Jupyter Book theme and keeping the docs upgrade path simple.
+Run `npm test` and `npm run build:all` after design-system changes so the copied Sphinx assets and final Astro output are both checked. Visual checks should include homepage, a notebook tutorial, API overview and Composer in both languages at desktop and 390px; also check keyboard focus, selected gates and Sphinx light/dark modes.
 
 ## Content Sourcing
 

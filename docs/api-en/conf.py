@@ -35,7 +35,7 @@ language = "en"
 
 html_theme = "sphinx_book_theme"
 html_static_path = [str(DOCS_ROOT / "_static")]
-html_css_files = ["mq-sphinx.css"]
+html_css_files = ["mq-fonts.css", "mq-variables.css", "mq-controls.css", "mq-theme.css"]
 
 # Self-hosted MathJax (vendored by scripts/prepare-mathjax.mjs); the CDN
 # default is unreachable for part of the audience
@@ -45,4 +45,3 @@ autosummary_generate = False  # Let mqdocs.autogen handle ms* directives
 
 # Keep autosummary stubs consistent
 autosummary_imported_members = False
-

@@ -159,7 +159,7 @@ const title = `${page.title} — ${messages.docsLabel}`;
     display: block;
     margin-bottom: 1.5rem;
     border: 1px solid hsl(var(--border));
-    border-radius: 0.5rem;
+    border-radius: var(--mq-radius-control);
     background-color: hsl(var(--secondary) / 0.4);
   }
   @media (min-width: 960px) {
@@ -287,7 +287,7 @@ const title = `${page.title} — ${messages.docsLabel}`;
   .docs-main code {
     background-color: hsl(var(--secondary));
     padding: 0.125rem 0.375rem;
-    border-radius: 0.25rem;
+    border-radius: var(--mq-radius-small);
     border: 1px solid hsl(var(--border));
   }
   .docs-main pre {
@@ -295,7 +295,7 @@ const title = `${page.title} — ${messages.docsLabel}`;
     font-size: 0.8125rem;
     background-color: hsl(var(--secondary));
     border: 1px solid hsl(var(--border));
-    border-radius: 0.5rem;
+    border-radius: var(--mq-radius-control);
     padding: 1rem 1.125rem;
     overflow-x: auto;
     line-height: 1.5;
@@ -307,12 +307,17 @@ const title = `${page.title} — ${messages.docsLabel}`;
     padding: 0;
     font-size: inherit;
   }
+  .docs-main .cell_input pre {
+    border: 0;
+    margin: 0;
+    border-radius: var(--mq-radius-control);
+  }
 
   /* Copy button (copybutton.js injects .copybtn.btn-copybtn onto pre) */
   .docs-main pre .copybtn {
     background: hsl(var(--background));
     border: 1px solid hsl(var(--border));
-    border-radius: 0.25rem;
+    border-radius: var(--mq-radius-small);
     color: hsl(var(--muted-foreground));
   }
   .docs-main pre .copybtn:hover { color: hsl(var(--foreground)); }
@@ -340,7 +345,7 @@ const title = `${page.title} — ${messages.docsLabel}`;
   .docs-main details.dropdown {
     border: 1px solid hsl(var(--border));
     background-color: hsl(var(--muted) / 0.35);
-    border-radius: 0.5rem;
+    border-radius: var(--mq-radius-control);
     padding: 0.875rem 1rem;
     margin: 1rem 0;
   }
@@ -358,11 +363,11 @@ const title = `${page.title} — ${messages.docsLabel}`;
   .docs-main details.dropdown > summary { cursor: pointer; }
   .docs-main .admonition.note { background-color: hsl(var(--primary) / 0.06); }
   .docs-main .admonition.tip,
-  .docs-main .admonition.hint { background-color: hsl(152 52% 40% / 0.07); }
+  .docs-main .admonition.hint { background-color: hsl(var(--success) / 0.07); }
   .docs-main .admonition.warning,
-  .docs-main .admonition.caution { background-color: hsl(32 78% 55% / 0.1); }
+  .docs-main .admonition.caution { background-color: hsl(var(--warning) / 0.1); }
   .docs-main .admonition.danger,
-  .docs-main .admonition.error { background-color: hsl(0 68% 52% / 0.08); }
+  .docs-main .admonition.error { background-color: hsl(var(--destructive) / 0.08); }
 
   /* Images & figures ---------------------------------------------- */
   .docs-main img { max-width: 100%; height: auto; border-radius: 0.375rem; }
@@ -411,7 +416,7 @@ const title = `${page.title} — ${messages.docsLabel}`;
     max-width: 50%;
     padding: 0.875rem 1rem;
     border: 1px solid hsl(var(--border));
-    border-radius: 0.5rem;
+    border-radius: var(--mq-radius-control);
     color: hsl(var(--foreground));
     text-decoration: none;
     transition: border-color 120ms ease-out, background-color 120ms ease-out;

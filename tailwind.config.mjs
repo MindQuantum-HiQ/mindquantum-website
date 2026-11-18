@@ -18,27 +18,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: [
-          "Hanken Grotesk",
-          "PingFang SC",
-          "Microsoft YaHei",
-          "Source Han Sans SC",
-          "Noto Sans SC",
-          "ui-sans-serif",
-          "system-ui",
-          "-apple-system",
-          "Segoe UI",
-          "sans-serif",
-        ],
-        mono: [
-          "JetBrains Mono",
-          "ui-monospace",
-          "SFMono-Regular",
-          "Menlo",
-          "Consolas",
-          "Liberation Mono",
-          "monospace",
-        ],
+        sans: ["var(--mq-font-sans)"],
+        mono: ["var(--mq-font-mono)"],
       },
       fontSize: {
         "display-xl": [
@@ -58,6 +39,7 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        selected: "hsl(var(--selected))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {

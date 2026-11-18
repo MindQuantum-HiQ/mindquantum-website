@@ -1,20 +1,8 @@
-/* Auto-synced from src/styles/tokens.css during build. */
-/*
- * MindQuantum Design Tokens
- *
- * Two parallel token systems live here:
- *
- *   1. --mq-* (OKLCH) — consumed by the Jupyter Book docs theme via
- *      scripts/prepare-tokens.mjs which syncs this file into
- *      docs/_static/mq-variables.css. Do not remove these tokens without
- *      updating docs/_static/mq-theme.css.
- *
- *   2. HSL tokens (--primary, --background, etc.) — consumed by the Astro
- *      site + Tailwind theme (tailwind.config.mjs). Shadcn-style naming
- *      keeps the utility layer simple.
- *
- * When adding a new brand color, define the HSL variant for Tailwind AND an
- * --mq-* alias so it remains available to the docs theme if needed.
+/* Generated from src/styles/tokens.css; do not edit. */
+/* MindQuantum's canonical semantic tokens.
+ * HSL channels support Tailwind opacity utilities. Complete --mq-* aliases
+ * expose the same values to Sphinx and the Composer Shadow DOM. Never define
+ * renderer-local brand colors; change the semantic value here instead.
  */
 
 :root {
@@ -73,7 +61,7 @@
   --brand-orange-foreground: 0 0% 100%;
 
   /* --- Legacy brand tokens (chart-only; do not use as UI accents) --- */
-  --brand-blue: 224 65% 52%;          /* alias of --primary                  */
+  --brand-blue: var(--primary);
   --brand-blue-light: 222 60% 95%;
   --brand-green: 152 52% 40%;
   --brand-teal: 186 52% 40%;
@@ -81,33 +69,54 @@
   --brand-yellow: 42 82% 55%;
 
   /* Same-hue tonal gradient — kills the old blue→cyan AI tell */
-  --hero-gradient: linear-gradient(135deg, hsl(40 22% 98%) 0%, hsl(222 30% 97%) 50%, hsl(40 22% 98%) 100%);
-  --cta-gradient: linear-gradient(135deg, hsl(224 65% 52%) 0%, hsl(222 58% 42%) 100%);
+  --hero-gradient: linear-gradient(135deg, var(--mq-bg), var(--mq-surface-2), var(--mq-bg));
+  --cta-gradient: linear-gradient(135deg, var(--mq-primary), var(--mq-primary-hover));
 
-  /* ---------------------------------------------------------------------
-   * Legacy --mq-* tokens (OKLCH) — consumed by Jupyter Book theme.
-   * Kept in visual sync with the HSL tokens above. Updated values follow
-   * the brief's quantum-blue target directly (no HSL round-trip).
-   * ---------------------------------------------------------------------*/
-  --mq-primary: oklch(55% 0.17 252);
-  --mq-primary-hover: oklch(48% 0.17 252);
-  --mq-primary-contrast: #ffffff;
-  --mq-bg: oklch(98.5% 0.006 80);
-  --mq-surface: oklch(97% 0.008 252);
-  --mq-surface-2: oklch(95% 0.012 252);
-  --mq-border: color-mix(in oklab, var(--mq-text-muted), transparent 65%);
-  --mq-text: oklch(20% 0.03 252);
-  --mq-text-muted: oklch(48% 0.02 252);
+  /* Feedback and selection are semantic, never gate/source-platform colors. */
+  --success: 152 52% 32%;
+  --warning: 32 78% 35%;
+  --selected: 224 65% 96%;
+  --selected-foreground: var(--primary);
+
+  /* Complete-color aliases for plain CSS, Sphinx and Shadow DOM.
+     These are references, never a second independently tuned palette. */
+  --mq-primary: hsl(var(--primary));
+  --mq-primary-hover: hsl(var(--primary-hover));
+  --mq-primary-contrast: hsl(var(--primary-foreground));
+  --mq-bg: hsl(var(--background));
+  --mq-surface: hsl(var(--card));
+  --mq-surface-2: hsl(var(--secondary));
+  --mq-border: hsl(var(--border));
+  --mq-text: hsl(var(--foreground));
+  --mq-text-muted: hsl(var(--muted-foreground));
+  --mq-selected: hsl(var(--selected));
+  --mq-selected-text: hsl(var(--selected-foreground));
+  --mq-run: hsl(var(--brand-orange));
+  --mq-run-text: hsl(var(--brand-orange-foreground));
+  --mq-danger: hsl(var(--destructive));
+  --mq-success: hsl(var(--success));
+  --mq-warning: hsl(var(--warning));
 
   --mq-page-max: min(96vw, 1400px);
-  --mq-radius: 12px;
-  --mq-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 10px 24px rgba(0, 0, 0, .06);
+  --mq-radius: var(--radius);
+  --mq-radius-control: 0.5rem;
+  --mq-radius-small: 0.25rem;
+  --mq-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  --mq-control-font-size: 0.875rem;
+  --mq-control-font-weight: 500;
+  --mq-control-height: 2.5rem;
+  --mq-control-height-compact: 2rem;
+  --mq-icon-size: 1rem;
+  --mq-icon-stroke: 2;
+  --mq-focus-width: 2px;
+  --mq-focus-offset: 2px;
+  --mq-transition: 150ms ease-out;
 
   --mq-font-sans: "Hanken Grotesk", "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans SC", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   --mq-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
-.dark {
+.dark, html[data-theme="dark"] {
   --background: 222 23% 11%;
   --foreground: 210 20% 96%;
 
@@ -118,6 +127,7 @@
   --popover-foreground: 210 20% 96%;
 
   --primary: 214 100% 62%;
+  --primary-hover: 214 100% 70%;
   --primary-foreground: 220 20% 10%;
 
   --secondary: 222 15% 20%;
@@ -136,13 +146,10 @@
   --input: 222 15% 22%;
   --ring: 214 100% 62%;
 
-  --hero-gradient: linear-gradient(135deg, hsl(222 30% 14%) 0%, hsl(222 25% 12%) 50%, hsl(222 35% 10%) 100%);
 
-  /* Legacy --mq-* dark tokens */
-  --mq-bg: oklch(16% 0.03 250);
-  --mq-surface: oklch(21% 0.03 250);
-  --mq-surface-2: oklch(25% 0.03 250);
-  --mq-border: color-mix(in oklab, var(--mq-text-muted), transparent 65%);
-  --mq-text: oklch(93% 0.01 250);
-  --mq-text-muted: oklch(80% 0.02 250);
+  --selected: 222 35% 22%;
+  --brand-orange: 28 90% 65%;
+  --brand-orange-foreground: 220 20% 10%;
+  --success: 152 52% 65%;
+  --warning: 32 78% 65%;
 }

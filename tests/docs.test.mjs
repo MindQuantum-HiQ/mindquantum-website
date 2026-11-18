@@ -59,3 +59,32 @@ test('publishing emits each identical script once, preserving distinct configura
   assert.equal(normalizeSphinxHtml(normalized), normalized)
   assert.equal(normalizeSphinxHtml(''), '')
 })
+
+test('imported source badges become labeled controls without changing links or figures', () => {
+  for (const [suffix, label] of [['_en', 'Download Notebook'], ['_cn', '下载 Notebook'], ['_zh', '下载 Notebook'], ['', '下载 Notebook']]) {
+    const href = 'https://example.org/tutorial.ipynb'
+    const html = `<head></head><article class="bd-article"><p><a href="${href}"><img alt="${label}" src="https://example.org/logo_notebook${suffix}.svg"></a></p><figure><img src="plot.svg" alt="A scientific plot"></figure></article>`
+    const normalized = normalizeSphinxHtml(html)
+    const root = parse(normalized)
+    const link = root.querySelector('.mq-article-actions a')
+    assert.equal(link.getAttribute('href'), href)
+    assert.equal(link.text.trim(), label)
+    assert.ok(link.classList.contains('mq-btn-outline'))
+    assert.equal(link.querySelector('.mq-icon').getAttribute('aria-hidden'), 'true')
+    assert.equal(root.querySelector('figure img').getAttribute('src'), 'plot.svg')
+    assert.equal(normalizeSphinxHtml(normalized), normalized)
+  }
+})
+
+test('theme icons share outline glyphs while preserving theme-switch behavior', () => {
+  const html = '<button aria-label="Color mode"><i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light" title="Light"></i></button><button aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button><i class="scientific-notation">x</i>'
+  const normalized = normalizeSphinxHtml(html)
+  const root = parse(normalized)
+  const toggle = root.querySelector('i.theme-switch')
+  assert.equal(toggle.getAttribute('data-mode'), 'light')
+  assert.equal(toggle.getAttribute('title'), 'Light')
+  assert.ok(toggle.querySelector('.mq-icon-sun'))
+  assert.equal(root.querySelector('[aria-label="Search"] .mq-icon-search').getAttribute('aria-hidden'), 'true')
+  assert.equal(root.querySelector('.scientific-notation').text, 'x')
+  assert.equal(normalizeSphinxHtml(normalized), normalized)
+})
