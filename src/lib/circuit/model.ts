@@ -6,7 +6,7 @@ export const ROTATION_PARAMETERS = { RX: "theta", RY: "theta", RZ: "phi" } as co
 export type RotationGateType = keyof typeof ROTATION_PARAMETERS;
 
 export function isRotationGate(type: GateType): type is RotationGateType {
-  return Object.hasOwn(ROTATION_PARAMETERS, type);
+  return type in ROTATION_PARAMETERS;
 }
 
 type PlacementBase = {
@@ -63,7 +63,14 @@ export function ensureColumns(c: Circuit, nColumns: number): Circuit {
 }
 
 export function cloneCircuit(c: Circuit): Circuit {
-  return structuredClone(c);
+  return {
+    nQubits: c.nQubits,
+    columns: c.columns.map((col) => ({
+      items: col.items.map((g) =>
+        g ? ({ ...g, targets: [...g.targets], controls: g.controls && [...g.controls], params: g.params && { ...g.params } } as GatePlacement) : null,
+      ),
+    })),
+  };
 }
 
 export function involvedWires(g: GatePlacement): number[] {
