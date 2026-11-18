@@ -20,8 +20,8 @@ const START = `${COURSES_ROOT}index.html`;
     />
   </section>
   <script>
-    const iframe = document.getElementById('mq-courses-frame');
-    const header = document.querySelector('.site-header');
+    const iframe = document.querySelector<HTMLIFrameElement>('#mq-courses-frame')!;
+    const header = document.querySelector<HTMLElement>('.site-header');
 
     function sizeFrame() {
       const h = header ? header.offsetHeight : 0;
@@ -34,24 +34,24 @@ const START = `${COURSES_ROOT}index.html`;
     const ROOT = iframe.dataset.root || '/courses/';
     const DEFAULT_REL = 'index.html';
 
-    function joinUrl(root, rel) {
+    function joinUrl(root: string, rel: string) {
       if (!root.endsWith('/')) root += '/';
       if (rel.startsWith('/')) rel = rel.slice(1);
       return root + rel;
     }
 
-    function relFromPathname(pathname, root) {
+    function relFromPathname(pathname: string, root: string) {
       if (!root.endsWith('/')) root += '/';
       return pathname.startsWith(root) ? pathname.slice(root.length) : null;
     }
 
-    function normalizeRel(rel) {
+    function normalizeRel(rel: string) {
       return rel === 'index.html' ? '' : rel;
     }
 
     let suppressHashHandler = false;
 
-    function navigateIframeTo(rel, replace=false) {
+    function navigateIframeTo(rel: string, replace=false) {
       const url = joinUrl(ROOT, rel || DEFAULT_REL);
       if (replace) iframe.setAttribute('src', url);
       else iframe.src = url;

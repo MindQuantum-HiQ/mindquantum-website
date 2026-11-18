@@ -15,12 +15,12 @@ MindQuantum 网站和双语文档的 Astro + Jupyter Book 单一代码库。
 
 ## 本地开发
 
-先决条件：Node 18+ 和 Python 3.9–3.11。
+本站构建的先决条件：Node 24 LTS（通过 `.nvmrc` 固定，运行 `nvm use`）和 Python 3.11。MindQuantum 0.12.0 支持 Python 3.9–3.11。
 
 1. 安装 Node 依赖
 
 ```bash
-npm install
+npm ci
 ```
 
 2. (可选) 创建 Python 虚拟环境并安装 Jupyter Book
@@ -28,7 +28,7 @@ npm install
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install jupyter-book==1.0.4 sphinx-copybutton sphinx-design sphinx-thebe mindspore mindquantum
+pip install -r requirements-docs.txt
 ```
 
 3. 同步文档内容（开发期间可选）
@@ -37,7 +37,7 @@ pip install jupyter-book==1.0.4 sphinx-copybutton sphinx-design sphinx-thebe min
 
 ```bash
 npm run sync:all            # 如果缺失则克隆，如果存在则重用缓存
-# 或在同步前更新到最新的上游
+# 或在同步前重新获取固定的上游提交
 python scripts/sync_all.py --update
 ```
 
@@ -87,7 +87,8 @@ sphinx-build -b html docs/api-zh docs/_build/api/zh
 
 - `npm run build` 会先执行 `scripts/prepare-tokens.mjs`（将设计令牌同步到 Jupyter Book 主题），随后运行 `astro build`。
 - `npm run build:all` 会将 Jupyter Books（教程 + 课程）和 Sphinx 构建到 `public/{docs,courses}/**`，然后将 Astro 构建到 `dist/`。临时工件集中在 `docs/_build/` 与 `courses/_build/` 下。
-- GitHub Actions 工作流 `.github/workflows/deploy.yml` 会构建两者并将 `dist/` 文件夹部署到 GitHub Pages。它会通过检测 `public/CNAME` 中提交的自定义域名，在构建前导出 `ASTRO_BASE` 与 `SITE_URL`。
+- GitHub Actions 工作流 `.github/workflows/site.yml` 对 PR 和部署执行相同的门禁：`npm run check`、`npm test`、`npm run build:docs`、`npm run build`、`npm run verify`。文档必须先构建；内部链接与关键页面由离线校验器检查。上游提交固定在 `scripts/upstreams.json`，Python 依赖固定在 `requirements-docs.txt`。
+- 仅非 PR 构建部署到 GitHub Pages。工作流根据 `public/CNAME` 导出 `ASTRO_BASE` 与 `SITE_URL`；本地构建和验证应使用相同的环境变量。
 
 ## 站点路由
 

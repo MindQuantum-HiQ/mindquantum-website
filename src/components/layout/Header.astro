@@ -21,7 +21,7 @@ interface Props {
   pathUnbased: string;
 }
 
-const { lang, pathUnbased } = Astro.props;
+const { lang } = Astro.props;
 const BASE = import.meta.env.BASE_URL || "/";
 const nav = NAV_MESSAGES[lang];
 const homeHref = withBase(pathForLang("/", lang), BASE);
@@ -618,8 +618,7 @@ function isActive(itemHref: string, currentPath: string) {
     const onChange = () => {
       if (mq.matches && !sheet.classList.contains("hidden")) setOpen(false);
     };
-    if (mq.addEventListener) mq.addEventListener("change", onChange);
-    else mq.addListener(onChange);
+    mq.addEventListener("change", onChange);
   })();
 </script>
 

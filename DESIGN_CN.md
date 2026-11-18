@@ -14,7 +14,7 @@
 - Astro 站点位于仓库根目录。静态输出在 `dist/` 中。
 - 两个 Jupyter Book 项目分别在 `docs/en` 和 `docs/zh` 中。构建输出集中在 `docs/_build/books/{lang}` 下，并复制到 `public/docs/{lang}`，Astro 将其作为 `/docs/{lang}/` 提供服务。
 - API (Sphinx) 构建作为两个项目分别在 `docs/api-en` 和 `docs/api-zh` 中。输出集中在 `docs/_build/api/{lang}` 下，并复制到 `public/docs/api/{lang}`。
-- GitHub Actions 首先构建文档 (Jupyter Book + Sphinx)，然后构建 Astro，并部署合并后的 `dist/`。
+- `.github/workflows/site.yml` 为 PR 和部署共用构建：Node 24（`.nvmrc`）、Python 3.11、`npm ci`、固定的 Python 依赖及上游提交，然后运行类型检查、单元测试、文档构建、Astro 构建与离线 `npm run verify` 内部链接/关键页面检查。缺失文档会使构建失败；仅非 PR 事件部署，Pages 写权限仅授予部署作业。
 - Jupyter Book 的 `_config.yml` 在 `copyright` 中使用 `{year}` 占位符（YAML 无法计算当前年份）。`scripts/update-copyright.mjs` 在 `build:docs` 期间将其替换为构建年份，构建结束后还原占位符，使提交的配置文件自解释且工作区保持干净。Astro 页脚和 Sphinx API 配置则动态计算年份。
 - MathJax 采用自托管：`scripts/prepare-mathjax.mjs` 在 `build:docs` 期间将 npm `mathjax` 包（合并组件 `tex-mml-chtml.js`、CHTML woff 字体、autoload 按需加载的 TeX 扩展）拷贝到已 gitignore 的 `docs/_static/mathjax/`，各 Sphinx / Jupyter Book 配置统一设置 `mathjax_path: mathjax/tex-mml-chtml.js`。Sphinx 默认的 jsdelivr CDN 对部分用户不可达，会导致所有公式无法渲染。
 
@@ -68,7 +68,7 @@
 
 ## 内容来源
 
-- 构建不依赖于外部仓库。
+- 文档构建获取 `scripts/upstreams.json` 中固定的上游提交；获取或检出失败立即终止。缓存仓库也必须检出到固定 SHA。
 - 教程：`scripts/sync_mindquantum_from_msdocs.py` 将 MindQuantum 教程源文件从本地 `mindspore/docs` 克隆（`docs/mindquantum/docs/source_en` 和 `source_zh_cn`）复制到 `docs/en/src` 和 `docs/zh/src`。
 - API：`scripts/sync_mindquantum_api.py` 将 API `.rst` 源文件从本地 `mindquantum` 克隆（`docs/api_python_en` 和 `docs/api_python`）复制到特定语言的 `src/` 文件夹中。
 - 课程：`courses/` 下的笔记本为本仓库自有内容。新增或编辑笔记本后请运行 `python scripts/normalize_course_math.py`，使 `$$ … $$` 块级公式符合 MyST 的块规则（公式块前后留空行、列表项内缩进对齐），否则公式会在 Jupyter Book 中渲染为字面 `$` 文本。

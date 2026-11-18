@@ -15,6 +15,7 @@ The transformation is idempotent and safe to run repeatedly.
 from __future__ import annotations
 
 from pathlib import Path
+import os
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -62,7 +63,8 @@ def fix_api_tile_href(text: str, lang: str) -> str:
     see the same experience as clicking the header "API" button. We also add
     ``target="_top"`` so the click breaks out of Jupyter Book's hash router.
     """
-    target = f"/api/{lang}/"
+    base = os.environ.get("ASTRO_BASE", "/").strip("/")
+    target = f"/{base}/api/{lang}/" if base else f"/api/{lang}/"
 
     new = text
     # Replace common upstream targets (overview pages) with the wrapper
@@ -105,6 +107,13 @@ def normalize_lang(lang: str) -> None:
         if transformed != original:
             path.write_text(transformed, encoding="utf-8")
             print(f"Normalized {path.relative_to(ROOT)}")
+    beginner = srcdir / "beginner" / "beginner.md"
+    if beginner.exists():
+        original = beginner.read_text(encoding="utf-8")
+        transformed = original.replace('href="advance_operations_of_quantum_circuit.html"',
+                                       'href="advanced_operations_of_quantum_circuit.html"')
+        if transformed != original:
+            beginner.write_text(transformed, encoding="utf-8")
 
 
 def main() -> None:

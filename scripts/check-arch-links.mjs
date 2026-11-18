@@ -19,8 +19,7 @@
  * the build instead of shipping.
  *
  * Behaviour:
- *   - public/docs/api/ missing → log a warning, exit 0 (typical in dev where
- *     `npm run build:docs` hasn't run; we don't want to block local builds).
+ *   - public/docs/api/ missing → fail and request a docs build.
  *   - any target file missing  → log every offender, exit 1.
  *   - all targets resolve      → log the count, exit 0.
  */
@@ -65,12 +64,12 @@ async function collectArchHrefs() {
 async function main() {
   if (!(await exists(API_ROOT))) {
     console.warn(
-      `[check-arch-links] ${API_ROOT} not found; skipping deep-link verification.`,
+      `[check-arch-links] ${API_ROOT} not found; cannot verify deep links.`,
     );
     console.warn(
-      `[check-arch-links] Run "npm run build:docs" before "npm run build:site" to enable this check.`,
+      `[check-arch-links] Run "npm run build:docs" before "npm run build".`,
     );
-    process.exit(0);
+    process.exit(1);
   }
 
   const hrefs = await collectArchHrefs();

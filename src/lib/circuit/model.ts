@@ -123,7 +123,7 @@ export function removeGateById(c: Circuit, id: string): Circuit {
 export function moveGateById(c: Circuit, id: string, tNew: number, qTargetNew: number): Circuit {
   const gateInfo = findGate(c, id);
   if (!gateInfo) return c;
-  const { tOld, gate } = gateInfo;
+  const { gate } = gateInfo;
   const updated: GatePlacement = { ...gate, targets: [qTargetNew] };
   const valid = validatePlacement(c, tNew, updated, id).ok;
   if (!valid) return c;
