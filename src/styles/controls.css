@@ -34,6 +34,7 @@
   outline: var(--mq-focus-width) solid var(--mq-primary);
   outline-offset: var(--mq-focus-offset);
 }
+.mq-btn-inverse:focus-visible { outline-color: var(--mq-primary-contrast); }
 .mq-icon {
   width: var(--mq-icon-size);
   height: var(--mq-icon-size);
