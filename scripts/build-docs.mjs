@@ -35,8 +35,8 @@ async function buildBook(lang) {
   const proj = resolve(`docs/${lang}`)
   const outRoot = resolve(`docs/_build/books/${lang}`)
   const dst = resolve(`public/docs/${lang}`)
-  // Build into a per-language folder under docs/_build/books
-  await run('jupyter-book', ['build', proj, '--path-output', outRoot])
+  // Write every page so CSS-only changes also refresh shared static assets.
+  await run('jupyter-book', ['build', proj, '--all', '--path-output', outRoot])
   // Jupyter Book writes to <path-output>/_build/html
   const src = resolve(outRoot, '_build/html')
   if (await exists(dst)) await rm(dst, { recursive: true, force: true })
@@ -52,7 +52,7 @@ async function buildCourses() {
   const dstRoot = resolve('public/courses')
   const lang = 'zh'
   const dst = resolve(dstRoot, lang)
-  await run('jupyter-book', ['build', proj, '--path-output', outRoot])
+  await run('jupyter-book', ['build', proj, '--all', '--path-output', outRoot])
   const src = resolve(outRoot, '_build/html')
   if (await exists(dstRoot)) await rm(dstRoot, { recursive: true, force: true })
   await mkdir(dst, { recursive: true })
