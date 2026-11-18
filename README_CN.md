@@ -15,7 +15,7 @@ MindQuantum 网站和双语文档的 Astro + Jupyter Book 单一代码库。
 
 ## 本地开发
 
-先决条件：Node 18+ 和 Python 3.9+。
+先决条件：Node 18+ 和 Python 3.9–3.11。
 
 1. 安装 Node 依赖
 

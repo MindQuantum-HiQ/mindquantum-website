@@ -1,4 +1,5 @@
 import type { Lang } from "../config/i18n";
+import { INSTALL_COMMAND, PYTHON_REQUIREMENT, STABLE_SERIES } from "../config/mindquantum.ts";
 
 export type DocSection = {
   title: string;
@@ -77,8 +78,8 @@ export const DOCUMENTATION_MESSAGES: Record<Lang, DocumentationMessages> = {
       },
     ],
     install: {
-      command: "pip install mindquantum",
-      meta: "Stable · Python 3.9+ · Linux / macOS / Windows (WSL)",
+      command: INSTALL_COMMAND,
+      meta: `Stable ${STABLE_SERIES} · ${PYTHON_REQUIREMENT} · Linux / macOS / Windows (WSL)`,
       copyLabel: "Copy",
       copiedLabel: "Copied",
       manualLabel: "Press \u2318C / Ctrl+C",
@@ -132,8 +133,8 @@ export const DOCUMENTATION_MESSAGES: Record<Lang, DocumentationMessages> = {
       },
     ],
     install: {
-      command: "pip install mindquantum",
-      meta: "稳定版 · Python 3.9+ · Linux / macOS / Windows (WSL)",
+      command: INSTALL_COMMAND,
+      meta: `稳定版 ${STABLE_SERIES} · ${PYTHON_REQUIREMENT} · Linux / macOS / Windows (WSL)`,
       copyLabel: "复制",
       copiedLabel: "已复制",
       manualLabel: "请按 \u2318C / Ctrl+C",
