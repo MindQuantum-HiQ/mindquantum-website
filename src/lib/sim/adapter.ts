@@ -1,4 +1,5 @@
-import type { Circuit } from "../circuit/model";
+import type { Circuit, GatePlacement } from "../circuit/model";
+import { ROTATION_PARAMETERS, rotationAngle } from "../circuit/model.ts";
 
 export type BuildAndRunMessage = {
   type: "BuildAndRun";
@@ -28,12 +29,12 @@ export async function buildAndRun(c: Circuit): Promise<BuildAndRunResult> {
     for (let t = 0; t < c.columns.length; t++) {
       const col = c.columns[t];
       // Collect unique gates by id in this column to avoid duplicating multi-qubit occupancy rows
-      const unique: Record<string, any> = {};
+      const unique: Record<string, GatePlacement> = {};
       for (let q = 0; q < c.nQubits; q++) {
-        const gp = col.items[q] as any;
+        const gp = col.items[q];
         if (gp && !unique[gp.id]) unique[gp.id] = gp;
       }
-      const gates = Object.values(unique) as any[];
+      const gates = Object.values(unique);
       for (const gp of gates) {
         switch (gp.type) {
           // Single-qubit gates
@@ -56,14 +57,11 @@ export async function buildAndRun(c: Circuit): Promise<BuildAndRunResult> {
             qc.addGate("t", t, gp.targets);
             break;
           case "RX":
-            // Default to π/4 rotation if no params provided
-            qc.addGate("rx", t, gp.targets, { params: { theta: gp.params?.theta || Math.PI/4 } });
-            break;
           case "RY":
-            qc.addGate("ry", t, gp.targets, { params: { theta: gp.params?.theta || Math.PI/4 } });
-            break;
           case "RZ":
-            qc.addGate("rz", t, gp.targets, { params: { phi: gp.params?.phi || Math.PI/4 } });
+            qc.addGate(gp.type.toLowerCase(), t, gp.targets, {
+              params: { [ROTATION_PARAMETERS[gp.type]]: rotationAngle(gp) },
+            });
             break;
           // Two-qubit gates
           case "CNOT": {

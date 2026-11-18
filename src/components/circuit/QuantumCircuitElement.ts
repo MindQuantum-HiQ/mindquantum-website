@@ -4,6 +4,7 @@
 import type { Circuit, GatePlacement, GateType } from "../../lib/circuit/model";
 import { createEmptyCircuit, ensureColumns, addGate, removeGateById, moveGateById, validatePlacement, serializeCircuit } from "../../lib/circuit/model";
 import { GATE_REGISTRY, type GateDef } from "../../lib/circuit/gates";
+import { isRotationGate, rotationAngle, createRotationPlacement, type RotationGateType } from "../../lib/circuit/model";
 
 type RunResult = {
   statevector?: { re: number[]; im: number[] };
@@ -832,16 +833,13 @@ class QuantumCircuitElement extends HTMLElement {
       chip.textContent = gateDef?.label || g.type;
       
       // Add angle display for rotation gates
-      if ((g.type === "RX" || g.type === "RY" || g.type === "RZ") && g.params) {
-        const paramName = g.type === "RZ" ? "phi" : "theta";
-        const angle = g.params[paramName];
-        if (angle !== undefined) {
-          // Display angle as fraction of π
-          const piValue = angle / Math.PI;
-          const displayValue = piValue.toFixed(2).replace(/\.?0+$/, "");
-          chip.textContent = `${gateDef?.label}(${displayValue}π)`;
-          chip.style.fontSize = "0.65rem";
-        }
+      if (isRotationGate(g.type)) {
+        const angle = rotationAngle(g);
+        // Display angle as fraction of π
+        const piValue = angle / Math.PI;
+        const displayValue = piValue.toFixed(2).replace(/\.?0+$/, "");
+        chip.textContent = `${gateDef?.label}(${displayValue}π)`;
+        chip.style.fontSize = "0.65rem";
       }
     }
     
@@ -903,7 +901,7 @@ class QuantumCircuitElement extends HTMLElement {
   private onGateClick(id: string) {
     // Check if this is a rotation gate - if so, allow editing angle
     const gate = this.findGateById(id);
-    if (gate && (gate.type === "RX" || gate.type === "RY" || gate.type === "RZ")) {
+    if (gate && isRotationGate(gate.type)) {
       // Find the gate position
       let t = -1, q = -1;
       for (let ti = 0; ti < this.circuit.columns.length; ti++) {
@@ -921,7 +919,7 @@ class QuantumCircuitElement extends HTMLElement {
         // Remove old gate and prompt for new angle
         this.circuit = removeGateById(this.circuit, id);
         this.renderGrid();
-        this.promptRotationAngle(t, q, gate.type as "RX" | "RY" | "RZ", id);
+        this.promptRotationAngle(t, q, gate.type, id);
         return;
       }
     }
@@ -1048,7 +1046,7 @@ class QuantumCircuitElement extends HTMLElement {
         this.renderGrid();
         this.promptSecondQubit(t, id, q, "SWAP");
         return;
-      } else if (gateType === "RX" || gateType === "RY" || gateType === "RZ") {
+      } else if (isRotationGate(gateType)) {
         // Rotation gates need angle parameter
         const id = `g_${Math.random().toString(36).slice(2)}`;
         this.promptRotationAngle(t, q, gateType, id);
@@ -1124,7 +1122,7 @@ class QuantumCircuitElement extends HTMLElement {
     canvas.addEventListener("click", handler);
   }
 
-  private promptRotationAngle(t: number, q: number, gateType: "RX" | "RY" | "RZ", id: string) {
+  private promptRotationAngle(t: number, q: number, gateType: RotationGateType, id: string) {
     // Create a simple dialog for angle input
     const dialog = document.createElement("div");
     dialog.className = "mqcb-param-dialog";
@@ -1184,18 +1182,12 @@ class QuantumCircuitElement extends HTMLElement {
     
     const apply = () => {
       const value = parseFloat(input.value);
-      if (isNaN(value)) {
+      if (!Number.isFinite(value * Math.PI)) {
         this.toast("Invalid angle value");
         return;
       }
       
-      const paramName = gateType === "RZ" ? "phi" : "theta";
-      const placement: GatePlacement = { 
-        type: gateType, 
-        targets: [q], 
-        id,
-        params: { [paramName]: value * Math.PI }
-      };
+      const placement = createRotationPlacement(gateType, [q], id, value * Math.PI);
       
       const valid = validatePlacement(this.circuit, t, placement).ok;
       if (!valid) {
