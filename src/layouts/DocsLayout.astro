@@ -233,7 +233,7 @@ const title = `${page.title} — ${messages.docsLabel}`;
     max-width: 760px;
     color: hsl(var(--foreground));
     font-size: 1rem;
-    line-height: 1.7;
+    line-height: var(--mq-prose-line-height, 1.7);
   }
   .docs-main h1 {
     font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
