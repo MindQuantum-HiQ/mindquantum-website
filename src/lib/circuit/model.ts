@@ -2,13 +2,43 @@
 
 export type GateType = "H" | "X" | "Y" | "Z" | "S" | "T" | "CNOT" | "CZ" | "SWAP" | "RX" | "RY" | "RZ";
 
-export type GatePlacement = {
-  type: GateType;
+export const ROTATION_PARAMETERS = { RX: "theta", RY: "theta", RZ: "phi" } as const;
+export type RotationGateType = keyof typeof ROTATION_PARAMETERS;
+
+export function isRotationGate(type: GateType): type is RotationGateType {
+  return type in ROTATION_PARAMETERS;
+}
+
+type PlacementBase = {
   targets: number[]; // required non-empty
   controls?: number[];
-  params?: Record<string, number>;
   id: string; // stable identity used for selection/drag
 };
+
+type RotationPlacement = {
+  [T in RotationGateType]: PlacementBase & { type: T; params: Record<typeof ROTATION_PARAMETERS[T], number> }
+}[RotationGateType];
+
+export type GatePlacement = RotationPlacement | (PlacementBase & {
+  type: Exclude<GateType, RotationGateType>;
+  params?: Record<string, number>;
+});
+
+export function rotationAngle(g: GatePlacement): number {
+  if (!isRotationGate(g.type)) throw new Error(`${g.type} is not a rotation gate`);
+  const parameter = ROTATION_PARAMETERS[g.type];
+  const angle = (g.params as Record<string, number> | undefined)?.[parameter];
+  if (typeof angle !== "number" || !Number.isFinite(angle)) {
+    throw new Error(`${g.type} requires a finite numeric '${parameter}' angle`);
+  }
+  return angle;
+}
+
+export function createRotationPlacement(type: RotationGateType, targets: number[], id: string, angle: number): RotationPlacement {
+  const gate = { type, targets, id, params: { [ROTATION_PARAMETERS[type]]: angle } } as RotationPlacement;
+  rotationAngle(gate);
+  return gate;
+}
 
 export type Column = {
   items: (GatePlacement | null)[]; // length = nQubits
@@ -35,7 +65,11 @@ export function ensureColumns(c: Circuit, nColumns: number): Circuit {
 export function cloneCircuit(c: Circuit): Circuit {
   return {
     nQubits: c.nQubits,
-    columns: c.columns.map((col) => ({ items: col.items.map((it) => (it ? { ...it, targets: [...it.targets], controls: it.controls ? [...it.controls] : undefined, params: it.params ? { ...it.params } : undefined } : null)) })),
+    columns: c.columns.map((col) => ({
+      items: col.items.map((g) =>
+        g ? ({ ...g, targets: [...g.targets], controls: g.controls && [...g.controls], params: g.params && { ...g.params } } as GatePlacement) : null,
+      ),
+    })),
   };
 }
 
@@ -113,11 +147,10 @@ export function findGate(c: Circuit, id: string): { tOld: number; gate: GatePlac
 
 export function serializeCircuit(c: Circuit) {
   // Structure suitable for postMessage (structured clone friendly)
-  return {
-    nQubits: c.nQubits,
-    columns: c.columns.map((col) => ({
-      items: col.items.map((g) => (g ? { type: g.type, targets: g.targets, controls: g.controls || [], params: g.params || {}, id: g.id } : null)),
-    })),
-  } as Circuit;
+  for (const col of c.columns) {
+    for (const g of col.items) {
+      if (g && isRotationGate(g.type)) rotationAngle(g);
+    }
+  }
+  return cloneCircuit(c);
 }
-
