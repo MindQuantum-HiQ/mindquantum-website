@@ -2,9 +2,22 @@ import type { Lang } from "../../config/i18n";
 import type { DocPage, DocTocEntry, DocTree } from "./types";
 import { listArticlePaths } from "./scan";
 import { extractPage, extractSidebar } from "./extract";
+import { translationSlug } from "./navigation";
 
 export * from "./types";
 export { resolveDocLink, slugFromSourcePath } from "./paths";
+
+export function docTranslation(pathname: string, lang: Lang, base: string) {
+  const match = pathname.match(/^\/docs\/(en|zh)\/(.*)$/);
+  if (!match) return null;
+  const slug = match[2].replace(/\/$/, "");
+  const tree = buildDocTree(lang, base);
+  const target = translationSlug(slug, new Set(Object.keys(tree.flat)));
+  return {
+    href: `${base}docs/${lang}/${target ? `${target}/` : ""}`,
+    exact: target === slug,
+  };
+}
 
 // Cache trees per (lang + base) so repeated getStaticPaths calls in dev are cheap.
 const cache = new Map<string, DocTree>();

@@ -10,6 +10,7 @@ import type {
   DocTocEntry,
 } from "./types";
 import { DOCS_PUBLIC_DIR, slugFromSourcePath, resolveDocLink } from "./paths";
+import { extractSphinxAssets } from "../../../scripts/sphinx-assets.mjs";
 
 const DECORATIVE_CLASSES = [
   "headerlink",
@@ -180,6 +181,8 @@ export function extractPage(
   }
 
   const pageToc = extractPageToc(doc);
+  const base = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const assets = extractSphinxAssets(doc, sourcePath, `${base}docs/${lang}/`);
   const { prev, next } = extractPrevNext(doc, sourcePath, lang);
   const { thebeConfig, kernelPath } = extractThebeConfig(article);
 
@@ -202,6 +205,7 @@ export function extractPage(
     next,
     thebeConfig,
     kernelPath,
+    assets,
   };
 }
 
