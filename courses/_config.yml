@@ -41,9 +41,6 @@ html:
   extra_navbar: |
     <a href="../" class="mq-home-link">← 返回首页</a>
 
-launch_buttons:
-  thebe: true
-
 theme:
   name: sphinx_book_theme
   logo: ../docs/_static/favicon.png

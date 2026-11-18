@@ -142,18 +142,7 @@ sphinx-build -b html docs/api-zh docs/_build/api/zh
 - 范围：执行由客户端发起；笔记本不会自动执行。这使得构建具有确定性，并能更好地应对流量。
 - 环境：Binder 环境由仓库 https://github.com/MindQuantum-HiQ/mq-env 进行配置和控制。
 
-### 增强的用户体验附加功能
-
-- 每个单元格的运行按钮：在 `docs/_static/mq-thebe.js` 中实现，并由 `docs/_static/mq-thebe.css` 样式化。它在 Python 代码单元格和笔记本单元格上叠加一个小的“运行”按钮。首次点击时，它会自动激活 Thebe，然后运行被点击的单元格。
-- 页面横幅：教程页面顶部有一个紧凑的横幅，宣传该页面可在浏览器中运行。它提供“激活”和“运行所有示例”操作，并镜像内置的 Thebe 状态行。
-- 包含：这两个资产都在 `docs/en/_config.yml` 和 `docs/zh/_config.yml` 中注册，位于 `sphinx.config.html_css_files` 和 `sphinx.config.html_js_files` 下。
-- 可访问性：按钮包含 `aria-label`；颜色使用共享令牌以确保对比度。默认情况下，叠加层会避开复制按钮，并且如果给定页面上没有 Thebe，则会优雅地回退。
-
-自定义和维护：
-
-- 要禁用横幅：从两个 Jupyter Book 配置中的 `html_css_files`/`html_js_files` 中移除 `mq-thebe.css`/`mq-thebe.js`。
-- 要限制每个单元格的按钮：调整 `mq-thebe.js` 中（函数 `attachRunButtons`）的选择器逻辑，使其仅匹配您偏好的模式（例如，仅 `.cell` 或仅 `code.language-python`）。`.thebe-ignored` 内部的单元格会自动跳过。
-- 该脚本避免了私有的 Thebe 内部机制：它触发标准的启动按钮并点击单元格内置的 `.thebe-run-button`。这使其在 Thebe/Jupyter Book 更新时仍能保持弹性。
+教程和课程共用 `docs/_static/mq-thebe.js` 和 `mq-thebe.css`。脚本使用 `sphinx-thebe` 生成的运行时地址和页面配置，不依赖 Sphinx 主题的启动按钮。“激活”、“全部运行”和单元格运行按钮启动的是同一个内核；只有内核响应后，横幅才显示“已激活”。激活后由 Thebe 提供编辑器和运行控件。`.thebe-ignored` 内的单元格不会被激活。
 
 ## 量子图形化编程（Composer 页面）
 
