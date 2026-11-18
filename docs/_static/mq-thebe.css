@@ -123,8 +123,14 @@ html[data-theme="dark"] .mq-thebe-banner::before {
   transition: transform 0.3s ease;
 }
 
-.mq-thebe-banner .mq-btn:hover i {
+.mq-thebe-banner .mq-btn:not(:disabled):hover i {
   transform: scale(1.1);
+}
+
+.mq-thebe-banner .mq-btn:disabled,
+.mq-run-btn:disabled {
+  opacity: .5;
+  cursor: default;
 }
 
 /* Dismiss button - minimal and subtle */
@@ -153,27 +159,20 @@ html[data-theme="dark"] .mq-thebe-banner::before {
   transform: rotate(90deg);
 }
 
-/* Status indicator with pulse animation */
-.thebe-status {
+.mq-kernel-status {
   margin-left: .5rem;
   font-family: var(--mq-font-mono);
   font-size: .8125rem;
   color: var(--sb-foreground-muted);
-  animation: pulse 2s infinite;
 }
 
 /* Dark theme: ensure status text is visible but muted */
-html[data-theme="dark"] .thebe-status {
+html[data-theme="dark"] .mq-kernel-status {
   color: rgba(255, 255, 255, 0.5);
 }
 
 html[data-theme="dark"] .mq-thebe-banner .mq-text {
   color: rgba(255, 255, 255, 0.65);
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
 }
 
 /* Per‑cell Run button - positioned next to copy button */
@@ -208,15 +207,7 @@ html[data-theme="dark"] .mq-thebe-banner .mq-text {
 .cell:hover .mq-run-btn,
 .highlight:hover .mq-run-btn,
 .mq-run-btn:hover,
-.mq-run-btn:focus,
-.mq-run-btn.is-busy {
-  opacity: 1 !important;
-}
-
-/* Also show when parent containers are hovered (for Thebe-modified DOM) */
-.thebelab-cell:hover .mq-run-btn,
-.jp-InputArea:hover .mq-run-btn,
-.thebelab-input:hover .mq-run-btn {
+.mq-run-btn:focus {
   opacity: 1 !important;
 }
 
@@ -235,21 +226,6 @@ html[data-theme="dark"] .mq-thebe-banner .mq-text {
   outline: 2px solid var(--mq-primary);
   outline-offset: 2px;
   opacity: 1;
-}
-
-/* Running/busy state */
-.mq-run-btn.is-busy {
-  border-color: #22863a;
-  color: #22863a;
-}
-
-.mq-run-btn.is-busy .mq-icon {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }
 
 /* Icon styling - using SVG like copy button */
@@ -307,15 +283,10 @@ html[data-theme="dark"] .mq-thebe-banner .mq-text {
   .mq-run-btn:hover,
   .mq-thebe-banner,
   .mq-thebe-banner .mq-btn,
-  .mq-thebe-banner .mq-btn:hover,
-  .thebe-status {
+  .mq-thebe-banner .mq-btn:hover {
     animation: none;
     transition: none;
     transform: none;
-  }
-  
-  .mq-run-btn.is-busy .mq-icon {
-    animation: none;
   }
 }
 
@@ -375,11 +346,6 @@ html[data-theme="dark"] .mq-run-btn:hover {
 
 html[data-theme="dark"] .mq-run-btn:active {
   background-color: #484f58;
-}
-
-html[data-theme="dark"] .mq-run-btn.is-busy {
-  border-color: #3fb950;
-  color: #3fb950;
 }
 
 /* Smooth entry animation */

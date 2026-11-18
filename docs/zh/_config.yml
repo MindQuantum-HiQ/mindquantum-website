@@ -23,9 +23,6 @@ html:
     <a href="../../" class="mq-home-link">← 返回首页</a> ·
     <a href="../en/" class="mq-home-link">English</a>
 
-launch_buttons:
-  thebe: true
-
 theme:
   name: sphinx_book_theme
   logo: ../_static/favicon.png
