@@ -15,7 +15,7 @@ Astro + Jupyter Book monorepo for the MindQuantum website and bilingual document
 
 ## Local Development
 
-Prerequisites: Node 18+ and Python 3.9+.
+Prerequisites: Node 18+ and Python 3.9–3.11.
 
 1. Install Node deps
 
