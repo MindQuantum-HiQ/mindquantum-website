@@ -2,17 +2,20 @@
 import type { Lang } from "../config/i18n";
 import { altLang } from "../config/urls";
 import { stripBase, withBase, pathForLang } from "../config/urls";
+import { docTranslation } from "../lib/docs";
 
 const { lang, compact = true } = Astro.props as { lang: Lang; compact?: boolean };
 const BASE = import.meta.env.BASE_URL || '/';
 const pathUnbased = stripBase(Astro.url.pathname, BASE);
 const other = altLang(lang);
-const href = withBase(pathForLang(pathUnbased, other), BASE);
+const translation = docTranslation(pathUnbased, other, BASE);
+const href = translation?.href ?? withBase(pathForLang(pathUnbased, other), BASE);
 const label = other === "en" ? "EN" : "中文";
 ---
 <a
   class="lang-switcher mq-focus-ring inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-foreground hover:text-primary hover:bg-secondary transition-colors"
   href={href}
+  data-preserve-hash={translation && !translation.exact ? "false" : "true"}
   aria-label={`Switch language to ${label}`}
 >
   {compact ? label : (other === 'en' ? 'English' : '中文')}
@@ -24,7 +27,7 @@ const label = other === "en" ? "EN" : "中文";
       const a = document.querySelector('a.lang-switcher') as HTMLAnchorElement | null;
       if (!a) return;
       const p = location.pathname || '';
-      if (/(\/docs|\/api)\//.test(p) && location.hash) {
+      if (a.dataset.preserveHash !== 'false' && /(\/docs|\/api)\//.test(p) && location.hash) {
         const href = a.getAttribute('href') || '';
         a.setAttribute('href', href.replace(/#.*$/, '') + location.hash);
       }

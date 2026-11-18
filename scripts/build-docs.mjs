@@ -1,7 +1,20 @@
 import { spawn } from 'node:child_process'
-import { cp, mkdir, rm, stat } from 'node:fs/promises'
-import { resolve } from 'node:path'
+import { cp, mkdir, rm, stat, readdir, readFile, writeFile } from 'node:fs/promises'
+import { resolve, join } from 'node:path'
 import { patchCopyrightYears } from './update-copyright.mjs'
+import { normalizeSphinxHtml } from './sphinx-assets.mjs'
+
+async function normalizeAssets(dir) {
+  for (const entry of await readdir(dir, { withFileTypes: true })) {
+    const file = join(dir, entry.name)
+    if (entry.isDirectory()) await normalizeAssets(file)
+    else if (entry.name.endsWith('.html')) {
+      const html = await readFile(file, 'utf8')
+      const normalized = normalizeSphinxHtml(html)
+      if (html !== normalized) await writeFile(file, normalized)
+    }
+  }
+}
 
 function run(cmd, args, opts = {}) {
   return new Promise((resolvePromise, reject) => {
@@ -34,6 +47,7 @@ async function buildBook(lang) {
   if (await exists(dst)) await rm(dst, { recursive: true, force: true })
   await mkdir(dst, { recursive: true })
   await cp(finalSrc, dst, { recursive: true })
+  await normalizeAssets(dst)
   console.log(`Copied ${lang} book → ${dst}`)
 }
 
@@ -53,6 +67,7 @@ async function buildCourses() {
   if (await exists(dstRoot)) await rm(dstRoot, { recursive: true, force: true })
   await mkdir(dst, { recursive: true })
   await cp(finalSrc, dst, { recursive: true })
+  await normalizeAssets(dst)
   console.log(`Copied courses (${lang}) book → ${dst}`)
 }
 

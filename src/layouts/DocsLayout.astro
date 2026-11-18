@@ -19,27 +19,8 @@ const BASE = import.meta.env.BASE_URL || "/";
 const messages = DOCS_MESSAGES[page.lang];
 const langRoot = withBase(`/docs/${page.lang}/`, BASE);
 
-// Scripts/styles shipped by Sphinx that we still need for interactive cells.
-const staticBase = `${langRoot}_static/`;
-const stylesheets = [
-  "pygments.css",
-  "mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css",
-  "sphinx-thebe.css",
-  "sphinx-design.min.css",
-  "togglebutton.css",
-  "copybutton.css",
-  "mq-variables.css",
-  "mq-theme.css",
-  "mq-thebe.css",
-];
-const scripts = [
-  "clipboard.min.js",
-  "copybutton.js",
-  "togglebutton.js",
-  "design-tabs.js",
-  "sphinx-thebe.js",
-  "mq-thebe.js",
-];
+const stylesheets = page.assets.filter((asset) => asset.tag === "link");
+const scripts = page.assets.filter((asset) => asset.tag === "script");
 
 const hubHref = withBase(pathForLang("/documentation/", page.lang), BASE);
 const prevHref = prevNext.prev
@@ -53,8 +34,8 @@ const title = `${page.title} — ${messages.docsLabel}`;
 ---
 
 <BaseLayout title={title} description={page.title} lang={page.lang}>
-  {stylesheets.map((file) => (
-    <link slot="head" rel="stylesheet" href={`${staticBase}${file}`} />
+  {stylesheets.map((asset) => (
+    <link slot="head" {...asset.attributes} />
   ))}
 
   <div class="docs-shell">
@@ -125,20 +106,8 @@ const title = `${page.title} — ${messages.docsLabel}`;
   {page.thebeConfig && (
     <script type="text/x-thebe-config" set:html={page.thebeConfig} is:inline />
   )}
-  <script is:inline>
-    // Thebe + MathJax globals that the Sphinx/Thebe/MathJax scripts read.
-    window.thebe_selector = ".thebe,.cell";
-    window.thebe_selector_input = "pre";
-    window.thebe_selector_output = ".output, .cell_output";
-    window.MathJax = {
-      options: {
-        processHtmlClass: "tex2jax_process|mathjax_process|math|output_area",
-      },
-    };
-  </script>
-  <script is:inline defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-  {scripts.map((file) => (
-    <script is:inline src={`${staticBase}${file}`} async></script>
+  {scripts.map((asset) => (
+    <script is:inline {...asset.attributes} set:html={asset.content} />
   ))}
 </BaseLayout>
 
@@ -236,6 +205,24 @@ const title = `${page.title} — ${messages.docsLabel}`;
   }
 
   .docs-main {
+    min-width: 0;
+  }
+  .docs-shell-grid > *,
+  .docs-main .cell,
+  .docs-main .cell_input,
+  .docs-main .cell_output,
+  .docs-main .highlight,
+  .docs-main .sd-tab-content {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .docs-main mjx-container[display="true"],
+  .docs-main .math,
+  .docs-main table {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .docs-main .math {
     min-width: 0;
   }
   .docs-main-header { margin-bottom: 1.75rem; }
@@ -388,6 +375,7 @@ const title = `${page.title} — ${messages.docsLabel}`;
 
   /* Tables --------------------------------------------------------- */
   .docs-main table {
+    display: block;
     border-collapse: collapse;
     width: 100%;
     margin: 1.25rem 0;

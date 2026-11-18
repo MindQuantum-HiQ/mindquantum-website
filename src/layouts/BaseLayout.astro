@@ -6,6 +6,7 @@ import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
 import { stripBase, withBase, pathForLang, detectLang } from "../config/urls";
 import { LANGS, DEFAULT_LANG, type Lang } from "../config/i18n";
+import { docTranslation } from "../lib/docs";
 
 interface Props {
   title?: string;
@@ -34,9 +35,12 @@ const currentLang = ((lang as Lang) || detectLang(pathUnbased)) as Lang;
 // Build canonical and hreflang alternates
 const hrefFor = (l: Lang) => withBase(pathForLang(pathUnbased, l), BASE);
 const alternates = Object.fromEntries(
-  LANGS.map((l) => [l, hrefFor(l)])
-) as Record<Lang, string>;
-const xDefaultHref = hrefFor(DEFAULT_LANG);
+  LANGS.flatMap((l) => {
+    const translation = docTranslation(pathUnbased, l, BASE);
+    return translation && !translation.exact ? [] : [[l, hrefFor(l)]];
+  })
+) as Partial<Record<Lang, string>>;
+const xDefaultHref = alternates[DEFAULT_LANG];
 const canonicalHref = hrefFor(currentLang);
 const abs = (href: string) =>
   Astro.site ? new URL(href, Astro.site).toString() : href;
@@ -62,7 +66,7 @@ const abs = (href: string) =>
         <link rel="alternate" hreflang={code} href={abs(href)} />
       ))
     }
-    <link rel="alternate" hreflang="x-default" href={abs(xDefaultHref)} />
+    {xDefaultHref && <link rel="alternate" hreflang="x-default" href={abs(xDefaultHref)} />}
     <title>{title}</title>
     <slot name="head" />
   </head>

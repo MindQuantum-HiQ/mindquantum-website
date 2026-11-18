@@ -56,7 +56,7 @@ export function resolveDocLink(
   if (href.startsWith("#")) return { kind: "fragment", href };
 
   // Protocol-relative or absolute URLs we do not own
-  if (/^([a-z]+:)?\/\//i.test(href) || /^(mailto:|tel:)/i.test(href)) {
+  if (/^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith("//")) {
     return { kind: "external", href };
   }
 

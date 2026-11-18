@@ -35,6 +35,11 @@ export interface DocPage {
   next: DocPrevNext | null;
   thebeConfig: string | null; // raw JSON config for sphinx-thebe
   kernelPath: string | null; // optional path override for Thebe kernels
+  assets: {
+    tag: string;
+    attributes: Record<string, string>;
+    content: string;
+  }[];
 }
 
 export interface DocTree {
