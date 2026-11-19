@@ -20,7 +20,7 @@ test('Astro and every Sphinx renderer consume the canonical typography', async (
   const read = path => readFile(new URL(path, import.meta.url), 'utf8')
   assert.match(await read('../src/layouts/BaseLayout.astro'), /import "\.\.\/styles\/typography\.css"/)
   assert.match(await read('../scripts/prepare-tokens.mjs'), /\['typography.css', 'mq-typography.css'\]/)
-  for (const path of ['../docs/en/_config.yml', '../docs/zh/_config.yml', '../docs/api-en/conf.py', '../docs/api-zh/conf.py']) {
+  for (const path of ['../docs/en/_config.yml', '../docs/zh/_config.yml', '../docs/api-en/conf.py', '../docs/api-zh/conf.py', '../courses/_config.yml']) {
     assert.match(await read(path), /mq-typography.css/)
   }
 })
