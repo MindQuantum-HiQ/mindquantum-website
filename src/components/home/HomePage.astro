@@ -15,10 +15,10 @@ interface Props {
   baseUrl: string;
 }
 
-const { messages } = Astro.props as Props;
+const { lang, messages } = Astro.props as Props;
 ---
 
-<Hero hero={messages.hero} bell={messages.bell} />
+<Hero lang={lang} hero={messages.hero} bell={messages.bell} />
 <AnnouncementBar announcements={messages.announcements} />
 <Features features={messages.features} />
 <GettingStarted learning={messages.learning} framework={messages.framework} />

@@ -65,7 +65,7 @@ export type HomeMessages = {
   };
   hero: {
     eyebrow?: string;
-    headline: string;
+    headline: string[];
     description: string;
     ctaLabel: string;
     proofLinkHref: string;
@@ -75,7 +75,6 @@ export type HomeMessages = {
   bell: {
     title: string;
     qubits: string;
-    circuit: string;
     circuitDescription: string;
     probabilities: string;
     outcome: string;
@@ -83,6 +82,7 @@ export type HomeMessages = {
     stepsLabel: string;
     steps: [string, string, string];
     explanations: [string, string, string];
+    summaries: [string, string, string];
     viewCode: string;
     tutorialLabel: string;
     method: string;
@@ -251,9 +251,9 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
     },
     hero: {
       eyebrow: "Open source · MindSpore ecosystem",
-      headline: "Quantum circuits, differentiated end\u2011to\u2011end",
+      headline: ["Quantum circuits,", "differentiated", "end\u2011to\u2011end"],
       description:
-        "Python framework for parameterized quantum circuits. CPU, GPU, and Ascend backends. Auto-differentiation via MindSpore.",
+        "Parameterized quantum circuits in Python. CPU, GPU, and Ascend backends. Auto-differentiation via MindSpore.",
       ctaLabel: "Get started",
       proofLinkHref: "/docs/en/src/beginner/quantum_simulator/",
       mirrorsLabel: "Source",
@@ -262,7 +262,6 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
     bell: {
       title: "Two qubits. One Bell state.",
       qubits: "|Φ⁺⟩",
-      circuit: "Circuit",
       circuitDescription: "Two qubits start in zero. A Hadamard gate on q0 is followed by a controlled X from q0 to q1.",
       probabilities: "Measurement probabilities",
       outcome: "Outcome, q1 q0",
@@ -274,7 +273,12 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
         "H puts q₀ in superposition: 00 and 01 are equally likely.",
         "CNOT entangles the pair. Only 00 or 11 can be measured, each with 50% probability.",
       ],
-      viewCode: "View the full Python example",
+      summaries: [
+        "00 with 100% probability.",
+        "00 or 01, each with 50% probability.",
+        "00 or 11, each with 50% probability.",
+      ],
+      viewCode: "Explore the circuit & Python",
       tutorialLabel: "Learn how the simulator works",
       method: "Exact statevector · computed at build time",
     },
@@ -448,9 +452,9 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
     },
     hero: {
       eyebrow: "开源 · MindSpore 生态",
-      headline: "端到端可微分的量子电路",
+      headline: ["端到端可微分的", "量子电路"],
       description:
-        "基于 Python 的参数化量子电路框架，可运行于 CPU、GPU 与昇腾，通过 MindSpore 实现自动微分。",
+        "用 Python 编写量子电路，通过 MindSpore 自动微分，在 CPU、GPU 与昇腾上运行。",
       ctaLabel: "开始使用",
       proofLinkHref: "/docs/zh/src/beginner/quantum_simulator/",
       mirrorsLabel: "源代码",
@@ -459,7 +463,6 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
     bell: {
       title: "两个量子比特，一个 Bell 态。",
       qubits: "|Φ⁺⟩",
-      circuit: "量子电路",
       circuitDescription: "两个量子比特从零态出发，先在 q0 上施加 Hadamard 门，再施加从 q0 控制 q1 的受控 X 门。",
       probabilities: "测量概率",
       outcome: "测量结果，q1 q0",
@@ -471,7 +474,12 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
         "H 门使 q₀ 进入叠加态，00 与 01 的测量概率相等。",
         "CNOT 使两个量子比特纠缠，测量只会得到 00 或 11，各占 50%。",
       ],
-      viewCode: "查看完整 Python 示例",
+      summaries: [
+        "测量结果始终为 00。",
+        "测量得到 00 或 01，各占 50%。",
+        "测量得到 00 或 11，各占 50%。",
+      ],
+      viewCode: "探索电路与 Python 代码",
       tutorialLabel: "了解模拟器的工作方式",
       method: "精确态向量 · 构建时计算",
     },

@@ -8,23 +8,21 @@ const { messages, tutorialHref } = Astro.props;
 const finalStage = example.stages.length - 1;
 const basisStates = example.probabilities.map((_, i) => i.toString(2).padStart(example.nQubits, '0'));
 const percent = (p: number) => `${Math.round(p * 100)}%`;
-const wireY = (q: number) => 30 + q * 56;
+const wireY = (q: number) => 22 + q * 48;
 ---
 
 <figure class="bell-example" data-bell-example data-stages={JSON.stringify(example.stages)}>
-  <figcaption class="flex items-baseline justify-between gap-3 mb-5">
-    <span class="text-lg font-semibold">{messages.title}</span>
-    <span class="text-sm text-muted-foreground">{messages.qubits}</span>
+  <figcaption class="flex items-baseline justify-between gap-3 mb-3">
+    <span class="font-semibold">{messages.title}</span>
+    <span class="shrink-0 whitespace-nowrap text-sm text-muted-foreground">{messages.qubits}</span>
   </figcaption>
 
   <div class="bell-program">
-    <span class="mq-eyebrow">01 · Python</span>
     <code>{example.expression}</code>
   </div>
 
   <div class="bell-circuit">
-    <span class="mq-eyebrow">02 · {messages.circuit}</span>
-    <svg viewBox="0 0 400 116" role="img" aria-label={messages.circuitDescription}>
+    <svg viewBox="0 0 400 96" role="img" aria-label={messages.circuitDescription}>
       {Array.from({ length: example.nQubits }, (_, q) => <>
         <text x="0" y={wireY(q) + 5} class="wire-label">q{q} |0⟩</text>
         <line x1="70" x2="390" y1={wireY(q)} y2={wireY(q)} class="wire" />
@@ -50,8 +48,8 @@ const wireY = (q: number) => 30 + q * 56;
   </div>
 
   <div class="bell-result">
-    <div class="flex items-baseline justify-between gap-3 mb-4">
-      <span class="mq-eyebrow">03 · {messages.probabilities}</span>
+    <div class="flex items-baseline justify-between gap-3 mb-2">
+      <span class="text-sm text-muted-foreground">{messages.probabilities}</span>
       <span class="font-mono text-sm text-muted-foreground" aria-hidden="true">q₁q₀</span>
     </div>
     <table class="w-full" aria-label={messages.probabilities}>
@@ -68,23 +66,25 @@ const wireY = (q: number) => 30 + q * 56;
         </tr>)}
       </tbody>
     </table>
+    <p class="bell-summary" aria-live="polite" aria-atomic="true" data-bell-summary>
+      {messages.summaries[finalStage]}
+    </p>
+    <div hidden data-bell-summaries>{messages.summaries.map(text => <span>{text}</span>)}</div>
+  </div>
+
+  <details class="bell-source">
+    <summary class="mq-focus-ring">{messages.viewCode}<span class="font-mono text-xs text-muted-foreground">bell_state.py</span></summary>
     <div class="bell-controls" role="group" aria-label={messages.stepsLabel} hidden data-bell-controls>
       {messages.steps.map((label, i) => <button type="button" class="mq-btn-ghost mq-btn-compact" data-bell-step={i} aria-pressed={i === finalStage}>
         {label}
       </button>)}
     </div>
-    <p class="bell-explanation" aria-live="polite" aria-atomic="true" data-bell-explanation>
-      {messages.explanations[finalStage]}
-    </p>
+    <p class="bell-explanation" data-bell-explanation>{messages.explanations[finalStage]}</p>
     <div hidden data-bell-explanations>{messages.explanations.map(text => <span>{text}</span>)}</div>
-  </div>
-
-  <details class="bell-source">
-    <summary class="mq-focus-ring">{messages.viewCode}<span class="font-mono text-xs text-muted-foreground">bell_state.py</span></summary>
     <Code code={example.code.trimEnd()} lang="python" theme="github-light" />
     <a href={tutorialHref} class="mq-link-arrow text-sm mt-3">{messages.tutorialLabel} →</a>
+    <p class="bell-method">{messages.method} · MindQuantum {example.version} / mqvector</p>
   </details>
-  <p class="bell-method">{messages.method} · MindQuantum {example.version} / mqvector</p>
 </figure>
 
 <script>
@@ -96,6 +96,8 @@ const wireY = (q: number) => 30 + q * 56;
     const gates = figure.querySelectorAll<SVGGElement>('[data-bell-gate]');
     const explanations = figure.querySelector('[data-bell-explanations]')!.children;
     const explanation = figure.querySelector<HTMLElement>('[data-bell-explanation]')!;
+    const summaries = figure.querySelector('[data-bell-summaries]')!.children;
+    const summary = figure.querySelector<HTMLElement>('[data-bell-summary]')!;
     buttons.forEach(button => button.addEventListener('click', () => {
       const stage = Number(button.dataset.bellStep);
       stages[stage].forEach((p, i) => {
@@ -106,17 +108,17 @@ const wireY = (q: number) => 30 + q * 56;
       gates.forEach((gate, i) => gate.classList.toggle('gate-inactive', i >= stage));
       buttons.forEach((item, i) => item.setAttribute('aria-pressed', String(i === stage)));
       explanation.textContent = explanations[stage].textContent;
+      summary.textContent = summaries[stage].textContent;
     }));
     figure.querySelector<HTMLElement>('[data-bell-controls]')!.hidden = false;
   });
 </script>
 
 <style>
-  .bell-example { margin: 0; padding: 1.5rem 1.75rem 1rem; border: 1px solid var(--mq-border); border-radius: var(--mq-radius); background: var(--mq-surface); }
-  .bell-program { display: grid; gap: 0.5rem; }
+  .bell-example { margin: 0; padding: 1.5rem; border: 1px solid var(--mq-border); border-radius: var(--mq-radius); background: var(--mq-surface); }
   .bell-program code { font-size: 0.875rem; color: var(--mq-primary); overflow-wrap: anywhere; }
-  .bell-circuit { margin: 1.25rem 0 0.75rem; }
-  .bell-circuit svg { display: block; width: 100%; margin-top: 0.5rem; }
+  .bell-circuit { margin: 1rem 0 0.75rem; }
+  .bell-circuit svg { display: block; width: 100%; }
   .wire { stroke: var(--mq-border); stroke-width: 2; }
   .wire-label { fill: var(--mq-text-muted); font-family: var(--mq-font-mono); font-size: 15px; }
   .gate-line { stroke: var(--mq-primary); stroke-width: 2; fill: none; }
@@ -124,24 +126,24 @@ const wireY = (q: number) => 30 + q * 56;
   .gate-target, .gate-box { fill: var(--mq-surface); stroke: var(--mq-primary); stroke-width: 2; }
   .gate-letter { fill: var(--mq-primary); font-family: var(--mq-font-mono); font-size: 18px; }
   .gate-inactive { opacity: 0.18; }
-  .bell-result { border-top: 1px solid var(--mq-border); padding-top: 1.25rem; }
-  .basis-label { padding: 0.25rem 1rem 0.25rem 0; width: 3.5rem; text-align: left; font-family: var(--mq-font-mono); font-size: 0.875rem; font-weight: 400; }
+  .bell-result { border-top: 1px solid var(--mq-border); padding-top: 0.875rem; }
+  .basis-label { padding: 0.125rem 1rem 0.125rem 0; width: 3.5rem; text-align: left; font-family: var(--mq-font-mono); font-size: 0.875rem; font-weight: 400; }
   .probability-row { display: flex; align-items: center; gap: 1rem; }
-  .probability-track { height: 1rem; flex: 1; background: var(--mq-surface-2); }
+  .probability-track { height: 0.75rem; flex: 1; background: var(--mq-surface-2); }
   .probability-track span { display: block; height: 100%; background: var(--mq-primary); transition: width 220ms ease-out; }
   .probability-value { min-width: 3ch; text-align: right; font-family: var(--mq-font-mono); font-size: 0.875rem; font-variant-numeric: tabular-nums; }
   .bell-controls { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 1rem; }
   .bell-controls[hidden] { display: none; }
   .bell-controls button { flex: 1; white-space: nowrap; }
   .bell-controls [aria-pressed="true"] { background: var(--mq-selected); color: var(--mq-selected-text); }
-  .bell-explanation { font-size: 0.875rem; color: var(--mq-text-muted); margin-top: 0.75rem; min-height: 3em; }
-  .bell-source { border-top: 1px solid var(--mq-border); margin-top: 1rem; padding-top: 0.75rem; }
+  .bell-summary, .bell-explanation { font-size: 0.875rem; color: var(--mq-text-muted); margin-top: 0.75rem; }
+  .bell-source { border-top: 1px solid var(--mq-border); margin-top: 0.875rem; padding-top: 0.75rem; }
   .bell-source summary { cursor: pointer; font-size: 0.875rem; border-radius: var(--mq-radius-small); }
   .bell-source summary span { float: right; }
   .bell-source :global(pre) { padding: 1rem 0; margin-top: 0.5rem; background: transparent !important; font-size: 0.75rem; line-height: 1.8; overflow-x: auto; }
   .bell-method { font-size: 0.75rem; color: var(--mq-text-muted); margin-top: 0.75rem; }
   @media (max-width: 639px) {
-    .bell-example { padding: 1.25rem 1rem 1rem; }
+    .bell-example { padding: 1rem; }
     .bell-program code { font-size: 0.75rem; }
     .bell-controls button { padding-inline: 0.5rem; }
     .bell-source summary span { display: none; }
