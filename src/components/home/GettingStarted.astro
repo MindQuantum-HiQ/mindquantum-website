@@ -1,0 +1,67 @@
+---
+import type { HomeMessages } from '../../locales/home';
+import { withBase } from '../../config/urls';
+
+interface Props { learning: HomeMessages['learning']; framework: HomeMessages['framework']; }
+const { learning, framework } = Astro.props;
+const href = (path: string) => withBase(path, import.meta.env.BASE_URL);
+---
+
+<section id="get-started" class="border-y border-border bg-secondary/40 mb-20 lg:mb-24 scroll-mt-24" aria-labelledby="get-started-heading">
+  <div class="mq-container py-12 lg:py-16">
+    <div class="max-w-2xl mb-10">
+      <h2 id="get-started-heading" class="mq-section-title mb-4">{learning.heading}</h2>
+      <p class="text-muted-foreground">{learning.description}</p>
+    </div>
+    <div class="grid lg:grid-cols-2 gap-10 lg:gap-16">
+      <div class="min-w-0">
+        <h3 class="text-lg font-semibold mb-4">{learning.installHeading}</h3>
+        <div class="install-command">
+          <code id="install-command">{framework.installCmd}</code>
+          <button type="button" class="mq-btn-run" data-install-copy data-copy-text={framework.installCmd} data-copied-label={learning.copiedLabel} data-error-label={learning.copyFailedLabel}>
+            <svg class="mq-icon" aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="13" rx="2" /><path d="M16 8V3H3v13h5" /></svg>
+            <span>{learning.copyLabel}</span>
+          </button>
+        </div>
+        <p data-copy-status role="status" class="text-sm text-muted-foreground min-h-6 mt-2"></p>
+        <p class="text-sm text-muted-foreground">{framework.pythonRequirement}</p>
+        <div class="flex flex-wrap gap-x-5 gap-y-2 mt-5 text-sm">
+          <a href={href(learning.installHref)} class="mq-link-arrow">{learning.installLabel} →</a>
+          <a href={href(learning.docsHref)} class="mq-link-arrow">{learning.docsLabel} →</a>
+        </div>
+        <a href={href(framework.releaseHref)} class="mq-focus-ring inline-block mt-6 text-sm text-muted-foreground hover:text-primary">{framework.release} →</a>
+      </div>
+      <ol class="border-t border-border">
+        {learning.cards.map((card, i) => <li class="border-b border-border">
+          <a href={href(card.href)} class="mq-focus-ring group flex gap-5 py-4 rounded-sm">
+            <span class="font-mono text-sm text-muted-foreground pt-0.5">{String(i + 1).padStart(2, '0')}</span>
+            <div class="flex-1 min-w-0">
+              <h3 class="text-base font-semibold group-hover:text-primary">{card.title}</h3>
+              <p class="mt-2 text-sm text-muted-foreground">{card.description}</p>
+            </div>
+            <span aria-hidden="true" class="text-muted-foreground">→</span>
+          </a>
+        </li>)}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-install-copy]').forEach(button => {
+    const status = button.closest('section')!.querySelector<HTMLElement>('[data-copy-status]')!;
+    button.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copyText!);
+        status.textContent = button.dataset.copiedLabel!;
+      } catch {
+        status.textContent = button.dataset.errorLabel!;
+      }
+    });
+  });
+</script>
+
+<style>
+  .install-command { display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem; }
+  .install-command code { font-size: 0.875rem; user-select: all; overflow-wrap: anywhere; }
+</style>

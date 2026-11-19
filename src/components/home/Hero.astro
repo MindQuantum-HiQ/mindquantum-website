@@ -1,0 +1,62 @@
+---
+import type { HomeMessages } from '../../locales/home';
+import type { Lang } from '../../config/i18n';
+import { CODE_MIRRORS } from '../../config/site';
+import { withBase } from '../../config/urls';
+import BellExample from './BellExample.astro';
+
+interface Props { lang: Lang; hero: HomeMessages['hero']; bell: HomeMessages['bell']; }
+const { lang, hero, bell } = Astro.props;
+---
+
+<section class="border-b border-border" aria-labelledby="hero-headline">
+  <div class="mq-container hero-container">
+    <div class="hero-grid">
+      <div class="hero-copy min-w-0 mq-animate-in">
+        <p class="mq-eyebrow hero-eyebrow">{hero.eyebrow}</p>
+        <h1 id="hero-headline" class="hero-headline" aria-label={hero.headline.join(lang === 'zh' ? '' : ' ')}>
+          {hero.headline.map(line => <span>{line}</span>)}
+        </h1>
+        <p class="hero-description text-muted-foreground">{hero.description}</p>
+        <a href="#get-started" class="mq-btn-primary px-6">
+          {hero.ctaLabel}<span aria-hidden="true">→</span>
+        </a>
+      </div>
+      <div class="min-w-0 mq-animate-in" style="--mq-delay: 160ms">
+        <BellExample messages={bell} tutorialHref={withBase(hero.proofLinkHref, import.meta.env.BASE_URL)} />
+      </div>
+    </div>
+    <p class="hero-sources text-sm text-muted-foreground flex flex-wrap gap-x-2 gap-y-1">
+      <span>{hero.mirrorsLabel}</span>
+      {CODE_MIRRORS.map(mirror => <>
+        <span aria-hidden="true">·</span>
+        <a href={mirror.href} target="_blank" rel="noopener" class="mq-focus-ring rounded-sm text-foreground hover:text-primary">
+          {mirror.label}<span class="sr-only"> {hero.opensInNewTab}</span>
+        </a>
+      </>)}
+    </p>
+  </div>
+</section>
+
+<style>
+  .hero-container { padding-top: 2rem; padding-bottom: 2rem; }
+  .hero-grid { display: grid; align-items: center; gap: 1.75rem; }
+  .hero-eyebrow { margin-bottom: 0.875rem; }
+  .hero-headline { margin-bottom: 1rem; font-size: clamp(2rem, 9.2vw, 2.5rem); font-weight: 800; line-height: 1.06; letter-spacing: -0.025em; }
+  .hero-headline span { display: block; white-space: nowrap; }
+  .hero-description { max-width: 52ch; margin-bottom: 1.25rem; font-size: 1rem; line-height: 1.6; }
+  .hero-sources { margin-top: 1.5rem; }
+  :global(html:lang(zh)) .hero-headline { font-size: clamp(2rem, 9.2vw, 2.5rem); font-weight: 600; line-height: 1.25; letter-spacing: 0; }
+  @media (min-width: 768px) {
+    .hero-container { padding-top: 4rem; padding-bottom: 3rem; }
+    .hero-grid { gap: 2.5rem; }
+    .hero-headline { font-size: clamp(3rem, 5vw, 4.25rem); }
+    .hero-description { margin-bottom: 1.75rem; font-size: 1.125rem; }
+    :global(html:lang(zh)) .hero-headline { font-size: clamp(2.75rem, 4.2vw, 3.5rem); }
+  }
+  @media (min-width: 1024px) {
+    .hero-container { padding-top: 5rem; padding-bottom: 3.5rem; }
+    .hero-grid { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+    .hero-sources { margin-top: 2rem; }
+  }
+</style>

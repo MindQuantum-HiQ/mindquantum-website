@@ -23,7 +23,7 @@ Prerequisites for building this site: Node 24 LTS (`nvm use`, pinned in `.nvmrc`
 npm ci
 ```
 
-2. (Optional) Create a Python venv and install Jupyter Book
+2. Create a Python 3.11 venv and install the pinned Python dependencies
 
 ```bash
 python -m venv .venv
@@ -47,11 +47,19 @@ python scripts/sync_all.py --update
 npm run build:docs   # auto-syncs upstreams, builds JB (tutorials) + Sphinx (API)
 ```
 
-5. Run the site
+5. Run the site (with the Python environment still active)
 
 ```bash
 npm run dev
 ```
+
+The homepage executes `src/lib/bell-state.py` with MindQuantum at build time.
+Its circuit diagram and exact measurement probabilities come from that same
+executed circuit, including the initial and intermediate states. The browser
+only switches between these computed results; it does not run Python or ship
+a simulator. The full displayed Python is the executable source, not a second
+copy. Missing MindQuantum fails the build. Set `PYTHON` to choose an interpreter
+explicitly, or activate `.venv` before running the dev server, tests, or build.
 
 ## Content Syncing
 

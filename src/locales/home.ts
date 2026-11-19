@@ -12,11 +12,8 @@ export type HomeFeature = {
 };
 
 export type LearningCard = {
-  icon: string;
   title: string;
   description: string;
-  color: "primary" | "green" | "orange" | "teal";
-  badge?: string;
   href: string;
 };
 
@@ -59,12 +56,8 @@ export type HomeMessages = {
   framework: {
     release: string;
     releaseHref: string;
-    description: string;
     installCmd: string;
     pythonRequirement: string;
-    installCopiedLabel: string;
-    installManualLabel: string;
-    docsLabel: string;
   };
   architecture: {
     heading: string;
@@ -72,22 +65,27 @@ export type HomeMessages = {
   };
   hero: {
     eyebrow?: string;
-    headline: string;
+    headline: string[];
     description: string;
     ctaLabel: string;
-    ctaHref: string;
-    proofTitle: string;
-    proofLang: string;
-    proofCode: string;
-    proofAriaLabel: string;
-    /* Secondary link rendered in the footer of the hero proof card. Points
-       to runnable tutorials, NOT Composer — Composer is a sibling product
-       that doesn't execute MindQuantum code (yet), so promoting "Run in
-       Composer →" beneath a Python snippet was a category error. */
-    proofLinkLabel: string;
     proofLinkHref: string;
     mirrorsLabel: string;
     opensInNewTab: string;
+  };
+  bell: {
+    title: string;
+    qubits: string;
+    circuitDescription: string;
+    probabilities: string;
+    outcome: string;
+    probability: string;
+    stepsLabel: string;
+    steps: [string, string, string];
+    explanations: [string, string, string];
+    summaries: [string, string, string];
+    viewCode: string;
+    tutorialLabel: string;
+    method: string;
   };
   features: {
     eyebrow: string;
@@ -104,20 +102,16 @@ export type HomeMessages = {
   };
   learning: {
     heading: string;
-    cards: LearningCard[];
-  };
-  cta: {
-    title: string;
+    description: string;
+    installHeading: string;
     installLabel: string;
     installHref: string;
     docsLabel: string;
     docsHref: string;
-  };
-  docs: {
-    heading: string;
-    blurbBeforeLink: string;
-    linkLabel: string;
-    blurbAfterLink: string;
+    copyLabel: string;
+    copiedLabel: string;
+    copyFailedLabel: string;
+    cards: LearningCard[];
   };
   builder?: {
     heading: string;
@@ -202,13 +196,8 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
     framework: {
       release: "MindSpore Quantum V0.12 released",
       releaseHref: "/docs/en/src/RELEASE/",
-      description:
-        "MindSpore Quantum is the open-source quantum framework from the MindSpore ecosystem. Write parameterized quantum circuits in Python, differentiate them through MindSpore's autograd, and run on CPU, GPU, or Ascend. Ships with VQE, QAOA, Grover, and quantum phase estimation, plus full-amplitude and density-matrix simulators.",
       installCmd: INSTALL_COMMAND,
       pythonRequirement: PYTHON_REQUIREMENT,
-      installCopiedLabel: "Copied",
-      installManualLabel: "Copy failed — press \u2318C / Ctrl+C",
-      docsLabel: "Documentation",
     },
     architecture: {
       heading: "Architecture",
@@ -262,30 +251,36 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
     },
     hero: {
       eyebrow: "Open source · MindSpore ecosystem",
-      headline: "Quantum circuits, differentiated end\u2011to\u2011end",
+      headline: ["Quantum circuits,", "differentiated", "end\u2011to\u2011end"],
       description:
-        "Python framework for parameterized quantum circuits. CPU, GPU, and Ascend backends. Auto-differentiation via MindSpore.",
-      ctaLabel: "Read the docs",
-      ctaHref: "/documentation/",
-      proofTitle: "bell_state.py",
-      proofLang: "python",
-      proofCode:
-        "from mindquantum.core.circuit import Circuit\n" +
-        "from mindquantum.core.gates import H, X\n" +
-        "from mindquantum.simulator import Simulator\n" +
-        "\n" +
-        "# Prepare a Bell state |\u03a6\u207a\u27e9\n" +
-        "circ = Circuit([H.on(0), X.on(1, 0)])\n" +
-        "sim = Simulator('mqvector', 2)\n" +
-        "sim.apply_circuit(circ)\n" +
-        "\n" +
-        "print(sim.get_qs())\n" +
-        "# array([0.707+0.j, 0.+0.j, 0.+0.j, 0.707+0.j])",
-      proofAriaLabel: "Sample MindQuantum code — prepare a Bell state in Python",
-      proofLinkLabel: "More examples",
-      proofLinkHref: "/docs/en/",
+        "Parameterized quantum circuits in Python. CPU, GPU, and Ascend backends. Auto-differentiation via MindSpore.",
+      ctaLabel: "Get started",
+      proofLinkHref: "/docs/en/src/beginner/quantum_simulator/",
       mirrorsLabel: "Source",
       opensInNewTab: "(opens in new tab)",
+    },
+    bell: {
+      title: "Two qubits. One Bell state.",
+      qubits: "|Φ⁺⟩",
+      circuitDescription: "Two qubits start in zero. A Hadamard gate on q0 is followed by a controlled X from q0 to q1.",
+      probabilities: "Measurement probabilities",
+      outcome: "Outcome, q1 q0",
+      probability: "Probability",
+      stepsLabel: "Explore the circuit one step at a time",
+      steps: ["Initial", "After H", "After CNOT"],
+      explanations: [
+        "Both qubits start in |0⟩. Measuring gives 00 every time.",
+        "H puts q₀ in superposition: 00 and 01 are equally likely.",
+        "CNOT entangles the pair. Only 00 or 11 can be measured, each with 50% probability.",
+      ],
+      summaries: [
+        "00 with 100% probability.",
+        "00 or 01, each with 50% probability.",
+        "00 or 11, each with 50% probability.",
+      ],
+      viewCode: "Explore the circuit & Python",
+      tutorialLabel: "Learn how the simulator works",
+      method: "Exact statevector · computed at build time",
     },
     features: {
       eyebrow: "Core capabilities",
@@ -354,55 +349,36 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
       ],
     },
     learning: {
-      heading: "Start Learning",
+      heading: "From your first circuit to your next idea",
+      description: "Install once. Then follow a tutorial, explore an algorithm, or go straight to the API.",
+      installHeading: "Set up MindQuantum",
+      installLabel: "Installation guide",
+      installHref: "/docs/en/src/mindquantum_install/",
+      docsLabel: "All documentation",
+      docsHref: "/documentation/",
+      copyLabel: "Copy command",
+      copiedLabel: "Copied",
+      copyFailedLabel: "Select the command and copy it manually.",
       cards: [
         {
-          icon: "🔬",
           title: "Quantum foundations",
           description:
             "Zero-foundation introduction to quantum information and computing — the math, the postulates, and the vocabulary you need before writing any circuit.",
-          color: "primary",
           href: "/learning/",
         },
         {
-          icon: "🧩",
-          title: "Install and set up",
+          title: "API reference",
           description:
-            "Install MindSpore Quantum on Linux, macOS, Windows, or Ascend, and stand up a local compile + debug environment.",
-          color: "primary",
-          href: "/documentation/",
+            "Find the interfaces for circuits, gates, simulators, and differentiable algorithms.",
+          href: "/api/en/",
         },
         {
-          icon: "🚀",
           title: "Algorithm case studies",
           description:
             "Runnable walkthroughs of VQE, QAOA, Grover, and quantum phase estimation — the jumping-off point for research work.",
-          color: "primary",
           href: "/docs/en/",
         },
-        {
-          icon: "🎬",
-          title: "Video courses",
-          description:
-            "Recorded lectures covering the introduction to quantum computing, MindSpore Quantum programming, case analysis, and applications.",
-          color: "primary",
-          badge: "Chinese only",
-          href: "/courses/",
-        },
       ],
-    },
-    cta: {
-      title: "Start building quantum programs with MindSpore Quantum",
-      installLabel: "Install",
-      installHref: "/docs/en/src/mindquantum_install/",
-      docsLabel: "Documentation",
-      docsHref: "/documentation/",
-    },
-    docs: {
-      heading: "Documentation",
-      blurbBeforeLink: "Browse tutorials, examples, and API reference in the ",
-      linkLabel: "documentation portal",
-      blurbAfterLink: ".",
     },
     builder: {
       heading: "Interactive Circuit",
@@ -425,13 +401,8 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
     framework: {
       release: "MindSpore Quantum V0.12 发布",
       releaseHref: "/docs/zh/src/RELEASE/",
-      description:
-        "MindSpore Quantum 是 MindSpore 生态中的开源量子框架。用 Python 编写参数化量子电路，通过 MindSpore 的自动微分引擎训练，并在 CPU、GPU 或昇腾上运行。内置 VQE、QAOA、Grover 与量子相位估计，以及全振幅和密度矩阵模拟器。",
       installCmd: INSTALL_COMMAND,
       pythonRequirement: PYTHON_REQUIREMENT,
-      installCopiedLabel: "已复制",
-      installManualLabel: "复制失败——请按 \u2318C / Ctrl+C",
-      docsLabel: "文档",
     },
     architecture: {
       heading: "框架架构",
@@ -481,30 +452,36 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
     },
     hero: {
       eyebrow: "开源 · MindSpore 生态",
-      headline: "端到端可微分的量子电路",
+      headline: ["端到端可微分的", "量子电路"],
       description:
-        "基于 Python 的参数化量子电路框架，可运行于 CPU、GPU 与昇腾，通过 MindSpore 实现自动微分。",
-      ctaLabel: "阅读文档",
-      ctaHref: "/zh/documentation/",
-      proofTitle: "bell_state.py",
-      proofLang: "python",
-      proofCode:
-        "from mindquantum.core.circuit import Circuit\n" +
-        "from mindquantum.core.gates import H, X\n" +
-        "from mindquantum.simulator import Simulator\n" +
-        "\n" +
-        "# 准备 Bell 态 |\u03a6\u207a\u27e9\n" +
-        "circ = Circuit([H.on(0), X.on(1, 0)])\n" +
-        "sim = Simulator('mqvector', 2)\n" +
-        "sim.apply_circuit(circ)\n" +
-        "\n" +
-        "print(sim.get_qs())\n" +
-        "# array([0.707+0.j, 0.+0.j, 0.+0.j, 0.707+0.j])",
-      proofAriaLabel: "MindQuantum 示例代码：用 Python 准备 Bell 态",
-      proofLinkLabel: "更多示例",
-      proofLinkHref: "/docs/zh/",
+        "用 Python 编写量子电路，通过 MindSpore 自动微分，在 CPU、GPU 与昇腾上运行。",
+      ctaLabel: "开始使用",
+      proofLinkHref: "/docs/zh/src/beginner/quantum_simulator/",
       mirrorsLabel: "源代码",
       opensInNewTab: "（在新标签页打开）",
+    },
+    bell: {
+      title: "两个量子比特，一个 Bell 态。",
+      qubits: "|Φ⁺⟩",
+      circuitDescription: "两个量子比特从零态出发，先在 q0 上施加 Hadamard 门，再施加从 q0 控制 q1 的受控 X 门。",
+      probabilities: "测量概率",
+      outcome: "测量结果，q1 q0",
+      probability: "概率",
+      stepsLabel: "逐步查看量子电路的计算过程",
+      steps: ["初始态", "H 门之后", "CNOT 之后"],
+      explanations: [
+        "两个量子比特均从 |0⟩ 出发，测量结果始终为 00。",
+        "H 门使 q₀ 进入叠加态，00 与 01 的测量概率相等。",
+        "CNOT 使两个量子比特纠缠，测量只会得到 00 或 11，各占 50%。",
+      ],
+      summaries: [
+        "测量结果始终为 00。",
+        "测量得到 00 或 01，各占 50%。",
+        "测量得到 00 或 11，各占 50%。",
+      ],
+      viewCode: "探索电路与 Python 代码",
+      tutorialLabel: "了解模拟器的工作方式",
+      method: "精确态向量 · 构建时计算",
     },
     features: {
       eyebrow: "核心能力",
@@ -569,55 +546,36 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
       featuredUniversities: ["北京大学", "清华大学", "上海交通大学"],
     },
     learning: {
-      heading: "开始学习",
+      heading: "从第一个电路，到下一个想法",
+      description: "安装 MindQuantum，选择适合你的起点：基础教程、算法案例或 API 参考。",
+      installHeading: "安装 MindQuantum",
+      installLabel: "安装指南",
+      installHref: "/docs/zh/src/mindquantum_install/",
+      docsLabel: "全部文档",
+      docsHref: "/zh/documentation/",
+      copyLabel: "复制命令",
+      copiedLabel: "已复制",
+      copyFailedLabel: "请选择命令并手动复制。",
       cards: [
         {
-          icon: "🔬",
           title: "量子基础",
           description:
             "零基础入门：量子信息与计算的数学基础、基本假设与术语，先学透再写代码。",
-          color: "primary",
           href: "/zh/learning/",
         },
         {
-          icon: "🧩",
-          title: "安装与环境搭建",
+          title: "API 参考",
           description:
-            "在 Linux、macOS、Windows 或昇腾上安装 MindSpore Quantum，并快速搭建本地编译与调试环境。",
-          color: "primary",
-          href: "/zh/documentation/",
+            "直接查阅量子电路、量子门、模拟器与可微分算法的接口。",
+          href: "/api/zh/",
         },
         {
-          icon: "🚀",
           title: "算法案例精讲",
           description:
             "VQE、QAOA、Grover 与量子相位估计的可运行案例——快速进入研究工作的起点。",
-          color: "primary",
           href: "/docs/zh/",
         },
-        {
-          icon: "🎬",
-          title: "视频课程",
-          description:
-            "涵盖量子计算入门、MindSpore Quantum 编程、案例分析与实战应用的录播课程。",
-          color: "primary",
-          badge: "仅中文",
-          href: "/courses/",
-        },
       ],
-    },
-    cta: {
-      title: "使用 MindSpore Quantum 开启量子编程",
-      installLabel: "安装",
-      installHref: "/docs/zh/src/mindquantum_install/",
-      docsLabel: "文档",
-      docsHref: "/zh/documentation/",
-    },
-    docs: {
-      heading: "文档",
-      blurbBeforeLink: "在 ",
-      linkLabel: "文档中心",
-      blurbAfterLink: " 浏览教程、示例与 API 参考。",
     },
     builder: {
       heading: "交互式电路",

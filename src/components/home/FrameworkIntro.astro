@@ -4,14 +4,10 @@ import { withBase } from "../../config/urls";
 
 interface Props {
   architecture: HomeMessages["architecture"];
-  framework: HomeMessages["framework"];
 }
 
-const { architecture, framework } = Astro.props as Props;
+const { architecture } = Astro.props as Props;
 const BASE = import.meta.env.BASE_URL || "/";
-const releaseHref = /^https?:\/\//.test(framework.releaseHref)
-  ? framework.releaseHref
-  : withBase(framework.releaseHref, BASE);
 
 function resolveHref(href: string): string {
   return /^https?:\/\//.test(href) ? href : withBase(href, BASE);
@@ -19,42 +15,6 @@ function resolveHref(href: string): string {
 ---
 
 <section class="mq-container mb-20 lg:mb-24">
-  {/* Intro band: release link + description on the left, install/docs CTAs on the right. */}
-  <div class="grid lg:grid-cols-12 gap-x-12 gap-y-7 items-start lg:items-end mb-12 lg:mb-16">
-    <div class="lg:col-span-7">
-      <a href={releaseHref} class="mq-link-arrow text-sm">
-        {framework.release}
-        <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24">
-          <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6l-6 6" />
-        </svg>
-      </a>
-      <p class="mq-measure mt-4 text-base lg:text-[1.0625rem] leading-relaxed text-muted-foreground">
-        {framework.description}
-      </p>
-    </div>
-
-    <div class="lg:col-span-5 flex flex-wrap items-center gap-3 lg:justify-end">
-      <button
-        type="button"
-        class="mq-btn-run mq-btn-command"
-        data-install-copy
-        data-copy-text={framework.installCmd}
-        data-copied-label={framework.installCopiedLabel}
-        data-manual-label={framework.installManualLabel}
-        aria-label={`Copy ${framework.installCmd}`}
-      >
-        <span data-install-label>{framework.installCmd}</span>
-        <svg aria-hidden="true" class="w-3.5 h-3.5 opacity-80" viewBox="0 0 24 24">
-          <path fill="currentColor" d="M9 2h9a2 2 0 0 1 2 2v13h-2V4H9V2Zm-4 4h9a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Zm0 2v13h9V8H5Z" />
-        </svg>
-      </button>
-      <span class="text-sm text-muted-foreground">{framework.pythonRequirement}</span>
-      <a href={releaseHref} class="mq-btn-outline">
-        {framework.docsLabel}
-      </a>
-    </div>
-  </div>
-
   {/*
    * Framework stack.
    *
@@ -189,55 +149,3 @@ function resolveHref(href: string): string {
     </ol>
   </div>
 </section>
-
-<script>
-  (function () {
-    document.querySelectorAll<HTMLButtonElement>("[data-install-copy]").forEach((button) => {
-      if (button.dataset.copyBound === "true") return;
-      button.dataset.copyBound = "true";
-
-      const text = button.getAttribute("data-copy-text") || "";
-      const copiedLabel = button.getAttribute("data-copied-label") || "Copied";
-      const manualLabel =
-        button.getAttribute("data-manual-label") ||
-        "Copy failed \u2014 press \u2318C / Ctrl+C";
-      const labelEl = button.querySelector<HTMLElement>("[data-install-label]");
-      const originalLabel = labelEl?.textContent || text;
-
-      function flashLabel(label: string, holdMs: number) {
-        if (labelEl) labelEl.textContent = label;
-        button.classList.remove("mq-flash");
-        void button.offsetWidth;
-        button.classList.add("mq-flash");
-        setTimeout(() => {
-          if (labelEl) labelEl.textContent = originalLabel;
-          button.classList.remove("mq-flash");
-          button.removeAttribute("data-copy-state");
-        }, holdMs);
-      }
-
-      button.addEventListener("click", async () => {
-        try {
-          if (!navigator.clipboard || !navigator.clipboard.writeText) {
-            throw new Error("clipboard unavailable");
-          }
-          await navigator.clipboard.writeText(text);
-          button.setAttribute("data-copy-state", "success");
-          flashLabel(copiedLabel, 1500);
-        } catch (_) {
-          button.setAttribute("data-copy-state", "error");
-          try {
-            const range = document.createRange();
-            if (labelEl) range.selectNodeContents(labelEl);
-            const sel = window.getSelection();
-            sel?.removeAllRanges();
-            if (labelEl) sel?.addRange(range);
-          } catch (_err) {
-            /* selection unavailable */
-          }
-          flashLabel(manualLabel, 2800);
-        }
-      });
-    });
-  })();
-</script>
