@@ -24,3 +24,9 @@ test('Astro and every Sphinx renderer consume the canonical typography', async (
     assert.match(await read(path), /mq-typography.css/)
   }
 })
+
+test('Sphinx inline identifiers wrap without changing preformatted code', async () => {
+  const css = await readFile(new URL('../docs/_static/mq-theme.css', import.meta.url), 'utf8')
+  assert.match(css, /\.bd-article :not\(pre\) > code \.pre, \.bd-article \.sig \.pre \{ white-space: normal; \}/)
+  assert.match(css, /\.bd-article :not\(pre\) > code, \.bd-article \.sig \{ overflow-wrap: anywhere; \}/)
+})

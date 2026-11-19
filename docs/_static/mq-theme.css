@@ -111,6 +111,7 @@ body { font-family: var(--mq-font-sans); color: var(--mq-text); background: var(
 .bd-article :is(pre, div.highlight, table.docutils) { max-width: 100%; overflow-x: auto; }
 .bd-article table.docutils { display: block; }
 .bd-article :not(pre) > code, .bd-article .sig { overflow-wrap: anywhere; }
+.bd-article :not(pre) > code .pre, .bd-article .sig .pre { white-space: normal; }
 .bd-article .sig { white-space: normal; }
 .bd-article h1 { overflow-wrap: anywhere; }
 html:lang(zh) .bd-article h1 { font-size: clamp(1.875rem, 1.5rem + 1.4vw, 2.5rem); font-weight: 600; }
