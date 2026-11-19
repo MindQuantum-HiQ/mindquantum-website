@@ -83,7 +83,12 @@ export type HomeMessages = {
     steps: [string, string, string];
     explanations: [string, string, string];
     summaries: [string, string, string];
-    viewCode: string;
+    viewsLabel: string;
+    resultLabel: string;
+    pythonLabel: string;
+    copyLabel: string;
+    copiedLabel: string;
+    copyFailedLabel: string;
     tutorialLabel: string;
     method: string;
   };
@@ -278,7 +283,12 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
         "00 or 01, each with 50% probability.",
         "00 or 11, each with 50% probability.",
       ],
-      viewCode: "Explore the circuit & Python",
+      viewsLabel: "Bell-state example views",
+      resultLabel: "Circuit & result",
+      pythonLabel: "Python",
+      copyLabel: "Copy code",
+      copiedLabel: "Code copied.",
+      copyFailedLabel: "Copy failed. Select the code to copy it manually.",
       tutorialLabel: "Learn how the simulator works",
       method: "Exact statevector · computed at build time",
     },
@@ -479,7 +489,12 @@ export const HOME_MESSAGES: Record<Lang, HomeMessages> = {
         "测量得到 00 或 01，各占 50%。",
         "测量得到 00 或 11，各占 50%。",
       ],
-      viewCode: "探索电路与 Python 代码",
+      viewsLabel: "Bell 态示例视图",
+      resultLabel: "电路与结果",
+      pythonLabel: "Python",
+      copyLabel: "复制代码",
+      copiedLabel: "代码已复制。",
+      copyFailedLabel: "复制失败，请选中代码手动复制。",
       tutorialLabel: "了解模拟器的工作方式",
       method: "精确态向量 · 构建时计算",
     },
