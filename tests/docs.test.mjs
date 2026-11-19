@@ -67,6 +67,8 @@ test('imported source badges become labeled controls without changing links or f
     const normalized = normalizeSphinxHtml(html)
     const root = parse(normalized)
     const link = root.querySelector('.mq-article-actions a')
+    assert.ok(root.querySelector('details.mq-article-tools > summary'))
+    assert.equal(root.querySelector('details.mq-article-tools').hasAttribute('open'), false)
     assert.equal(link.getAttribute('href'), href)
     assert.equal(link.text.trim(), label)
     assert.ok(link.classList.contains('mq-btn-outline'))
@@ -74,6 +76,24 @@ test('imported source badges become labeled controls without changing links or f
     assert.equal(root.querySelector('figure img').getAttribute('src'), 'plot.svg')
     assert.equal(normalizeSphinxHtml(normalized), normalized)
   }
+})
+
+test('article tools are localized, preserve all source links, and leave mixed prose alone', () => {
+  for (const [lang, label] of [['en', 'Downloads & source'], ['zh-CN', '下载与源文件']]) {
+    const links = ['notebook', 'download_code', 'source'].map(kind => `<a href="https://example.org/${kind}"><img src="https://example.org/logo_${kind}.svg" alt="${kind}"></a>`).join(' \n')
+    const html = `<html lang="${lang}"><article class="bd-article"><h1>Title</h1><p>${links}</p><p>Prose <a href="plot.svg"><img src="plot.svg" alt="Figure"></a></p></article></html>`
+    const result = normalizeSphinxHtml(html)
+    const root = parse(result)
+    const tools = root.querySelector('details.mq-article-tools')
+    assert.equal(tools.querySelector('summary').text, label)
+    assert.deepEqual(tools.querySelectorAll('a').map(a => a.getAttribute('href')), ['notebook', 'download_code', 'source'].map(kind => `https://example.org/${kind}`))
+    assert.equal(root.querySelector('img').getAttribute('src'), 'plot.svg')
+    assert.equal(normalizeSphinxHtml(result), result)
+  }
+  const mixed = '<article class="bd-article"><p>Read this <a href="x"><img src="https://example.org/logo_source.svg" alt="Source"></a> first.</p></article>'
+  const root = parse(normalizeSphinxHtml(mixed))
+  assert.equal(root.querySelector('details'), null)
+  assert.match(root.text, /Read this Source first\./)
 })
 
 test('theme icons share outline glyphs while preserving theme-switch behavior', () => {

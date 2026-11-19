@@ -25,7 +25,7 @@ const { messages } = Astro.props as Props;
   <div class="mq-container pt-16 pb-20 lg:pt-24 lg:pb-28">
     <div class="grid lg:grid-cols-12 gap-x-12 gap-y-12 items-end">
       <div class="lg:col-span-8">
-        <p class="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+        <p class="font-mono mq-caption uppercase tracking-[0.08em] text-muted-foreground">
           {messages.kicker}
         </p>
         <h1 class="mt-6 text-display-xl font-extrabold text-foreground tracking-tight max-w-[18ch]">
@@ -45,7 +45,7 @@ const { messages } = Astro.props as Props;
                 idx === 0 ? "" : "border-t border-border",
               ]}
             >
-              <dt class="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground">
+              <dt class="font-mono mq-caption uppercase tracking-[0.08em] text-muted-foreground">
                 {row.label}
               </dt>
               <dd class="font-mono text-sm text-foreground tabular-nums text-right">
@@ -68,14 +68,14 @@ const { messages } = Astro.props as Props;
   <div class="grid md:grid-cols-3 gap-x-12 gap-y-10">
     {messages.methodology.blocks.map((block) => (
       <div>
-        <p class="font-mono text-[11px] uppercase tracking-[0.16em] text-muted-foreground mb-3">
+        <p class="font-mono mq-caption uppercase tracking-[0.08em] text-muted-foreground mb-3">
           {block.label}
         </p>
         <p class="text-foreground text-lg font-semibold tracking-tight leading-snug">
           {block.value}
         </p>
         {block.detail && (
-          <p class="mt-2 text-sm text-muted-foreground leading-relaxed">
+          <p class="mt-2 mq-body text-muted-foreground">
             {block.detail}
           </p>
         )}
@@ -95,7 +95,7 @@ const { messages } = Astro.props as Props;
         <h2 class="text-2xl md:text-[1.75rem] font-bold text-foreground tracking-tight leading-tight">
           {messages.frameworks.heading}
         </h2>
-        <p class="mt-4 text-sm text-muted-foreground leading-relaxed mq-measure">
+        <p class="mt-4 mq-body text-muted-foreground mq-measure">
           {messages.frameworks.lead}
         </p>
       </div>
@@ -111,7 +111,7 @@ const { messages } = Astro.props as Props;
               >
                 {fw.name}
               </span>
-              <span class="font-mono text-xs text-muted-foreground tabular-nums">
+              <span class="font-mono mq-caption text-muted-foreground tabular-nums">
                 {fw.version}
               </span>
             </li>

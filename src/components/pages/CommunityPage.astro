@@ -21,8 +21,8 @@ function resolveHref(href: string) {
 
 <section class="relative overflow-hidden bg-hero-gradient">
   <div class="mq-container py-16">
-    <h1 class="text-4xl md:text-5xl font-bold text-foreground mb-3">{messages.title}</h1>
-    <p class="text-sm md:text-base text-muted-foreground max-w-2xl leading-relaxed mb-6">
+    <h1 class="mq-page-title mb-3">{messages.title}</h1>
+    <p class="mq-body text-muted-foreground max-w-2xl mb-6">
       {messages.subtitle}
     </p>
     <div class="flex flex-wrap gap-3">
@@ -55,7 +55,7 @@ function resolveHref(href: string) {
             <h3 class="font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
               {item.label}
             </h3>
-            <p class="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+            <p class="mq-body text-muted-foreground">{item.description}</p>
           </a>
         ))}
       </div>

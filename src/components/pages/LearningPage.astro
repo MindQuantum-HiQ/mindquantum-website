@@ -22,7 +22,7 @@ const [prereq, ...pathSteps] = messages.cards;
 <section class="mq-container py-10 md:py-16">
   <header class="max-w-2xl">
     <p class="mq-eyebrow mb-3">{messages.eyebrow}</p>
-    <h1 class="text-display-lg text-foreground mb-5">{messages.title}</h1>
+    <h1 class="mq-page-title mb-5">{messages.title}</h1>
     <p class="mq-measure text-base md:text-lg text-muted-foreground leading-relaxed">{messages.lede}</p>
   </header>
 
@@ -37,7 +37,7 @@ const [prereq, ...pathSteps] = messages.cards;
           <span class="text-brand-orange font-semibold tabular-nums text-2xl md:text-3xl leading-none shrink-0 pt-1">00</span>
           <div class="flex-1 min-w-0">
             <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">{prereq.title}</h3>
-            <p class="text-sm text-muted-foreground mt-1.5 leading-relaxed">{prereq.description}</p>
+            <p class="mq-body text-muted-foreground mt-1.5">{prereq.description}</p>
           </div>
           <svg aria-hidden="true" class="w-4 h-4 text-muted-foreground/60 shrink-0 mt-2 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" viewBox="0 0 24 24">
             <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 18l6-6l-6-6" />
@@ -58,7 +58,7 @@ const [prereq, ...pathSteps] = messages.cards;
                 <span class="text-muted-foreground font-semibold tabular-nums text-2xl md:text-3xl leading-none shrink-0 pt-1">{idx}</span>
                 <div class="flex-1 min-w-0">
                   <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">{card.title}</h3>
-                  <p class="text-sm text-muted-foreground mt-1.5 leading-relaxed">{card.description}</p>
+                  <p class="mq-body text-muted-foreground mt-1.5">{card.description}</p>
                 </div>
                 <svg aria-hidden="true" class="w-4 h-4 text-muted-foreground/60 shrink-0 mt-2 transition-transform group-hover:translate-x-0.5 group-hover:text-primary" viewBox="0 0 24 24">
                   <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="m9 18l6-6l-6-6" />
@@ -73,7 +73,7 @@ const [prereq, ...pathSteps] = messages.cards;
     <aside class="space-y-6 lg:sticky lg:top-24 lg:self-start">
       <div class="mq-card p-5">
         <p class="mq-eyebrow text-foreground mb-2">{messages.sideRail.videoTitle}</p>
-        <p class="text-sm text-muted-foreground leading-relaxed mb-4">{messages.sideRail.videoDescription}</p>
+        <p class="mq-body text-muted-foreground mb-4">{messages.sideRail.videoDescription}</p>
         <a href={resolveHref(messages.sideRail.videoHref)} class="mq-link-arrow text-sm">
           {messages.sideRail.videoLinkLabel}
           <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6l-6 6" /></svg>
@@ -81,7 +81,7 @@ const [prereq, ...pathSteps] = messages.cards;
       </div>
       <div class="px-5 py-1">
         <p class="mq-eyebrow text-foreground mb-2">{messages.sideRail.helpTitle}</p>
-        <p class="text-sm text-muted-foreground leading-relaxed mb-4">{messages.sideRail.helpDescription}</p>
+        <p class="mq-body text-muted-foreground mb-4">{messages.sideRail.helpDescription}</p>
         <a href={resolveHref(messages.sideRail.helpHref)} class="mq-link-arrow text-sm">
           {messages.sideRail.helpLinkLabel}
           <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6l-6 6" /></svg>

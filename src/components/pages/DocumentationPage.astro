@@ -43,7 +43,7 @@ function resolveHref(href: string) {
           <a
             href={resolveHref(item.href)}
             class:list={[
-              "mq-focus-ring inline-flex items-center whitespace-nowrap px-3 py-1.5 text-xs font-medium rounded-full border transition-colors shrink-0",
+              "mq-focus-ring inline-flex items-center whitespace-nowrap px-3 py-2 text-sm font-medium rounded-full border transition-colors shrink-0",
               i === 0
                 ? "bg-primary text-primary-foreground border-primary"
                 : "border-border text-muted-foreground hover:text-foreground hover:bg-secondary",
@@ -56,13 +56,13 @@ function resolveHref(href: string) {
 
       <header class="max-w-2xl">
         <p class="mq-eyebrow mb-3">{messages.eyebrow}</p>
-        <h1 class="text-display-lg text-foreground mb-5">{messages.title}</h1>
+        <h1 class="mq-page-title mb-5">{messages.title}</h1>
         <p class="mq-measure text-base md:text-lg text-muted-foreground leading-relaxed">{messages.lede}</p>
       </header>
 
       <div class="mt-10 mb-14">
         <div class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-secondary/40 pl-4 pr-2 py-2 font-mono text-sm">
-          <code class="text-foreground truncate py-1">
+          <code class="text-foreground break-all py-1">
             <span class="text-muted-foreground select-none">$ </span>{messages.install.command}
           </code>
           <button
@@ -80,7 +80,7 @@ function resolveHref(href: string) {
             </svg>
           </button>
         </div>
-        <p class="mt-2.5 text-xs text-muted-foreground">{messages.install.meta}</p>
+        <p class="mt-2.5 mq-caption text-muted-foreground">{messages.install.meta}</p>
       </div>
 
       <section aria-labelledby="docs-sections-heading">
@@ -98,10 +98,10 @@ function resolveHref(href: string) {
                 >
                   <div class="flex-1 min-w-0">
                     <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">{section.title}</h3>
-                    <p class="hidden sm:block text-sm text-muted-foreground mt-0.5 leading-relaxed">{section.description}</p>
+                    <p class="mq-body text-muted-foreground mt-1">{section.description}</p>
                   </div>
                   {section.meta && (
-                    <span class="hidden sm:inline-block text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground shrink-0">
+                    <span class="hidden sm:inline-block mq-caption font-semibold uppercase tracking-[0.08em] text-muted-foreground shrink-0">
                       {section.meta}
                     </span>
                   )}

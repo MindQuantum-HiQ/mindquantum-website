@@ -19,7 +19,7 @@ const { section, cpuImage, gpuImage, tinted = false } = Astro.props as Props;
     {/* Section header — asymmetric, left-weighted. */}
     <div class="grid lg:grid-cols-12 gap-x-12 mb-12 lg:mb-14">
       <div class="lg:col-span-9">
-        <p class="font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+        <p class="font-mono mq-caption uppercase tracking-[0.08em] text-muted-foreground">
           {section.kicker}
         </p>
         <h2 class="mt-4 text-display-md font-bold text-foreground tracking-tight">
@@ -44,10 +44,10 @@ const { section, cpuImage, gpuImage, tinted = false } = Astro.props as Props;
           />
         </div>
         <figcaption class="px-6 py-5 border-t border-border bg-background/40">
-          <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          <p class="font-mono mq-caption uppercase tracking-[0.08em] text-muted-foreground">
             {section.cpuFigLabel}
           </p>
-          <p class="mt-2 text-sm text-foreground leading-relaxed">
+          <p class="mt-2 mq-body text-foreground">
             {section.cpuCaption}
           </p>
         </figcaption>
@@ -64,10 +64,10 @@ const { section, cpuImage, gpuImage, tinted = false } = Astro.props as Props;
           />
         </div>
         <figcaption class="px-6 py-5 border-t border-border bg-background/40">
-          <p class="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+          <p class="font-mono mq-caption uppercase tracking-[0.08em] text-muted-foreground">
             {section.gpuFigLabel}
           </p>
-          <p class="mt-2 text-sm text-foreground leading-relaxed">
+          <p class="mt-2 mq-body text-foreground">
             {section.gpuCaption}
           </p>
         </figcaption>
@@ -85,7 +85,7 @@ const { section, cpuImage, gpuImage, tinted = false } = Astro.props as Props;
           href={section.findingHref}
           target="_blank"
           rel="noopener"
-          class="mt-5 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground transition-colors hover:text-foreground mq-focus-ring rounded-sm"
+          class="mt-5 inline-flex items-center gap-2 font-mono mq-caption uppercase tracking-[0.08em] text-muted-foreground transition-colors hover:text-foreground mq-focus-ring rounded-sm"
         >
           {section.findingSource}
           <svg aria-hidden="true" class="w-3 h-3" viewBox="0 0 24 24">
@@ -100,7 +100,7 @@ const { section, cpuImage, gpuImage, tinted = false } = Astro.props as Props;
           </svg>
         </a>
       ) : (
-        <p class="mt-5 font-mono text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+        <p class="mt-5 font-mono mq-caption uppercase tracking-[0.08em] text-muted-foreground">
           {section.findingSource}
         </p>
       )}

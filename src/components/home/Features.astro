@@ -84,7 +84,7 @@ const { features } = Astro.props as Props;
               {feature.title}
             </h3>
             <p
-              class="mt-3 text-sm lg:text-[0.9375rem] leading-relaxed text-muted-foreground mq-measure"
+              class="mt-3 mq-body text-muted-foreground mq-measure"
             >
               {feature.description}
             </p>
@@ -95,7 +95,7 @@ const { features } = Astro.props as Props;
                 identifiers (gate names, backends, algorithm acronyms);
                 CJK glyphs fall back to the regular sans stack gracefully. */}
             <ul
-              class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-[0.7rem] uppercase tracking-[0.12em] text-muted-foreground/85"
+              class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono mq-caption text-muted-foreground"
             >
               {feature.keywords.map((kw, i) => (
                 <>

@@ -68,6 +68,16 @@ function normalizeArticleActions(doc) {
     if (link.parentNode.tagName === 'P') link.parentNode.classList.add('mq-article-actions')
     changed = true
   }
+  for (const paragraph of doc.querySelectorAll('p.mq-article-actions')) {
+    if (!paragraph.childNodes.every(node => node.nodeType === 3
+      ? !node.rawText.trim()
+      : node.tagName === 'A' && node.classList.contains('mq-btn'))) continue
+    const isEnglish = doc.querySelector('html')?.getAttribute('lang')?.startsWith('en')
+    const tools = parse(`<details class="mq-article-tools"><summary>${isEnglish ? 'Downloads &amp; source' : '下载与源文件'}</summary></details>`).firstChild
+    paragraph.replaceWith(tools)
+    tools.appendChild(paragraph)
+    changed = true
+  }
   return changed
 }
 
@@ -91,7 +101,7 @@ export function extractSphinxAssets(doc, sourcePath, langRoot) {
     const url = new URL(raw, sourceUrl)
     const local = url.origin === sourceUrl.origin
     // Astro already imports these exact sources; avoid duplicate global CSS.
-    if (local && /\/_static\/mq-(fonts|variables|controls)\.css$/.test(url.pathname)) continue
+    if (local && /\/_static\/mq-(fonts|variables|controls|typography)\.css$/.test(url.pathname)) continue
     if (local && (/\/_static\/(styles|scripts)\//.test(url.pathname) ||
       /\/(searchtools|language_data|searchindex)\.js$/.test(url.pathname))) continue
     const href = local ? `${langRoot}${url.pathname.slice(1)}${url.search}${url.hash}` : url.href

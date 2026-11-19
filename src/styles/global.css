@@ -46,36 +46,6 @@
     color: hsl(var(--foreground));
   }
 
-  /* Bilingual parity (brief principle #4). CJK glyphs are taller and fuller
-     than Latin, so tracking tuned for Latin display type makes Chinese feel
-     crammed. Add more leading, neutralize negative letter-spacing, and let
-     the body breathe a touch wider — applied as a scoped override so Latin
-     pages keep their existing rhythm. */
-  html:lang(zh) {
-    --mq-prose-line-height: 1.75;
-    line-height: 1.75;
-  }
-  html:lang(zh) h1,
-  html:lang(zh) h2,
-  html:lang(zh) h3,
-  html:lang(zh) h4,
-  html:lang(zh) h5,
-  html:lang(zh) h6 {
-    line-height: 1.25;
-    letter-spacing: 0;
-  }
-  html:lang(zh) .text-display-xl,
-  html:lang(zh) .text-display-lg,
-  html:lang(zh) .text-display-md {
-    line-height: 1.2;
-    letter-spacing: 0;
-  }
-  html:lang(zh) .mq-eyebrow {
-    /* Wide tracking on tracked uppercase Latin reads "designed"; on CJK it
-       breaks character joining. Dial it back. */
-    letter-spacing: 0.06em;
-  }
-
   pre,
   code,
   kbd,
@@ -126,8 +96,12 @@
     @apply text-display-md font-bold text-foreground;
   }
 
+  .mq-page-title {
+    @apply text-display-lg text-foreground;
+  }
+
   .mq-eyebrow {
-    @apply inline-block text-xs font-semibold uppercase text-muted-foreground;
+    @apply inline-block text-[0.8125rem] font-semibold uppercase text-muted-foreground;
     letter-spacing: 0.14em;
   }
 
