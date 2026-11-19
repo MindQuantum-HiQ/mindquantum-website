@@ -69,6 +69,7 @@ function normalizeArticleActions(doc) {
     changed = true
   }
   for (const paragraph of doc.querySelectorAll('p.mq-article-actions')) {
+    if (paragraph.parentNode.classList.contains('mq-article-tools')) continue
     if (!paragraph.childNodes.every(node => node.nodeType === 3
       ? !node.rawText.trim()
       : node.tagName === 'A' && node.classList.contains('mq-btn'))) continue
