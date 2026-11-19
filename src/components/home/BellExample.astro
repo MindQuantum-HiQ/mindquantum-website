@@ -92,7 +92,7 @@ const wireY = (q: number) => 22 + q * 48;
         <span class="font-mono text-xs text-muted-foreground">bell_state.py</span>
         <button type="button" class="mq-btn-ghost mq-btn-compact" hidden data-bell-copy data-copy-text={example.code} data-copied-label={messages.copiedLabel} data-error-label={messages.copyFailedLabel}>{messages.copyLabel}</button>
       </div>
-      <Code code={example.code.trimEnd()} lang="python" theme="github-light" tabindex="0" />
+      <Code code={example.code.trimEnd()} lang="python" theme="github-light" wrap />
       <p class="bell-copy-status" role="status" data-bell-copy-status></p>
       <a href={tutorialHref} class="mq-link-arrow text-sm">{messages.tutorialLabel} →</a>
       <p class="bell-method">{messages.method} · MindQuantum {example.version} / mqvector</p>
@@ -211,7 +211,7 @@ const wireY = (q: number) => 22 + q * 48;
   .bell-explanation[aria-hidden="true"] { visibility: hidden; }
   .bell-source-heading { display: flex; align-items: center; justify-content: space-between; min-height: 2rem; gap: 0.75rem; }
   .bell-source [hidden] { display: none; }
-  .bell-source :global(pre) { padding: 0.75rem 0; background: transparent !important; font-size: 0.75rem; line-height: 1.8; overflow-x: auto; }
+  .bell-source :global(pre) { padding: 0.75rem 0; background: transparent !important; font-size: 0.75rem; line-height: 1.8; }
   .bell-copy-status { min-height: 3em; margin-bottom: 0.75rem; font-size: 0.75rem; line-height: 1.5; color: var(--mq-text-muted); }
   .bell-method { font-size: 0.75rem; color: var(--mq-text-muted); margin-top: 0.75rem; }
   @media (max-width: 639px) {
