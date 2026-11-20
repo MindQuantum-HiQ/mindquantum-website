@@ -147,8 +147,8 @@ const { id, image, label, alt, caption, hardware, reader } = Astro.props;
       link.addEventListener("click", event => {
         if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         event.preventDefault();
-        setZoom(window.matchMedia("(max-width: 767px)").matches);
         dialog.showModal();
+        setZoom(window.matchMedia("(max-width: 767px)").matches);
         document.documentElement.classList.add("benchmark-reader-open");
       });
     });
