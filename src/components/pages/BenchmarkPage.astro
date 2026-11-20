@@ -126,6 +126,8 @@ const { messages } = Astro.props as Props;
     SECTION 01 — Random circuit. Plain background.
    ------------------------------------------------------------------- */}
 <BenchmarkSection
+  id="random-circuit"
+  reader={messages.reader}
   section={messages.randomCircuit}
   cpuImage={randomCircuitCpu}
   gpuImage={randomCircuitGpu}
@@ -135,6 +137,8 @@ const { messages } = Astro.props as Props;
     SECTION 02 — QAOA. Tinted surface alternates rhythm with §1.
    ------------------------------------------------------------------- */}
 <BenchmarkSection
+  id="qaoa"
+  reader={messages.reader}
   section={messages.qaoa}
   cpuImage={qaoaCpu}
   gpuImage={qaoaGpu}
