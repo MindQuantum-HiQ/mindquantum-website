@@ -30,3 +30,15 @@ test('Sphinx inline identifiers wrap without changing preformatted code', async 
   assert.match(css, /\.bd-article :not\(pre\) > code \.pre, \.bd-article \.sig \.pre \{ white-space: normal; \}/)
   assert.match(css, /\.bd-article :not\(pre\) > code, \.bd-article \.sig \{ overflow-wrap: anywhere; \}/)
 })
+
+test('display math scrolls at the Sphinx block, not the MathJax glyph box or inline math', async () => {
+  const layout = await readFile(new URL('../src/layouts/DocsLayout.astro', import.meta.url), 'utf8')
+  const rules = [...layout.matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+  const overflowRules = rules.filter(([, , declarations]) => /overflow(?:-[xy])?\s*:/.test(declarations))
+  const mathRules = overflowRules.filter(([, selectors]) => selectors.includes('.math'))
+  assert.equal(mathRules.length, 1)
+  assert.ok(mathRules[0][1].split(',').map(selector => selector.trim()).includes('.docs-main div.math'))
+  assert.match(mathRules[0][2], /overflow-x:\s*auto/)
+  assert.match(mathRules[0][2], /max-width:\s*100%/)
+  assert.ok(overflowRules.every(([, selectors]) => !selectors.includes('mjx-')))
+})
