@@ -16,14 +16,14 @@ button, select, input { font: inherit; }
 .mqcb-qubits { min-height: 2.25rem; padding: .25rem .5rem; border-radius: var(--mq-radius-control); border: 1px solid var(--mq-border); background: var(--mq-surface); color: var(--mq-text); }
 .mqcb-placement-hint, .mqcb-scroll-hint, .mqcb-results-empty { margin: 0; color: var(--mq-text-muted); font-size: .875rem; line-height: 1.6; }
 .mqcb-placement-hint { grid-column: 1 / -1; }
-.mqcb-canvas { overflow-x: auto; padding: 1rem; }
+.mqcb-canvas { --mqcb-canvas-inset: 1rem; overflow-x: auto; padding: 1rem 0; }
 .mqcb-canvas:focus-visible { outline-offset: -3px; }
-.mqcb-grid { display: grid; gap: 4px 0; align-items: center; }
+.mqcb-grid { display: grid; min-width: max-content; gap: 4px 0; align-items: center; padding-right: var(--mqcb-canvas-inset); }
 .mqcb-row { display: contents; }
 .mqcb-header .mqcb-time { min-height: 1.5rem; text-align: center; color: var(--mq-text-muted); font: .8125rem var(--mq-font-mono); }
 .mqcb-cell { min-height: 48px; position: relative; }
-.mqcb-wirelabel, .mqcb-corner { position: sticky; left: 0; z-index: 3; background: var(--mq-surface); }
-.mqcb-wirelabel { display: flex; align-items: center; color: var(--mq-text-muted); font: .875rem var(--mq-font-mono); }
+.mqcb-wirelabel, .mqcb-corner { position: sticky; left: 0; z-index: 3; align-self: stretch; background: var(--mq-surface); }
+.mqcb-wirelabel { display: flex; align-items: center; padding-left: var(--mqcb-canvas-inset); color: var(--mq-text-muted); font: .875rem var(--mq-font-mono); }
 .mqcb-drop { border: 1px solid transparent; border-radius: var(--mq-radius-small); transition: background-color var(--mq-transition); }
 .mqcb-drop:hover, .mqcb-drop.maybe { background: var(--mq-selected); }
 .mqcb-drop.over.valid { outline: var(--mq-focus-width) solid var(--mq-primary); }
@@ -86,7 +86,7 @@ button, select, input { font: inherit; }
 }
 @media (max-width: 767px) {
   .mqcb-topbar { padding: .75rem; }
-  .mqcb-canvas { padding: .75rem; }
+  .mqcb-canvas { --mqcb-canvas-inset: .75rem; padding: .75rem 0; }
   .mqcb-results { padding: 1rem .75rem; }
 }
 @media (max-width: 680px) { .mqcb-scroll-hint { display: block; } }

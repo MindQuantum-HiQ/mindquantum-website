@@ -183,7 +183,7 @@ class QuantumCircuitElement extends HTMLElement {
     // Build grid
     const table = document.createElement("div");
     table.className = "mqcb-grid";
-    table.style.gridTemplateColumns = `3rem repeat(${this.circuit.columns.length}, minmax(48px, 1fr))`;
+    table.style.gridTemplateColumns = `calc(3rem + var(--mqcb-canvas-inset)) repeat(${this.circuit.columns.length}, minmax(48px, 1fr))`;
 
     // Header row (time indices)
     const header = document.createElement("div");
