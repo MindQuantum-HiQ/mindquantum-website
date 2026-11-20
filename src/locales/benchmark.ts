@@ -51,6 +51,19 @@ export type BenchmarkMessages = {
     versionLabel: string;
     items: BenchmarkFramework[];
   };
+  reader: {
+    original: string;
+    enlarge: string;
+    close: string;
+    zoom: string;
+    fit: string;
+    openOriginal: string;
+    pan: string;
+    axes: string;
+    precision: string;
+    cpuHardware: string;
+    gpuHardware: string;
+  };
   randomCircuit: BenchmarkSection;
   qaoa: BenchmarkSection;
   cta: {
@@ -84,7 +97,7 @@ export const BENCHMARK_MESSAGES: Record<Lang, BenchmarkMessages> = {
     kicker: "Performance benchmark · v0.9.0",
     title: "MindQuantum against eight other quantum frameworks.",
     subtitle:
-      "Same hardware, same circuits, double precision. We ran random circuit simulation and end-to-end QAOA on every framework, on both CPU and a single NVIDIA V100. The four charts below are the result.",
+      "Published results for random circuit simulation and end-to-end QAOA on CPU and a single NVIDIA V100. Compare the original figures from the MindSpore Quantum white paper, with hardware and precision noted below.",
     summary: [
       { label: "Frameworks tested", value: "9" },
       { label: "Workloads", value: "2" },
@@ -103,26 +116,39 @@ export const BENCHMARK_MESSAGES: Record<Lang, BenchmarkMessages> = {
           label: "Test harness",
           value: "pytest-benchmark",
           detail:
-            "End-to-end wall-clock per run. Each data point is the median of multiple iterations.",
+            "End-to-end wall-clock time over repeated iterations, as reported in the white paper.",
         },
         {
           label: "Numerical precision",
-          value: "Double (FP64)",
+          value: "FP64 and FP32",
           detail:
-            "TensorFlow Quantum is single precision (FP32); the framework does not expose a double-precision path.",
+            "MindQuantum is shown at both precisions. TensorFlow Quantum is single precision (FP32); compare like-for-like where available.",
         },
       ],
     },
     frameworks: {
       heading: "Nine frameworks, one rig.",
-      lead: "Every framework was installed at its current stable release, configured for the same number of threads, and given the same circuit definitions.",
+      lead: "Versions used in the published benchmark, not current releases. CPU runs use the same thread configuration and circuit definitions.",
       versionLabel: "Version",
       items: FRAMEWORKS,
+    },
+    reader: {
+      original: "Original figure · MindSpore Quantum white paper",
+      enlarge: "Enlarge figure",
+      close: "Close",
+      zoom: "Zoom in",
+      fit: "Fit width",
+      openOriginal: "Open original PNG",
+      pan: "When zoomed, scroll or swipe to inspect the figure. Keyboard: focus the figure and use the arrow keys.",
+      axes: "Reading the figures: time in seconds, logarithmic scale. Lower is faster; each major step is ×10.",
+      precision: "MindQuantum: solid red = FP64; dashed red = FP32. Original legends and all comparison curves are preserved.",
+      cpuHardware: "CPU · 16 threads, SIMD",
+      gpuHardware: "GPU · NVIDIA V100",
     },
     randomCircuit: {
       kicker: "01 / Raw simulation speed",
       heading: "Random circuit evolution, 4 to 27 qubits.",
-      lead: "Each framework simulates the same random circuit built from X, Y, Z, H, CNOT, S, T, RX, RY, RZ, Rxx, Ryy, Rzz, SWAP, and their controlled variants. Qubit count scales from 4 to 27. We time each run with pytest-benchmark and plot the median against the qubit count on a log scale.",
+      lead: "Each framework simulates the same random circuit built from X, Y, Z, H, CNOT, S, T, RX, RY, RZ, Rxx, Ryy, Rzz, SWAP, and their controlled variants. Qubit count scales from 4 to 27, timed with pytest-benchmark.",
       cpuFigLabel: "Fig. 1a — CPU backend",
       gpuFigLabel: "Fig. 1b — GPU backend",
       cpuAlt:
@@ -170,7 +196,7 @@ export const BENCHMARK_MESSAGES: Record<Lang, BenchmarkMessages> = {
     kicker: "性能基准 · v0.9.0",
     title: "MindQuantum 与八个量子框架同台对比。",
     subtitle:
-      "同一套硬件、同一组电路、统一双精度。我们在所有框架上分别跑了随机电路模拟与端到端 QAOA，并覆盖 CPU 与单卡 NVIDIA V100 两种后端。下方四张图即为结果。",
+      "来自 MindSpore Quantum 技术报告的已发表结果，覆盖随机电路模拟与端到端 QAOA，包含 CPU 与单卡 NVIDIA V100 两种后端。下方保留论文原图，并列明硬件与精度条件。",
     summary: [
       { label: "参测框架", value: "9 个" },
       { label: "测试任务", value: "2 项" },
@@ -188,25 +214,38 @@ export const BENCHMARK_MESSAGES: Record<Lang, BenchmarkMessages> = {
         {
           label: "测试工具",
           value: "pytest-benchmark",
-          detail: "记录每次运行的端到端墙钟时间，取多次迭代的中位数。",
+          detail: "多次迭代测量端到端墙钟时间，结果以技术报告为准。",
         },
         {
           label: "数值精度",
-          value: "双精度 FP64",
-          detail: "TensorFlow Quantum 仅支持单精度 FP32，框架本身未提供双精度路径。",
+          value: "FP64 与 FP32",
+          detail: "MindQuantum 同时展示两种精度；TensorFlow Quantum 使用单精度 FP32。请在可比精度下阅读结果。",
         },
       ],
     },
     frameworks: {
       heading: "九个框架，一套环境。",
-      lead: "所有框架均安装其当前稳定版本，使用相同的线程配置，并接收完全一致的电路定义。",
+      lead: "以下为已发表测试采用的版本，并非当前版本。CPU 测试使用相同的线程配置与电路定义。",
       versionLabel: "版本",
       items: FRAMEWORKS,
+    },
+    reader: {
+      original: "论文原图 · MindSpore Quantum 技术报告",
+      enlarge: "放大查看",
+      close: "关闭",
+      zoom: "放大图表",
+      fit: "适应宽度",
+      openOriginal: "打开 PNG 原图",
+      pan: "放大后可滚动或滑动查看。键盘操作：聚焦图表后使用方向键。",
+      axes: "读图提示：纵轴为耗时（秒），采用对数坐标。越低越快；每个主刻度相差 10 倍。",
+      precision: "MindQuantum：红色实线为 FP64，红色虚线为 FP32。保留原始图例与全部对比曲线。",
+      cpuHardware: "CPU · 16 线程，SIMD",
+      gpuHardware: "GPU · NVIDIA V100",
     },
     randomCircuit: {
       kicker: "01 / 底层模拟性能",
       heading: "随机电路演化，4 至 27 比特。",
-      lead: "每个框架模拟同一条随机电路，门集合包含 X、Y、Z、H、CNOT、S、T、RX、RY、RZ、Rxx、Ryy、Rzz、SWAP 及其受控版本。比特数从 4 扩展到 27，使用 pytest-benchmark 计时，以对数坐标绘制中位数耗时随比特数的变化。",
+      lead: "每个框架模拟同一条随机电路，门集合包含 X、Y、Z、H、CNOT、S、T、RX、RY、RZ、Rxx、Ryy、Rzz、SWAP 及其受控版本。比特数从 4 扩展到 27，使用 pytest-benchmark 计时。",
       cpuFigLabel: "图 1a — CPU 后端",
       gpuFigLabel: "图 1b — GPU 后端",
       cpuAlt:

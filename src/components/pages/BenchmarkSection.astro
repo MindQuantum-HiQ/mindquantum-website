@@ -1,17 +1,19 @@
 ---
-import { Image } from "astro:assets";
+import BenchmarkFigure from "./BenchmarkFigure.astro";
 import type { ImageMetadata } from "astro";
-import type { BenchmarkSection } from "../../locales/benchmark";
+import type { BenchmarkSection, BenchmarkMessages } from "../../locales/benchmark";
 
 interface Props {
   section: BenchmarkSection;
   cpuImage: ImageMetadata;
   gpuImage: ImageMetadata;
+  id: string;
+  reader: BenchmarkMessages["reader"];
   /** Tinted alternative surface for rhythm between consecutive sections. */
   tinted?: boolean;
 }
 
-const { section, cpuImage, gpuImage, tinted = false } = Astro.props as Props;
+const { section, cpuImage, gpuImage, id, reader, tinted = false } = Astro.props as Props;
 ---
 
 <section class:list={[tinted ? "bg-muted/30 border-t border-border" : ""]}>
@@ -31,48 +33,20 @@ const { section, cpuImage, gpuImage, tinted = false } = Astro.props as Props;
       </div>
     </div>
 
-    {/* Two charts side-by-side on lg+, stacked below. */}
-    <div class="grid lg:grid-cols-2 gap-6 lg:gap-8">
-      <figure class="mq-card overflow-hidden bg-card flex flex-col">
-        <div class="p-4 md:p-5 lg:p-6">
-          <Image
-            src={cpuImage}
-            alt={section.cpuAlt}
-            class="w-full h-auto"
-            loading="lazy"
-            densities={[1, 2]}
-          />
-        </div>
-        <figcaption class="px-6 py-5 border-t border-border bg-background/40">
-          <p class="font-mono mq-caption uppercase tracking-[0.08em] text-muted-foreground">
-            {section.cpuFigLabel}
-          </p>
-          <p class="mt-2 mq-body text-foreground">
-            {section.cpuCaption}
-          </p>
-        </figcaption>
-      </figure>
-
-      <figure class="mq-card overflow-hidden bg-card flex flex-col">
-        <div class="p-4 md:p-5 lg:p-6">
-          <Image
-            src={gpuImage}
-            alt={section.gpuAlt}
-            class="w-full h-auto"
-            loading="lazy"
-            densities={[1, 2]}
-          />
-        </div>
-        <figcaption class="px-6 py-5 border-t border-border bg-background/40">
-          <p class="font-mono mq-caption uppercase tracking-[0.08em] text-muted-foreground">
-            {section.gpuFigLabel}
-          </p>
-          <p class="mt-2 mq-body text-foreground">
-            {section.gpuCaption}
-          </p>
-        </figcaption>
-      </figure>
+    <div class="mb-8 grid md:grid-cols-2 gap-x-12 gap-y-3 text-sm text-muted-foreground">
+      <p>{reader.axes}</p>
+      <p>{reader.precision}</p>
     </div>
+    <BenchmarkFigure
+      id={`${id}-cpu`} image={cpuImage} label={section.cpuFigLabel}
+      alt={section.cpuAlt} caption={section.cpuCaption}
+      hardware={reader.cpuHardware} reader={reader}
+    />
+    <BenchmarkFigure
+      id={`${id}-gpu`} image={gpuImage} label={section.gpuFigLabel}
+      alt={section.gpuAlt} caption={section.gpuCaption}
+      hardware={reader.gpuHardware} reader={reader}
+    />
 
     {/* Finding — large display sentence + mono attribution. No border bar,
         no quote chrome. Typography alone carries the weight. */}

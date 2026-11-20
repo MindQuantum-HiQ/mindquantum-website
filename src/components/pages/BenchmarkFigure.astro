@@ -1,0 +1,158 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import type { BenchmarkMessages } from "../../locales/benchmark";
+
+interface Props {
+  id: string;
+  image: ImageMetadata;
+  label: string;
+  alt: string;
+  caption: string;
+  hardware: string;
+  reader: BenchmarkMessages["reader"];
+}
+
+const { id, image, label, alt, caption, hardware, reader } = Astro.props;
+---
+
+<figure class="benchmark-figure" data-benchmark-figure>
+  <figcaption class="figure-notes">
+    <h3 id={`${id}-label`} class="font-mono mq-caption text-muted-foreground">{label}</h3>
+    <p class="mt-3 text-lg font-semibold text-foreground">{hardware}</p>
+    <p class="mt-4 mq-body text-muted-foreground">{caption}</p>
+    <a href={image.src} class="figure-open mq-focus-ring" data-figure-open>
+      {reader.enlarge}
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5M3 3l6 6m12-6-6 6M3 21l6-6m12 6-6-6" />
+      </svg>
+    </a>
+  </figcaption>
+
+  <div class="figure-plate">
+    <p class="figure-provenance">{reader.original}</p>
+    <a href={image.src} class="figure-preview mq-focus-ring" aria-labelledby={`${id}-label ${id}-action`} data-figure-open>
+      <Image src={image} alt={alt} widths={[640, 960, 1440]} sizes="(min-width: 1024px) 65vw, 100vw" loading="lazy" />
+      <span id={`${id}-action`} class="sr-only">{reader.enlarge}</span>
+    </a>
+  </div>
+
+  <dialog class="figure-reader" aria-labelledby={`${id}-reader-title`} data-figure-reader>
+    <header class="reader-header">
+      <div>
+        <h3 id={`${id}-reader-title`} class="font-semibold">{label}</h3>
+        <p class="text-sm text-muted-foreground">{reader.original} · {hardware}</p>
+      </div>
+      <form method="dialog">
+        <button type="submit" class="mq-btn-outline" autofocus>{reader.close}</button>
+      </form>
+    </header>
+    <div class="reader-tools">
+      <button type="button" class="mq-btn-outline mq-btn-compact" aria-pressed="false" data-figure-zoom data-zoom-label={reader.zoom} data-fit-label={reader.fit}>{reader.zoom}</button>
+      <a href={image.src} target="_blank" rel="noopener" class="reader-original mq-focus-ring">{reader.openOriginal} <span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="reader-viewport mq-focus-ring" tabindex="0" role="region" aria-label={reader.pan} data-figure-viewport>
+      <img src={image.src} alt={alt} width={image.width} height={image.height} loading="lazy" />
+    </div>
+    <p class="reader-hint text-sm text-muted-foreground">{reader.pan}</p>
+  </dialog>
+</figure>
+
+<style>
+  .benchmark-figure {
+    display: grid;
+    gap: 1.5rem;
+    padding-block: 2rem;
+    border-top: 1px solid var(--mq-border);
+    margin: 0;
+  }
+  .figure-notes { min-width: 0; }
+  .figure-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 2.75rem;
+    margin-top: 1rem;
+    color: var(--mq-primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: var(--mq-radius-small);
+  }
+  .figure-open:hover, .reader-original:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+  .figure-plate {
+    align-self: start;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--mq-border);
+    border-radius: var(--mq-radius-small);
+    /* Paper originals retain their white background, including in dark mode. */
+    background: white;
+  }
+  .figure-provenance {
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--mq-border);
+    background: var(--mq-surface);
+    color: var(--mq-text-muted);
+    font-size: 0.8125rem;
+  }
+  .figure-preview { display: block; padding: 0.75rem; cursor: zoom-in; }
+  .figure-preview img { display: block; width: 100%; height: auto; }
+  .figure-reader {
+    padding: 0;
+    width: min(90rem, calc(100% - 2rem));
+    max-width: none;
+    max-height: calc(100dvh - 2rem);
+    overflow: hidden;
+    border: 1px solid var(--mq-border);
+    border-radius: var(--mq-radius-control);
+    background: var(--mq-bg);
+    color: var(--mq-text);
+  }
+  .figure-reader[open] { display: flex; flex-direction: column; }
+  .figure-reader::backdrop { background: rgb(10 15 28 / 0.65); }
+  .reader-header, .reader-tools { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 1.25rem; }
+  .reader-header { border-bottom: 1px solid var(--mq-border); }
+  .reader-header form { flex-shrink: 0; }
+  .reader-tools { flex-wrap: wrap; padding-block: 0.75rem; }
+  .reader-original { color: var(--mq-primary); font-size: 0.875rem; border-radius: var(--mq-radius-small); }
+  .reader-viewport { min-height: 0; overflow: auto; background: white; overscroll-behavior: contain; }
+  .reader-viewport img { display: block; width: 100%; max-width: none; height: auto; }
+  .reader-viewport.is-zoomed img { width: max(100%, 90rem); }
+  .reader-hint { margin: 0; padding: 0.75rem 1.25rem; border-top: 1px solid var(--mq-border); }
+  :global(html.benchmark-reader-open) { overflow: hidden; }
+  @media (min-width: 1024px) {
+    .benchmark-figure { grid-template-columns: minmax(0, 1fr) minmax(0, 2.5fr); gap: 3rem; padding-block: 2.5rem; }
+  }
+  @media (max-width: 639px) {
+    .figure-reader { width: calc(100% - 1rem); max-height: calc(100dvh - 1rem); }
+    .reader-header, .reader-tools { padding-inline: 1rem; }
+    .figure-preview { padding: 0.375rem; }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>("[data-benchmark-figure]").forEach(figure => {
+    const dialog = figure.querySelector<HTMLDialogElement>("[data-figure-reader]")!;
+    const viewport = figure.querySelector<HTMLElement>("[data-figure-viewport]")!;
+    const zoom = figure.querySelector<HTMLButtonElement>("[data-figure-zoom]")!;
+    const setZoom = (enlarged: boolean) => {
+      viewport.classList.toggle("is-zoomed", enlarged);
+      zoom.setAttribute("aria-pressed", String(enlarged));
+      zoom.textContent = enlarged ? zoom.dataset.fitLabel! : zoom.dataset.zoomLabel!;
+      viewport.scrollTo(0, 0);
+    };
+    figure.querySelectorAll<HTMLAnchorElement>("[data-figure-open]").forEach(link => {
+      link.setAttribute("aria-haspopup", "dialog");
+      link.addEventListener("click", event => {
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        dialog.showModal();
+        setZoom(window.matchMedia("(max-width: 767px)").matches);
+        document.documentElement.classList.add("benchmark-reader-open");
+      });
+    });
+    zoom.addEventListener("click", () => setZoom(zoom.getAttribute("aria-pressed") !== "true"));
+    dialog.addEventListener("close", () => document.documentElement.classList.remove("benchmark-reader-open"));
+  });
+</script>
