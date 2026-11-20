@@ -220,6 +220,10 @@ const title = `${page.title} — ${messages.docsLabel}`;
   .docs-main div.math {
     min-width: 0;
   }
+  /* Preserve Sphinx's hidden accessibility layer without inflating the scrollport. */
+  .docs-main div.math mjx-container > mjx-assistive-mml {
+    height: 0;
+  }
   /* Article typography --------------------------------------------- */
   .docs-main article.bd-article,
   .docs-main .bd-article {

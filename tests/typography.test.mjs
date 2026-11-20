@@ -42,3 +42,11 @@ test('display math scrolls at the Sphinx block, not the MathJax glyph box or inl
   assert.match(mathRules[0][2], /max-width:\s*100%/)
   assert.ok(overflowRules.every(([, selectors]) => !selectors.includes('mjx-')))
 })
+
+test('assistive MathML retains Sphinx sizing without hiding it from accessibility tools', async () => {
+  const layout = await readFile(new URL('../src/layouts/DocsLayout.astro', import.meta.url), 'utf8')
+  const rule = layout.match(/\.docs-main div\.math mjx-container > mjx-assistive-mml\s*\{([^}]+)\}/)
+  assert.ok(rule)
+  assert.match(rule[1], /height:\s*0;/)
+  assert.doesNotMatch(rule[1], /display:\s*none|visibility:\s*hidden/)
+})
