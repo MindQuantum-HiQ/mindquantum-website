@@ -67,7 +67,7 @@
         </button>
         <button type="button" class="mq-btn mq-btn-ghost mq-btn-compact mq-dismiss" aria-label="${T.dismiss}" title="${T.dismiss}"><span class="mq-icon mq-icon-close" aria-hidden="true"></span></button>
       </div>`;
-    article.prepend(banner);
+    cells[0].input.closest('.cell').before(banner);
 
     const status = banner.querySelector('.mq-kernel-status');
     const activate = banner.querySelector('.mq-activate');

@@ -5,6 +5,7 @@ for (const [source, destination] of [
   ['tokens.css', 'mq-variables.css'],
   ['controls.css', 'mq-controls.css'],
   ['fonts.css', 'mq-fonts.css'],
+  ['typography.css', 'mq-typography.css'],
 ]) {
   const src = `src/styles/${source}`
   const css = await readFile(src, 'utf8')

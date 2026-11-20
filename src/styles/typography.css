@@ -1,0 +1,30 @@
+/* Shared by Astro and Sphinx; target prose, never MathJax internals. */
+:root { --mq-prose-line-height: 1.7; }
+:is(h1, h2, h3, h4) { text-wrap: balance; }
+html:lang(zh) {
+  --mq-prose-line-height: 1.75;
+  line-height: 1.75;
+}
+html:lang(zh) :is(h1, h2, h3, h4, h5, h6) {
+  line-height: 1.35;
+  letter-spacing: 0;
+  line-break: strict;
+}
+html:lang(zh) :is(p, li, dd, dt) { line-break: strict; }
+html:lang(zh) :is(.mq-page-title, .mq-section-title, .text-display-xl, .text-display-lg, .text-display-md) {
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0;
+}
+html:lang(zh) :is(.mq-page-title, .text-display-lg) {
+  font-size: clamp(1.875rem, 1.25rem + 2.2vw, 2.75rem);
+}
+html:lang(zh) :is(.mq-section-title, .text-display-md) {
+  font-size: clamp(1.625rem, 1.25rem + 1.5vw, 2.25rem);
+}
+html:lang(zh) .text-display-xl {
+  font-size: clamp(2rem, 1.5rem + 2.5vw, 3.5rem);
+}
+html:lang(zh) .mq-eyebrow { letter-spacing: 0.04em; }
+.mq-body { font-size: 1rem; line-height: var(--mq-prose-line-height); text-wrap: pretty; }
+.mq-caption { font-size: 0.8125rem; line-height: 1.6; }
