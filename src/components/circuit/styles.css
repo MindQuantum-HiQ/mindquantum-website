@@ -22,6 +22,7 @@ button, select, input { font: inherit; }
 .mqcb-row { display: contents; }
 .mqcb-header .mqcb-time { min-height: 1.5rem; text-align: center; color: var(--mq-text-muted); font: .8125rem var(--mq-font-mono); }
 .mqcb-cell { min-height: 48px; position: relative; }
+.mqcb-wirelabel, .mqcb-corner { position: sticky; left: 0; z-index: 3; background: var(--mq-surface); }
 .mqcb-wirelabel { display: flex; align-items: center; color: var(--mq-text-muted); font: .875rem var(--mq-font-mono); }
 .mqcb-drop { border: 1px solid transparent; border-radius: var(--mq-radius-small); transition: background-color var(--mq-transition); }
 .mqcb-drop:hover, .mqcb-drop.maybe { background: var(--mq-selected); }

@@ -8,10 +8,8 @@ export type ComposerMessages = {
   eyebrow: string;
   title: string;
   subtitle: string;
-  /* Honest framing for the future MindQuantum integration. Rendered as a
-     small note below the subtitle. Generating MindQuantum code from a
-     Composer circuit is on the roadmap, not a current capability — saying
-     so up-front is what makes Composer's independence legible. */
+  /* Export is a roadmap item, not a current capability. Keep this note
+     separate from the editor's current controls. */
   roadmapNote: string;
   qubits: string;
   measurementProbabilities: string;
@@ -46,7 +44,7 @@ export const COMPOSER_MESSAGES: Record<Lang, ComposerMessages> = {
     rotationGates: "Rotation gates",
     twoQubitGates: "Two-qubit gates",
     placementHint: "Drag a gate onto a wire to begin. Results update automatically.",
-    scrollHint: "Scroll horizontally to see all columns →",
+    scrollHint: "↔ Scroll horizontally to see all columns",
     canvasLabel: "Quantum circuit canvas",
     trashLabel: "Drag a placed gate here to remove it",
     emptyProbabilities: "Place a gate to calculate measurement probabilities.",
@@ -68,7 +66,7 @@ export const COMPOSER_MESSAGES: Record<Lang, ComposerMessages> = {
     rotationGates: "旋转门",
     twoQubitGates: "双比特门",
     placementHint: "将量子门拖到线路上即可开始，结果会自动更新。",
-    scrollHint: "左右滚动查看所有列 →",
+    scrollHint: "↔ 左右滚动查看所有列",
     canvasLabel: "量子电路画布",
     trashLabel: "将已放置的量子门拖到此处删除",
     emptyProbabilities: "放置量子门后，即可查看测量概率。",

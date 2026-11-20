@@ -188,7 +188,9 @@ class QuantumCircuitElement extends HTMLElement {
     // Header row (time indices)
     const header = document.createElement("div");
     header.className = "mqcb-row mqcb-header";
-    header.appendChild(document.createElement("div")); // empty corner
+    const corner = document.createElement("div");
+    corner.className = "mqcb-corner";
+    header.appendChild(corner);
     for (let t = 0; t < this.circuit.columns.length; t++) {
       const h = document.createElement("div");
       h.className = "mqcb-cell mqcb-time";
