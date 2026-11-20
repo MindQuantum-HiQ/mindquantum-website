@@ -5,8 +5,10 @@ import type { Circuit, GatePlacement, GateType } from "../../lib/circuit/model";
 import controlStyles from "../../styles/controls.css?inline";
 import circuitStyles from "./styles.css?inline";
 import { createEmptyCircuit, ensureColumns, addGate, removeGateById, moveGateById, validatePlacement, serializeCircuit } from "../../lib/circuit/model";
-import { GATE_REGISTRY, type GateDef } from "../../lib/circuit/gates";
+import { GATE_REGISTRY } from "../../lib/circuit/gates";
 import { isRotationGate, rotationAngle, createRotationPlacement, type RotationGateType } from "../../lib/circuit/model";
+import { COMPOSER_MESSAGES, type ComposerMessages } from "../../locales/composer";
+import type { Lang } from "../../config/i18n";
 
 type RunResult = {
   statevector?: { re: number[]; im: number[] };
@@ -23,37 +25,41 @@ const DEFAULT_COLUMNS = 12;
 // into the shadow stylesheet; semantic tokens inherit from the site root.
 const TEMPLATE_STYLES = `<style>${controlStyles}\n${circuitStyles}</style>`;
 
-const TEMPLATE_HTML = /* html */ `
+const templateHTML = (messages: ComposerMessages) => /* html */ `
   ${TEMPLATE_STYLES}
   <div class="mqcb-root" part="root">
     <div class="mqcb-topbar">
-      <div class="mqcb-palette" role="listbox" aria-label="Gate Palette">
-        <!-- palette gates injected -->
-      </div>
+      <h2 class="mqcb-subheading">${messages.gatePaletteLabel}</h2>
       <div class="mqcb-controls">
         <label>
-          <span class="mqcb-label" data-label="qubits">Qubits</span>
-          <select class="mqcb-qubits" aria-label="Qubits">
+          <span class="mqcb-label">${messages.qubits}</span>
+          <select class="mqcb-qubits">
             ${Array.from({ length: MAX_QUBITS - MIN_QUBITS + 1 }, (_, i) => MIN_QUBITS + i)
               .map((n) => `<option value="${n}">${n}</option>`)
               .join("")}
           </select>
         </label>
       </div>
+      <div class="mqcb-palette" role="group" aria-label="${messages.gatePaletteLabel}"></div>
+      <p class="mqcb-placement-hint">${messages.placementHint}</p>
     </div>
 
-    <div class="mqcb-canvas" tabindex="0" aria-label="Circuit Canvas" role="application">
+    <div class="mqcb-canvas" tabindex="0" aria-label="${messages.canvasLabel}" role="application">
       <!-- grid injected -->
     </div>
+    <p class="mqcb-scroll-hint">${messages.scrollHint}</p>
+    <div class="mqcb-trash">${messages.trashLabel}</div>
 
     <div class="mqcb-results" aria-live="polite">
       <div class="mqcb-results-body">
         <div class="mqcb-probs">
-          <div class="mqcb-subheading" data-label="probs">Measurement Probabilities</div>
+          <h2 class="mqcb-subheading">${messages.measurementProbabilities}</h2>
+          <p class="mqcb-results-empty">${messages.emptyProbabilities}</p>
           <div class="mqcb-problist"></div>
         </div>
         <div class="mqcb-state-section">
-          <div class="mqcb-subheading" data-label="state">State Vector</div>
+          <h2 class="mqcb-subheading">${messages.stateVector}</h2>
+          <p class="mqcb-results-empty">${messages.emptyStateVector}</p>
           <div class="mqcb-state"></div>
         </div>
         <div class="mqcb-error" hidden></div>
@@ -87,7 +93,6 @@ class QuantumCircuitElement extends HTMLElement {
 
   connectedCallback() {
     this.render();
-    this.applyLabels();
     // Worker disabled - using main thread for simulation
     // this.ensureWorker();
     this.bindEvents();
@@ -98,23 +103,13 @@ class QuantumCircuitElement extends HTMLElement {
   }
 
   private render() {
-    this.root.innerHTML = TEMPLATE_HTML;
+    this.root.innerHTML = templateHTML(this.messages);
     this.renderPalette();
     this.renderGrid();
   }
 
-  private applyLabels() {
-    const labels = {
-      qubits: this.getAttribute("data-label-qubits") || this.dataset.labelQubits || "Qubits",
-      probs: this.getAttribute("data-label-probs") || this.dataset.labelProbs || "Measurement Probabilities",
-      state: this.getAttribute("data-label-state") || this.dataset.labelState || "State Vector",
-    };
-    const q = this.root.querySelector<HTMLElement>('[data-label="qubits"]');
-    const pr = this.root.querySelector<HTMLElement>('[data-label="probs"]');
-    const st = this.root.querySelector<HTMLElement>('[data-label="state"]');
-    if (q) q.textContent = labels.qubits;
-    if (pr) pr.textContent = labels.probs;
-    if (st) st.textContent = labels.state;
+  private get messages() {
+    return COMPOSER_MESSAGES[this.lang as Lang];
   }
 
   private bindEvents() {
@@ -124,6 +119,16 @@ class QuantumCircuitElement extends HTMLElement {
 
     const canvas = this.qs<HTMLElement>(".mqcb-canvas");
     canvas.addEventListener("keydown", (e) => this.onCanvasKeyDown(e as KeyboardEvent));
+
+    const trash = this.qs<HTMLElement>(".mqcb-trash");
+    trash.addEventListener("dragover", (e) => {
+      if (this.selectedGateId) {
+        e.preventDefault();
+        trash.classList.add("over");
+      }
+    });
+    trash.addEventListener("dragleave", () => trash.classList.remove("over"));
+    trash.addEventListener("drop", (e) => this.onTrashDrop(e));
   }
 
   private qs<T extends Element>(sel: string): T {
@@ -136,36 +141,34 @@ class QuantumCircuitElement extends HTMLElement {
   private renderPalette() {
     const pal = this.qs<HTMLDivElement>(".mqcb-palette");
     pal.innerHTML = "";
-    const gates: GateDef[] = [
-      GATE_REGISTRY.H, 
-      GATE_REGISTRY.X, 
-      GATE_REGISTRY.Y, 
-      GATE_REGISTRY.Z, 
-      GATE_REGISTRY.S,
-      GATE_REGISTRY.T,
-      GATE_REGISTRY.RX,
-      GATE_REGISTRY.RY,
-      GATE_REGISTRY.RZ,
-      GATE_REGISTRY.CNOT,
-      GATE_REGISTRY.CZ,
-      GATE_REGISTRY.SWAP,
+    const families: { label: string; gates: GateType[] }[] = [
+      { label: this.messages.singleQubitGates, gates: ["H", "X", "Y", "Z", "S", "T"] },
+      { label: this.messages.rotationGates, gates: ["RX", "RY", "RZ"] },
+      { label: this.messages.twoQubitGates, gates: ["CNOT", "CZ", "SWAP"] },
     ];
-    for (const g of gates) {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = `mq-btn mq-btn-outline mq-btn-compact mqcb-gate mqcb-g-${g.type.toLowerCase()}`;
-      btn.textContent = g.label;
-      btn.setAttribute("role", "option");
-      btn.draggable = true;
-      btn.dataset.gate = g.type;
-      btn.title = g.title || g.label;
-      btn.addEventListener("dragstart", (e) => {
-        if (!e.dataTransfer) return;
-        e.dataTransfer.setData("application/x-mq-gate", g.type);
-        e.dataTransfer.setData("text/plain", g.type);
-        e.dataTransfer.effectAllowed = "copy";
-      });
-      pal.appendChild(btn);
+    for (const family of families) {
+      const group = document.createElement("div");
+      group.className = "mqcb-gate-family";
+      group.setAttribute("role", "group");
+      group.setAttribute("aria-label", family.label);
+      for (const type of family.gates) {
+        const g = GATE_REGISTRY[type];
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `mq-btn mq-btn-outline mq-btn-compact mqcb-gate mqcb-g-${g.type.toLowerCase()}`;
+        btn.textContent = g.label;
+        btn.draggable = true;
+        btn.dataset.gate = g.type;
+        btn.title = g.title || g.label;
+        btn.addEventListener("dragstart", (e) => {
+          if (!e.dataTransfer) return;
+          e.dataTransfer.setData("application/x-mq-gate", g.type);
+          e.dataTransfer.setData("text/plain", g.type);
+          e.dataTransfer.effectAllowed = "copy";
+        });
+        group.appendChild(btn);
+      }
+      pal.appendChild(group);
     }
   }
 
@@ -180,7 +183,7 @@ class QuantumCircuitElement extends HTMLElement {
     // Build grid
     const table = document.createElement("div");
     table.className = "mqcb-grid";
-    table.style.gridTemplateColumns = `auto repeat(${this.circuit.columns.length}, minmax(48px, 1fr))`;
+    table.style.gridTemplateColumns = `3rem repeat(${this.circuit.columns.length}, minmax(48px, 1fr))`;
 
     // Header row (time indices)
     const header = document.createElement("div");
@@ -231,30 +234,6 @@ class QuantumCircuitElement extends HTMLElement {
 
       table.appendChild(row);
     }
-
-    // Trash bin row
-    const trashRow = document.createElement("div");
-    trashRow.className = "mqcb-row mqcb-footer";
-    const trashLabel = document.createElement("div");
-    trashLabel.className = "mqcb-cell mqcb-wirelabel";
-    trashLabel.textContent = "";
-    trashRow.appendChild(trashLabel);
-    for (let t = 0; t < this.circuit.columns.length; t++) {
-      const cell = document.createElement("div");
-      cell.className = "mqcb-cell mqcb-trash";
-      cell.dataset.t = String(t);
-      cell.setAttribute("aria-label", "Trash Bin");
-      cell.addEventListener("dragover", (e) => {
-        if (this.selectedGateId) {
-          e.preventDefault();
-          cell.classList.add("over");
-        }
-      });
-      cell.addEventListener("dragleave", () => cell.classList.remove("over"));
-      cell.addEventListener("drop", (e) => this.onTrashDrop(e));
-      trashRow.appendChild(cell);
-    }
-    table.appendChild(trashRow);
 
     canvas.appendChild(table);
   }
@@ -410,7 +389,7 @@ class QuantumCircuitElement extends HTMLElement {
     this.root.querySelectorAll<HTMLElement>(`.mqcb-cell.mqcb-drop.maybe, .mqcb-cell.mqcb-drop.valid, .mqcb-cell.mqcb-drop.invalid`).forEach((c) => {
       c.classList.remove("maybe", "valid", "invalid", "over");
     });
-    this.root.querySelectorAll<HTMLElement>(`.mqcb-cell.mqcb-trash.over`).forEach((c) => c.classList.remove("over"));
+    this.root.querySelectorAll<HTMLElement>(`.mqcb-trash.over`).forEach((c) => c.classList.remove("over"));
   }
 
   private onCellDragOver(e: DragEvent) {
@@ -535,6 +514,7 @@ class QuantumCircuitElement extends HTMLElement {
 
   private onTrashDrop(e: DragEvent) {
     e.preventDefault();
+    this.clearDragHighlights();
     const dt = e.dataTransfer!;
     const moveId = dt.getData("application/x-mq-move");
     if (moveId) {
@@ -770,6 +750,7 @@ class QuantumCircuitElement extends HTMLElement {
     const errBox = this.qs<HTMLDivElement>(".mqcb-error");
     const probsList = this.qs<HTMLDivElement>(".mqcb-problist");
     const stateBox = this.qs<HTMLDivElement>(".mqcb-state");
+    this.root.querySelectorAll<HTMLElement>(".mqcb-results-empty").forEach((el) => { el.hidden = true; });
     if (res.error) {
       errBox.hidden = false;
       errBox.textContent = res.error.message;
@@ -788,7 +769,7 @@ class QuantumCircuitElement extends HTMLElement {
     const items = probs.map((p, i) => {
       const bit = i.toString(2).padStart(pad, "0");
       const pct = (p * 100).toFixed(2) + "%";
-      return `<div class="mqcb-prob"><code>${bit}</code><span class="bar" style="--w:${Math.max(1, p * 100)}%"></span><span class="val">${pct}</span></div>`;
+      return `<div class="mqcb-prob"><code>${bit}</code><span class="mqcb-prob-track"><span class="bar" style="--w:${p * 100}%"></span></span><span class="val">${pct}</span></div>`;
     });
     return items.join("");
   }
@@ -803,7 +784,7 @@ class QuantumCircuitElement extends HTMLElement {
     for (let i = 0; i < state.re.length; i++) {
       const re = fmt(state.re[i]);
       const im = fmt(state.im[i]);
-      parts.push(`<div class="mqcb-amp"><code>|${i.toString(2).padStart(Math.ceil(Math.log2(state.re.length)), "0")}\u27e9</code> = <span>${re} + ${im}i</span></div>`);
+      parts.push(`<div class="mqcb-amp"><code>|${i.toString(2).padStart(Math.ceil(Math.log2(state.re.length)), "0")}\u27e9</code><span>= ${re} + ${im}i</span></div>`);
     }
     return parts.join("");
   }

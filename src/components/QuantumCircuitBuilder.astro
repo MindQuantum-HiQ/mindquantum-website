@@ -1,18 +1,9 @@
 ---
-import { HOME_MESSAGES } from "../locales/home";
+import type { Lang } from "../config/i18n";
 
-const { lang = 'en', heading = 'Interactive Circuit' } = Astro.props as { lang?: string; heading?: string };
-const t = HOME_MESSAGES[lang as keyof typeof HOME_MESSAGES]?.builder;
-const labels = {
-  qubits: t?.qubits || 'Qubits',
-  measurementProbabilities: t?.measurementProbabilities || 'Measurement Probabilities',
-  stateVector: t?.stateVector || 'State Vector',
-};
+const { lang } = Astro.props as { lang: Lang };
 ---
-<section class="mq-circuit-section">
-  <h2 class="mq-circuit-heading">{heading}</h2>
-  <mq-circuit-builder lang={lang} data-label-qubits={labels.qubits} data-label-probs={labels.measurementProbabilities} data-label-state={labels.stateVector}></mq-circuit-builder>
-</section>
+<mq-circuit-builder lang={lang}></mq-circuit-builder>
 
 <script>
   // Import and register the custom element
@@ -20,7 +11,5 @@ const labels = {
 </script>
 
 <style>
-  .mq-circuit-section { margin: 2rem 0; }
-  .mq-circuit-heading { margin: 0 0 1rem; }
   mq-circuit-builder { display: block; width: 100%; }
 </style>

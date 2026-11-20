@@ -11,21 +11,30 @@ interface Props {
 const { lang, messages } = Astro.props as Props;
 ---
 
-<section class="relative overflow-hidden bg-hero-gradient">
-  <div class="mq-container py-8 md:py-16">
-    <p class="mq-eyebrow text-muted-foreground mb-4">{messages.eyebrow}</p>
-    <h1 class="mq-page-title mb-4">
-      {messages.title}
-    </h1>
-    <p class="text-base md:text-lg text-muted-foreground max-w-2xl leading-relaxed">
-      {messages.subtitle}
-    </p>
-    <p class="mt-4 mq-body text-muted-foreground max-w-2xl">
-      {messages.roadmapNote}
-    </p>
-  </div>
-</section>
+<div class="mq-container composer-workspace">
+  <header class="composer-intro">
+    <div>
+      <p class="mq-eyebrow mb-2">{messages.eyebrow}</p>
+      <h1 class="mq-page-title">{messages.title}</h1>
+    </div>
+    <p class="mq-body text-muted-foreground composer-summary">{messages.subtitle}</p>
+  </header>
 
-<section class="mq-container my-10">
-  <QuantumCircuitBuilder lang={lang} heading="" />
-</section>
+  <QuantumCircuitBuilder lang={lang} />
+  <p class="mq-caption text-muted-foreground composer-roadmap">{messages.roadmapNote}</p>
+</div>
+
+<style>
+  .composer-workspace { padding-top: 2rem; padding-bottom: 3rem; }
+  .composer-intro { display: grid; gap: 1rem; padding-bottom: 1.5rem; }
+  .composer-summary { max-width: 54ch; }
+  .composer-roadmap { margin-top: 1rem; }
+  @media (min-width: 768px) {
+    .composer-intro { grid-template-columns: 1fr 1fr; align-items: end; gap: 3rem; padding-bottom: 2rem; }
+  }
+  @media (max-width: 767px) {
+    .composer-workspace { padding: 1.5rem .75rem 2rem; }
+    .composer-intro { padding-inline: .5rem; }
+    .composer-roadmap { padding-inline: .5rem; }
+  }
+</style>
